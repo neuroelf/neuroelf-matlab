@@ -1,0 +1,78 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.POS files (Position Information file)
+# POS FileVersions supported: 1, 2, 3
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Position parameter files
+Extensions:pos
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+POS_ptypenoslc|1, 256      |regexpi |projecttype\:?\s*.mr\s*nrofslices
+POS_trans     |1, 256      |regexpi |translationx.*translationy.*translationz
+EndMagic
+
+# Field description
+ListOfFields:!
+type !cond               !field            !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion      !double  !%d     !1      !3       !FileVersion
+FLIST!                   !ProjectType      !string  !%s     !1      !FMR     !ProjectType
+FLIST!                   !NrOfSlices       !double  !%d     !1      !        !NrOfSlices
+FLIST!@FileVersion == 2  !TranslationX     !double  !%.6f   !1      !0       !TranslationX
+FLIST!@FileVersion == 2  !TranslationY     !double  !%.6f   !1      !0       !TranslationY
+FLIST!@FileVersion == 2  !TranslationZ     !double  !%.6f   !1      !0       !TranslationZ
+FLIST!@FileVersion == 3  !Slice1CenterX    !double  !%.6f   !1      !        !Slice1CenterX
+FLIST!@FileVersion == 3  !Slice1CenterY    !double  !%.6f   !1      !        !Slice1CenterY
+FLIST!@FileVersion == 3  !Slice1CenterZ    !double  !%.6f   !1      !        !Slice1CenterZ
+FLIST!@FileVersion == 3  !SliceNCenterX    !double  !%.6f   !1      !        !SliceNCenterX
+FLIST!@FileVersion == 3  !SliceNCenterY    !double  !%.6f   !1      !        !SliceNCenterY
+FLIST!@FileVersion == 3  !SliceNCenterZ    !double  !%.6f   !1      !        !SliceNCenterZ
+EXPRE!!!!!!!; # workaround for MATLAB 13 regexp bug
+FLIST!                   !RowDirX          !double  !%.6f   !1      !1       !RowDirX
+FLIST!                   !RowDirY          !double  !%.6f   !1      !0       !RowDirY
+FLIST!                   !RowDirZ          !double  !%.6f   !1      !0       !RowDirZ
+FLIST!                   !ColDirX          !double  !%.6f   !1      !0       !ColDirX
+FLIST!                   !ColDirY          !double  !%.6f   !1      !1       !ColDirY
+FLIST!                   !ColDirZ          !double  !%.6f   !1      !0       !ColDirZ
+FLIST!                   !MatrixRows       !double  !%d     !1      !        !MatrixRows
+FLIST!                   !MatrixCols       !double  !%d     !1      !        !MatrixCols
+FLIST!                   !FoVRows          !double  !%d     !1      !        !FoVRows
+FLIST!                   !FoVCols          !double  !%d     !1      !        !FoVCols
+FLIST!                   !SliceThickness   !double  !%.6f   !1      !        !SliceThickness
+FLIST!                   !GapThickness     !double  !%.6f   !1      !        !GapThickness
+FLIST!                   !CoordinateSystem !double  !%d     !1      !        !CoordinateSystem
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 3;
+@ProjectType = 'FMR';
+@NrOfSlices = 30;
+@Slice1CenterX = 0;
+@Slice1CenterY = 0;
+@Slice1CenterZ = -58;
+@SliceNCenterX = 0;
+@SliceNCenterY = 0;
+@SliceNCenterZ = 58;
+@RowDirX = 1;
+@RowDirY = 0;
+@RowDirZ = 0;
+@ColDirX = 0;
+@ColDirY = 1;
+@ColDirZ = 0;
+@MatrixRows = 64;
+@MatrixCols = 64;
+@FoVRows = 256;
+@FoVCols = 256;
+@SliceThickness = 4;
+@GapThickness = 0;
+@CoordinateSystem = 1;
+EndNewFileCode

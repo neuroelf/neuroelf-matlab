@@ -1,0 +1,68 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.TXT files (AVeraGing Text file)
+# DAT FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050315
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Event-related averaging table data files (*.txt)
+Extensions:avgt # bogus extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+AVGT_CurveLst |1, 16       |regexpi |\s+\"curve\s1\:\s
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# read only support
+EXPRE!$TFFWRITE!!!!!!error('Averaging Tables can only be read.');
+
+# get number of curves
+EXPRE!!!!!!!...
+@NrOfCurves = sum(linecont{linec} == '"') / 2; ...
+if @NrOfCurves < 1 || @NrOfCurves ~= fix(@NrOfCurves), ...
+    error('Bad AGVT file.'); ...
+end
+
+# get names of curves
+ARRAY!                   !CurveNames          !string  !"%s"   !1, @NrOfCurves! !CurveNames
+
+# get number of points
+EXPRE!!!!!!!...
+@NrOfCurvePoints = numel(linecont) - 1; ...
+@CurveData = zeros(@NrOfCurvePoints, @NrOfCurves);
+
+# read points
+EXPRE!!!!!!!...
+for pc = 1:@NrOfCurvePoints, ...
+    try, ...
+        @CurveData(pc, :) = str2num(regexprep(linecont{1 + pc}, '\"\d+\"', '')); ...
+    catch ne_eo; ...
+        neuroelf_lasterr(ne_eo); ...
+        clear ne_eo; ...
+        error('Bad AVGT file'), ...
+    end, ...
+end
+
+# go beyond end of file !
+EXPRE!!!!!!!linec = linecount + 1;
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfCurves = 0;
+@CurveNames = cell(1, 0);
+@NrOfCurvePoints = 0;
+@CurveData = [];
+EndNewFileCode

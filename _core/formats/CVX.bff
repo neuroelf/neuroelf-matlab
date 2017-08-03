@@ -1,0 +1,81 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.CVX and *.CSX (CoVariance/Cross-Spectral eXtension files)
+# CVX FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:CoVariance eXtension files,Cross-Spectral eXtension files
+EncodingSyntax:ieee-le
+Extensions:cvx,csx
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# parse header
+FIELD !                       !uint32  !double  !1, 1                     !1       !FileVersion
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSourceTCFile      # e.g. *.ctc, *.mtc
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSourceCCFile      # e.g. *.ccc, *.srf
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSignals
+EXPRE !$BFFWRITE          !!!!!@SignalSources = @SignalSources - 1;
+FIELD !                       !uint32  !double  !1, @NrOfSignals          !        !SignalSources           # references to SourceTC/SourceCC file
+EXPRE !                   !!!!!@SignalSources = @SignalSources + 1;
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTrials
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSelectedFrequencies # 0 for CVX, > 0 for CSX
+FIELD !                       !single  !double  !1, @NrOfSelectedFrequencies !     !SelectedFrequencies
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfLatencies
+FIELD !                       !single  !double  !1, 1                     !        !LatencyOffset
+FIELD !                       !single  !double  !1, 1                     !        !LatencyStepsize
+FIELD !                       !single  !double  !1, 1                     !        !OriginalSamplingFrequency
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSkippedTrials
+EXPRE !$BFFWRITE          !!!!!@SkippedTrials = @SkippedTrials - 1;
+FIELD !                       !uint32  !double  !1, @NrOfSkippedTrials    !        !SkippedTrials           # from Protocol Parameters (art. rejection)
+EXPRE !                   !!!!!@SkippedTrials = @SkippedTrials + 1;
+EXPRE !                   !!!!!$CovDim = [@NrOfSignals, @NrOfSignals];
+EXPRE !$BFFREAD           !!!!!@CovarianceData = []; @CovarianceReal = []; @CovarianceImag = [];
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 8 * (1 + (@NrOfSelectedFrequencies > 0)) * prod($CovDim), 0); rulec = 999;
+
+# for wide-band data (no frequency selection on time courses -> cvx)
+BLOOP !@NrOfSelectedFrequencies < 1 ! ! !1 ! !IsCVX
+FIELD !                       !double  !double  !$CovDim                  !        !CovarianceData
+ELOOP !                       ! ! !  ! !IsCVX
+
+# for narrow-band data (frequency selection on tfd -> csx)
+BLOOP !@NrOfSelectedFrequencies > 0 ! ! !1 ! !IsCSX
+FIELD !                       !double  !double  !$CovDim                  !        !CovarianceReal
+FIELD !                       !double  !double  !$CovDim                  !        !CovarianceImag
+ELOOP !                       ! ! !  ! !IsCSX
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NameOfSourceTCFile = '<none>';
+@NameOfSourceCCFile = '<none>';
+@NrOfSignals = 1;
+@SignalSources = 1;
+@NrOfTrials = 1;
+@NrOfSelectedFrequencies = 0;
+@SelectedFrequencies = zeros(1, 0);
+@NrOfLatencies = 1;
+@LatencyOffset = 0;
+@LatencyStepsize = 1;
+@OriginalSamplingFrequency = 400;
+@NrOfSkippedTrials = 0;
+@SkippedTrials = zeros(1, 0);
+@CovarianceData = 1;
+@CovarianceReal = [];
+@CovarianceImag = [];
+EndNewFileCode

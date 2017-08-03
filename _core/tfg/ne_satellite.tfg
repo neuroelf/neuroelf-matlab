@@ -1,0 +1,81 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf GUI satellite
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:39 PM EST
+Figure:   NeuroElf satellite window
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI (satellite)
+
+% Copyright (c) 2010, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+rtag    |]sprintf('BS%06x_', floor(2^24 * rand(1, 1)))
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                               |Tag                          |Page|CallbackClReq
+        |pixels|off    |$   -1   -1   528  528 |NeuroElf - satellite                |][tfgtv.rtag 'Figure']       |$ 1 |]['neuroelf_gui(''closesatwindow'', ''' tfgtv.rtag(1:8) ''');']
+---    END_FIGURE    ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                 |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|Page|RGroup|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+3 oblique slicing | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XImage     |$    6  266  256  256 |]zeros(256,256)                         |]['IM_' tfgtv.rtag 'Slice_SAG'] |||      ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |]['AX_' tfgtv.rtag 'Slice_SAG'] |||      ||     |      |      |       |       |off    |       |    |      ||||
+        |XImage     |$  260    0    0    0 |]zeros(256,256)                         |]['IM_' tfgtv.rtag 'Slice_COR'] |||      ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |]['AX_' tfgtv.rtag 'Slice_COR'] |||      ||     |      |      |       |       |off    |       |    |      ||||
+        |XImage     |$    0 -260    0    0 |]zeros(256,256)                         |]['IM_' tfgtv.rtag 'Slice_TRA'] |||      ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |]['AX_' tfgtv.rtag 'Slice_TRA'] |||      ||     |      |      |       |       |off    |       |    |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+coordinate boxes  | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$ -248  232  -48  -18 |X (mm):                                 |]['TX_' tfgtv.rtag 'TALX'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |0                                       |]['ED_' tfgtv.rtag 'TALX'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |Label      |$  -56  -28    0  -18 |Y (mm):                                 |]['TX_' tfgtv.rtag 'TALY'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |0                                       |]['ED_' tfgtv.rtag 'TALY'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |Label      |$  -56  -28    0  -18 |Z (mm):                                 |]['TX_' tfgtv.rtag 'TALZ'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |0                                       |]['ED_' tfgtv.rtag 'TALZ'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |Label      |$   64   56    0  -18 |X (vox):                                |]['TX_' tfgtv.rtag 'BVSX'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |128                                     |]['ED_' tfgtv.rtag 'BVSX'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |Label      |$  -56  -28    0  -18 |Y (vox):                                |]['TX_' tfgtv.rtag 'BVSY'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |128                                     |]['ED_' tfgtv.rtag 'BVSY'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |Label      |$  -56  -28    0  -18 |Z (vox):                                |]['TX_' tfgtv.rtag 'BVSZ'] |||           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   56    0    0  -24 |128                                     |]['ED_' tfgtv.rtag 'BVSZ'] |||           ||     |      |      |       |       |       |       |$1  |      ||||
+        |MultiEdit  |$ -176 -176  224 -168 |Values at cursor:                       |]['TX_' tfgtv.rtag 'SValues']||$ 9|      ||     |left  |      |       |       |       |       |$1  |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+zoomed/render image||                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XImage     |$    8    8  512  512 |]zeros(512,512)                         |]['IM_' tfgtv.rtag 'Slice_Zoom'] |||     ||     |      |      |       |       |off    |       |$2  |      ||||
+        |XAxes      |$    0    0    0    0 |                                        |]['AX_' tfgtv.rtag 'Slice_Zoom'] |||     ||     |      |      |       |       |off    |       |$2 3|      ||||
+        |XImage     |$   -8   -8 -528  528 |]zeros(528,528)                         |]['IM_' tfgtv.rtag 'Slice_Rend'] |||     ||     |      |      |       |       |off    |       |$4  |      ||||
+        |XAxes      |$    0    0    0    0 |                                        |]['AX_' tfgtv.rtag 'Slice_Rend'] |||     ||     |      |      |       |       |off    |       |$4  |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+---  END_UICONTROLS  ---

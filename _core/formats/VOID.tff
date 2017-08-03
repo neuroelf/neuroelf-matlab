@@ -1,0 +1,77 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for [VOI_Details].TXT files (VOI DETAILS)
+# VOI_Details FileVersions supported: (without subroi)
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:VOI details files (*.txt)
+Extensions:void # dummy extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+VOID_DETAILSFV|1, 64       |regexp  |^\s+DETAILS\s+FOR\s+VOI
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!                ROI DETAILS
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !RandomEffectsAnalysis!string !%s     !1      !        !RandomEffectsAnalysis
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !TypeOfStatistic     !string  !%s     !1      !        !TypeOfStatistic
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfVoxels          !double  !%d     !1      !        !NrOfVoxels
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !StatMinValue        !double  !%.6f   !1      !        !StatMinValue
+FLIST!                   !StatMaxValue        !double  !%.6f   !1      !        !StatMaxValue
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !AvgStatValue        !double  !%.6f   !1      !        !AvgStatValue
+FLIST!                   !AvgPValue           !double  !%.6f   !1      !        !AvgPValue
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !StatWeightedMass    !double  !%.6f   !1      !        !StatWeightedMass
+FLIST!                   !PWeightedMass       !double  !%.6f   !1      !        !PWeightedMass
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!ListOfVOIVoxels:
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!! x   y   z     StatValue     p
+WRTLN!!!!!!!----------------------------------------------
+
+# no writing yet
+EXPRE!$TFFWRITE     !!!!!!error('writing of ROI DETAILS file not yet supported');
+
+# loop over Voxels
+ARRAY!                   !VoxelData           !double  !%d     !@NrOfVoxels, 5 !!VoxelData
+
+# split data
+EXPRE!!!!!!!@VoxelCoords = @VoxelData(:, 1:3);
+EXPRE!!!!!!!@VoxelStats = @VoxelData(:, 4);
+EXPRE!!!!!!!@VoxelP = @VoxelData(:, 5);
+
+EndListOfFields
+
+NewFileCode:!
+@RandomEffectsAnalysis = 'no';
+@TypeOfStatistic = 't';
+@NrOfVoxels = 0;
+@StatMinValue = 0;
+@StatMaxValue = 999999;
+@AvgStatValue = 0;
+@AvgPValue = 1;
+@StatWeightedMass = 0;
+@PWeightedMass = 1;
+@VoxelData = zeros(0, 6);
+@VoxelCoords = zeros(0, 3);
+@VoxelStats = zeros(0, 1);
+@VoxelP = zeros(0, 1);
+EndNewFileCode

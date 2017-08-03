@@ -1,0 +1,49 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# TAR file format for *.TAR files (Tape ARchive)
+# TAR FileVersions supported: ustar
+#
+# See http://www.gnu.org/software/tar/manual/html_node/Standard.html for details
+
+# Version:  v1.1
+# Build:    16060314
+# Date:     Jun-03 2016, 2:20 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:TAR files (*.tar)
+EncodingSyntax:ieee-le
+Extensions:tar
+Magic:|
+name          |range       |type    |magic
+TAR_Magic     |258, 262    |hex     |75, 73, 74, 61, 72
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# no write support at the moment
+EXPRE !$BFFWRITE              !!!!!error('no write support');
+
+# use external reader !
+EXPRE !$BFFREAD               !!!!!...
+try, ...
+    t_obj = tario($FILENAME); ...
+    @@ = getcont(t_obj); ...
+    delete(t_obj); ...
+catch ne_eo; ...
+    rethrow(ne_eo); ...
+end
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@Name = cell(0, 1);
+@Type = zeros(0, 1);
+@HeadPos = zeros(0, 1);
+@ContPos = zeros(0, 1);
+@ContLen = zeros(0, 1);
+EndNewFileCode

@@ -1,0 +1,84 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.VWP files (VieWPoint)
+# VWP FileVersions supported: 1.0
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Viewpoint information files
+Extensions:vwp
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# header
+FIELD!                   !FileVersion         !double  !%.1f   !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+ARRAY!                   !AngleY              !double  !%.6f   !1, 1   !        !Camera.AngleY
+ARRAY!                   !AngleZ              !double  !%.6f   !1, 1   !        !Camera.AngleZ
+ARRAY!                   !AngleX              !double  !%.6f   !1, 1   !        !Camera.AngleX
+ARRAY!                   !CameraPositionY     !double  !%.6f   !1, 1   !        !Camera.PositionY
+ARRAY!                   !CameraPositionZ     !double  !%.6f   !1, 1   !        !Camera.PositionZ
+ARRAY!                   !CameraPositionXneg  !double  !%.6f   !1, 1   !        !Camera.PositionXneg
+ARRAY!                   !UnFlag1             !double  !%d     !1, 1   !        !UnFlag1
+ARRAY!                   !Light1On            !double  !%d     !1, 1   !        !Light1.On
+ARRAY!                   !Light1XDir          !double  !%.6f   !1, 1   !        !Light1.XDir
+ARRAY!                   !Light1YDir          !double  !%.6f   !1, 1   !        !Light1.YDir
+ARRAY!                   !Light1ZDir          !double  !%.6f   !1, 1   !        !Light1.ZDir
+ARRAY!                   !Light1Red           !double  !%.6f   !1, 1   !        !Light1.Red
+ARRAY!                   !Light1Green         !double  !%.6f   !1, 1   !        !Light1.Green
+ARRAY!                   !Light1Blue          !double  !%.6f   !1, 1   !        !Light1.Blue
+ARRAY!                   !Light2On            !double  !%d     !1, 1   !        !Light2.On
+ARRAY!                   !Light2XDir          !double  !%.6f   !1, 1   !        !Light2.XDir
+ARRAY!                   !Light2YDir          !double  !%.6f   !1, 1   !        !Light2.YDir
+ARRAY!                   !Light2ZDir          !double  !%.6f   !1, 1   !        !Light2.ZDir
+ARRAY!                   !Light2Red           !double  !%.6f   !1, 1   !        !Light2.Red
+ARRAY!                   !Light2Green         !double  !%.6f   !1, 1   !        !Light2.Green
+ARRAY!                   !Light2Blue          !double  !%.6f   !1, 1   !        !Light2.Blue
+ARRAY!                   !UnFlags2            !double  !%d     !4, 1   !        !UnFlags2
+ARRAY!                   !FOVAngle            !double  !%.6f   !1, 1   !        !FOVAngle
+ARRAY!                   !OrthoVolSize        !double  !%.6f   !1, 1   !        !OrthoVolSize
+ARRAY!                   !FrustrumDepthNear   !double  !%.6f   !1, 1   !        !Frustrum.DepthNear
+ARRAY!                   !FrustrumDepthFar    !double  !%.6f   !1, 1   !        !Frustrum.DepthFar
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@Camera.AngleY = 180;
+@Camera.AngleZ = 0;
+@Camera.AngleX = 0;
+@Camera.PositionY = 0;
+@Camera.PositionZ = 0;
+@Camera.PositionXneg = -500;
+@UnFlag1 = 3;
+@Light1.On = 1;
+@Light1.XDir = -0.813880;
+@Light1.YDir = -0.328211;
+@Light1.ZDir = 0.479454;
+@Light1.Red = 0.7;
+@Light1.Green = 0.7;
+@Light1.Blue = 0.7;
+@Light2.On = 1;
+@Light2.XDir = -0.809163;
+@Light2.YDir = -0.378832;
+@Light2.ZDir = -0.449156;
+@Light2.Red = 0.7;
+@Light2.Green = 0.7;
+@Light2.Blue = 0.7;
+@UnFlags2 = [6914; 7425; 1; 0];
+@FOVAngle = 30;
+@OrthoVolSize = 166.666666;
+@Frustrum.DepthNear = 1;
+@Frustrum.DepthFar = 1200;
+EndNewFileCode

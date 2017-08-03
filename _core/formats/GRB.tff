@@ -1,0 +1,46 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.GRB files (GRadient and B-values information)
+# GRB FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Gradients
+Description:Gradient and b-values files
+Extensions:grb
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+GRB_IncludeBV |1, 48       |regexp  |\s+IncludeBValues\:\s*
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !IncludeBValues      !string  !%s     !1      !yes     !IncludeBValues
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfEntries = size(@Gradients, 1);
+FIELD!                   !NrOfEntries         !double  !%d     !1      !1       !NrOfEntries
+EXPRE!              !!!!!!if any('jy' == @IncludeBValues(1)), $dim2 = 4; else, $dim2 = 3; end
+WRTLN!$dim2 == 3    !!!!!!X	Y	Z
+WRTLN!$dim2 == 4    !!!!!!X	Y	Z	b
+ARRAY!                   !Gradients           !double!%.7f !@NrOfEntries,$dim2 !!Gradients
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@IncludeBValues = 'yes';
+@NrOfEntries = 1;
+@Gradients = [0, 0, 0, 1000];
+EndNewFileCode

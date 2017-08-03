@@ -1,0 +1,63 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf image satellite
+
+Version:  1.0
+Build:    14121713
+Date:     Dec-17 2014, 1:39 PM EST
+Figure:   NeuroElf image satellite window
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI (image satellite)
+
+% Copyright (c) 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+rtag    |]sprintf('IS%06x_', floor(2^24 * rand(1, 1)))
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                               |Tag                          |Page|CallbackClReq
+        |pixels|off    |$   -1   -1   512  512 |NeuroElf - image satellite          |][tfgtv.rtag 'Figure']       |$ 1 |]['neuroelf_gui(''closesatwindow'', ''' tfgtv.rtag(1:8) ''');']
+---    END_FIGURE    ---
+
+---    BEGIN_MENU    ---
+Comment |Level |Enabled |Checked |Separator |EGroups|VGroups|Caption     |Accelerator |Tag                          |Callback
+        |      |        |        |          |       |       |                       | |                             |
+        |$1    |        |        |          |       |       |File                   | |]['UIM_' tfgtv.rtag 'FILE']  |
+        |$ 2   |        |        |          |       |       |Load Image             | |]['UIM_' tfgtv.rtag 'LoadImage']|
+---     END_MENU     ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                 |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|Page|RGroup|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+zoomed/render image||                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XImage     |$    0    0  512  512 |]zeros(512,512)                         |]['IM_' tfgtv.rtag 'Image']|||           ||     |      |      |       |       |off    |       |    |      ||||
+        |XAxes      |$    0    0    0    0 |                                        |]['AX_' tfgtv.rtag 'Image']|||           ||     |      |      |       |       |off    |       |    |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+---  END_UICONTROLS  ---

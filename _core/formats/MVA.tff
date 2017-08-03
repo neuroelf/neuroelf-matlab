@@ -1,0 +1,54 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# NeuroElf file format for *.MVA files (Multi-VOI Analysis)
+# MDM FileVersions supported: 1,2,3
+#
+# Version:  v1.1
+# Build:    16012321
+# Date:     Jan-23 2016, 9:50 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Multi-VOI Analysis files
+Extensions:mva
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+MVA_NRGSIG    |1, 512      |regexpi |nrofglobalsignalfiles\:\s*\d+
+EndMagic
+
+# Field description
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# pre-set on read
+EXPRE!$TFFREAD      !!!!!!eval(tffspec.NewFileCode);
+
+# file version
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+
+# global header fields
+FIELD!                   !ComputationType     !string  !%s     !1      !        !Computation
+FIELD!                   !TCTransform         !string  !%s     !1      !        !TCTransform
+WRTLN!!!!!!!!  # empty line
+
+# file numbers
+FIELD!                   !NrOfTCFiles         !double  !%d     !1      !        !NrOfTCFiles
+
+# files
+ARRAY!                   !TCFiles             !string  !"%s"   !@NrOfTCFiles, 1!!TCFiles
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@ComputationType = 'rmatrix';
+@TCTransform = 'psc';
+@NrOfTCFiles = 0;
+@TCFiles = cell(0, 1);
+EndNewFileCode

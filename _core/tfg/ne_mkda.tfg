@@ -1,0 +1,189 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - MKDA dialog
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:26 PM EST
+Figure:   NeuroElf GUI - MKDA dialog
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - MKDA dialog
+
+% Copyright (c) 2011, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                 |Tag                        |CallbackClReq
+        |pixels|off    |$   -1   -1  920  518  |NeuroElf GUI - MKDA                   |Wnd_NeuroElf_MKDA          |
+---    END_FIGURE    ---
+
+
+--- BEGIN_VARIABLES  ---
+VarName   |VarContent
+condoper  |]{'equals'; 'doesn''t equal'; 'is less than'; 'is less or equal'; 'is greater than'; 'is greater or equal'}
+maskname  |]{'colin_brain_ICBMnorm.vmr'; '<select HDR/MSK/VMR file>'}
+resolution|]{'1'; '2'; '3'; '4'; '5'; '6'}
+---  END_VARIABLES   ---
+
+---    BEGIN_MENU    ---
+Comment |Level |Enabled |Checked |Separator |EGroups|VGroups|Caption     |Accelerator |Tag                          |Callback
+        |      |        |        |          |       |       |                       | |                             |
+Main menu ->
+
+  File ->
+        |$1    |        |        |          |       |       |&File                  | |UIM_NeuroElf_MKDA_FILE       |
+        |$2    |        |        |          |       |       |Load PLP...            |o|UIM_NeuroElf_MKDA_Load       |
+        |$2    |        |        |          |       |       |Import PLP...          |i|UIM_NeuroElf_MKDA_Import     |
+        |$2    |        |        |          |PLPOK  |       |Save PLP...            |s|UIM_NeuroElf_MKDA_Save       |
+        |$2    |        |        |          |PLPOK  |       |Save PLP as...         |a|UIM_NeuroElf_MKDA_SaveAs     |
+        |$2    |        |        |on        |PLPOK  |       |Run MKDA...            |r|UIM_NeuroElf_MKDA_Run        |
+        |$2    |        |        |on        |       |       |Close dialog           |x|UIM_NeuroElf_MKDA_Close      |
+
+  Options ->
+        |$1    |        |        |          |       |       |&Options               | |UIM_NeuroElf_MKDA_OPT        |
+        |$2    |        |        |          |       |       |Apply mask to results       | |UIM_NeuroElf_MKDA_OPT_mskr   |
+        |$2    |off     |        |on        |       |       |Contrast computation        | |UIM_NeuroElf_MKDA_OCNT       |
+        |$2    |        |        |          |       |       |Plain difference (A - B)                      | |UIM_NeuroElf_MKDA_OCNT_diff|
+        |$2    |        |        |          |       |       |Set voxels to 0 where both A > 0 and B > 0    | |UIM_NeuroElf_MKDA_OCNT_excl|
+        |$2    |        |on      |          |       |       |Set voxels to 0 where both A > T and B > T    | |UIM_NeuroElf_MKDA_OCNT_wex |
+        |$2    |        |        |          |       |       |Set relative exclusion weight... (T = 0.5)    | |UIM_NeuroElf_MKDA_OCNT_swex|
+        |$2    |off     |        |on        |       |       |Group map computation       | |UIM_NeuroElf_MKDA_OGRP       |
+        |$2    |        |        |          |       |       |Plain sum                                     | |UIM_NeuroElf_MKDA_OGRP_sum |
+        |$2    |        |on      |          |       |       |Weighted sum                                  | |UIM_NeuroElf_MKDA_OGRP_wsum|
+        |$2    |off     |        |on        |       |       |Join within-unit blobs      | |UIM_NeuroElf_MKDA_OJBM       |
+        |$2    |        |        |          |       |       |Use maximum value                             | |UIM_NeuroElf_MKDA_OJBM_max |
+        |$2    |        |on      |          |       |       |Use restricted sum                            | |UIM_NeuroElf_MKDA_OJBM_rsum|
+        |$2    |        |on      |on        |       |       |Keep individual (unit) maps | |UIM_NeuroElf_MKDA_OPT_imap   |
+        |$2    |off     |        |on        |       |       |Points-per-study weighting  | |UIM_NeuroElf_MKDA_OWPS       |
+        |$2    |        |on      |          |       |       |]'Don''t use additional weights'              | |UIM_NeuroElf_MKDA_OWPS_none|
+        |$2    |        |        |          |       |       |Use confidence guess (see MKDA method help)   | |UIM_NeuroElf_MKDA_OWPS_conf|
+        |$2    |        |        |          |       |       |Use log(number of points)                     | |UIM_NeuroElf_MKDA_OWPS_log |
+        |$2    |        |        |          |       |       |Use number of points                          | |UIM_NeuroElf_MKDA_OWPS_npts|
+        |$2    |        |        |          |       |       |Use sqrt(number of points)                    | |UIM_NeuroElf_MKDA_OWPS_sqrt|
+        |$2    |        |on      |on        |       |       |Separate VMP with group maps| |UIM_NeuroElf_MKDA_OPT_svmp   |
+        |$2    |off     |        |on        |       |       |Spatial null hypothesis     | |UIM_NeuroElf_MKDA_OSPN       |
+        |$2    |        |on      |          |       |       |Sample from full mask (all voxels)            | |UIM_NeuroElf_MKDA_OSPN_full|
+        |$2    |        |        |          |       |       |]'Sample within given coordinates'' vicinity' | |UIM_NeuroElf_MKDA_OSPN_near|
+        |$2    |        |on      |on        |       |       |Unique points within unit   | |UIM_NeuroElf_MKDA_OPT_uniq   |
+
+  Visualize ->
+        |$1    |        |        |          |PLPOK  |       |&Visualize             | |UIM_NeuroElf_MKDA_VIS        |
+        |$2    |        |        |          |       |       |Slice based plot       |l|UIM_NeuroElf_MKDA_PSlice     |
+        |$2    |        |        |          |       |       |Surface based plot     |f|UIM_NeuroElf_MKDA_PSurf      |
+        |$2    |        |        |on        |       |       |Set color based on column||UIM_NeuroElf_MKDA_PSetColor |
+        |$2    |        |        |on        |       |       |Label points by column (none)||UIM_NeuroElf_MKDA_PSetLabel|
+        |$2    |        |        |          |       |       |Set label color        | |UIM_NeuroElf_MKDA_PSetLColor |
+        |$2    |        |        |          |       |       |Set marker edge color  | |UIM_NeuroElf_MKDA_PSetBColor |
+---     END_MENU     ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                 |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Value|MinMaxTop|ToolTip
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$   12  490   30   18 |PLP:                                      |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   36   -4  222  -24 |<no PLP loaded>                           |DD_NeuroElf_MKDA_PLPs   |$ 9 |left  |      |       |PLPOK  |      |     |         |Use to select one of the loaded/imported PLPs
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$  -36  -26  250  -18 |Study selection:                          |                        |    |left  |      |       |       |      |     |         |
+        |ListBox    |$    0 -330  254 -330 |empty                                     |LB_NeuroElf_MKDA_studies|$ 9 |      |      |       |PLPOK  |      |     |$ 0 2 1  |Selection of studies to include in the analysis
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$    0  -30  250  -18 |Column selection:                         |                        |    |left  |      |       |PLPOK  |      |     |         |
+        |ListBox    |$    0  -88  254  -88 |empty                                     |LB_NeuroElf_MKDA_columns|$ 9 |      |      |       |PLPOK  |      |     |$ 0 2 1  |Selection of columns to display in the points list
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Frame      |$  262   -6   -1  510 |                                          |                        |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$    8  484   72  -18 |Analyses:                                 |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   80   -4  416  -24 |<no analyses defined>                     |DD_NeuroElf_MKDA_anas   |$ 9 |left  |      |off    |HasAnas|      |     |         |Use to select one of the configured analyses
+        |Button     |$  422    6   18  -18 |]imread([neuroelf_path('icons') '/plus.tif'])  |BT_NeuroElf_MKDA_addana||center|      |       |       |      |     |         |Click to add a new analysis
+        |Button     |$   28    0    0    0 |]imread([neuroelf_path('icons') '/minus.tif']) |BT_NeuroElf_MKDA_delana||center|      |off    |HasAnas|      |     |         |Click to remove the currently selected analysis
+        |Button     |$   28   -2   72  -24 |Rename                                    |BT_NeuroElf_MKDA_renana |$ 9 |center|      |off    |HasAnas|      |     |         |Clear to rename the currently selected analysis
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -558  -30   72  -18 |Contrast:                                 |                        |    |left  |      |       |       |      |     |         |
+        |Edit       |$   84    0  344  -26 |<not yet specified>                       |ED_NeuroElf_MKDA_cont   |$ 9 |      |      |       |PLPOK  |      |     |         |Edit contrast terms (add a > to indicate a differential contrast)
+        |Label      |$  352    0   20  -18 |in                                        |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   20   -4  176  -24 |<no columns>                              |DD_NeuroElf_MKDA_contcol|$ 9 |      |      |       |PLPOK  |      |     |         |Select a column that contains the contrast information
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -456  -26  428  -18 |Condition particles:                      |                        |    |left  |      |       |       |      |     |         |
+        |ListBox    |$    0 -116    0 -116 |none                                      |LB_NeuroElf_MKDA_conds  |$ 9 |      |      |       |PLPOK  |      |     |$ 0 2 1  |List of conditional statements
+        |Button     |$  432   96   20  -20 |]imread([neuroelf_path('icons') '/plus.tif'])  |BT_NeuroElf_MKDA_addcnd||center|      |       |PLPOK  |      |     |         |Click to add a new condition particle
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/back.tif'])  |BT_NeuroElf_MKDA_setcnd||center|      |       |PLPOK  |      |     |         |Click to replace selected condition particle
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/trash.tif']) |BT_NeuroElf_MKDA_delcnd||center|      |       |PLPOK  |      |     |         |Click to remove the selected particles
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/paren.tif']) |BT_NeuroElf_MKDA_addpar||center|      |       |PLPOK  |      |     |         |Click to add a set of parantheses around the selected particles
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/xparen.tif'])|BT_NeuroElf_MKDA_delpar||center|      |       |PLPOK  |      |     |         |Click to remove a set of parantheses from around the selected particles
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$   26  116 -164    0 |  additional particle                     |                        |    |left  |      |       |       |      |     |         |
+        |Radiobutton|$   24  -18   64  -18 |and ...                                   |RB_NeuroElf_MKDA_cndand |    |      |      |       |PLPOK  |CondOP|$ 1  |         |
+        |Radiobutton|$   68    0  -80    0 |or ...                                    |RB_NeuroElf_MKDA_cndor  |    |      |      |       |PLPOK  |CondOP|$ 0  |         |
+        |DropDown   |$  -92  -26  176  -24 |<no columns>                              |DD_NeuroElf_MKDA_cndcol |$ 9 |      |      |       |PLPOK  |      |     |         |
+        |DropDown   |$    0  -24    0    0 |]tfgtv.condoper                           |DD_NeuroElf_MKDA_cndoper|$ 9 |      |      |       |PLPOK  |      |     |         |
+        |DropDown   |$    0  -24    0    0 |<value>                                   |DD_NeuroElf_MKDA_cndop2s|$ 9 |      |      |       |PLPOK  |      |     |         |
+        |Edit       |$    0  -24 -170    0 |<value>                                   |ED_NeuroElf_MKDA_cndop2m|$ 9 |      |      |       |PLPOK  |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -458  -30   72  -18 |Weighting:                                |                        |    |left  |      |       |       |      |     |         |
+        |Edit       |$   84    0  344  -26 |]'sqrt($N)'                               |ED_NeuroElf_MKDA_weights|$ 9 |      |      |       |PLPOK  |      |     |         |Edit weighting formula (for each point)
+        |Label      |$  352    0   60  -18 |Stat. unit:                               |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   64   -4  132  -24 |<no columns>                              |DD_NeuroElf_MKDA_stdcol |$ 9 |      |      |       |PLPOK  |      |     |         |Select the column that represents the statistical unit
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -500  -26  604  -18 |Selected points: (selecting has no effect!)|TX_NeuroElf_MKDA_points|    |left  |      |       |       |      |     |         |
+        |Checkbox   |$  610    2  -18    0 |]' '                                      |CB_NeuroElf_MKDA_selpts |$ 9 |      |      |       |PLPOK  |      |$ 1  |         |Show only selected points
+        |ListBox    |$ -610 -118  604 -116 |none                                      |LB_NeuroElf_MKDA_points |$ 9 |      |      |       |PLPOK  |      |     |$ 0 2 1  |Selection of points (manual selection has no effect!)
+        |Button     |$  608   96   20  -20 |]imread([neuroelf_path('icons') '/plus.tif'])  |BT_NeuroElf_MKDA_addcol||center|      |       |PLPOK  |      |     |         |Click to add a new column to the PLP object
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/minus.tif']) |BT_NeuroElf_MKDA_delcol||center|      |       |PLPOK  |      |     |         |Click to remove a column from the PLP object
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/props.tif']) |BT_NeuroElf_MKDA_editpt||center|      |       |PLPOK  |      |     |         |Click to edit the selected point (or add a point)
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/down.tif'])  |BT_NeuroElf_MKDA_setcol||center|      |       |PLPOK  |      |     |         |Click to set a value of one column for the selected points
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/trash.tif']) |BT_NeuroElf_MKDA_delpts||center|      |       |PLPOK  |      |     |         |Click to remove the selected points
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Frame      |$ -612   -6  638   -1 |                                          |                        |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$    4  -28   72  -18 |Settings:                                 |                        |    |left  |      |       |       |      |     |         |
+        |Edit       |$   84    0   64  -24 |5000                                      |ED_NeuroElf_MKDA_iter   |$ 9 |center|      |       |PLPOK  |      |     |         |Number of iterations for simulation
+        |Label      |$   72    0  172  -18 |simulation iterations within              |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$  180   -4  208  -24 |]tfgtv.maskname                           |DD_NeuroElf_MKDA_mask   |$ 9 |      |      |       |PLPOK  |      |     |         |Select a mask file for spatial scrambling and data masking
+        |Label      |$  216    4  120  -18 |spatial mask                              |                        |    |left  |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -552  -30   72  -18 |Resolution:                               |                        |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   80   -4   72  -24 |]tfgtv.resolution                         |DD_NeuroElf_MKDA_res    |$ 9 |      |      |       |PLPOK  |      |$ 3  |         |Resolution of target map (VMP)
+        |Label      |$   76    4   72  -18 |mm, using                                 |                        |    |left  |      |       |       |      |     |         |
+        |Radiobutton|$   76    0   88  -18 |indicator                                 |RB_NeuroElf_MKDA_scindic|    |left  |      |       |PLPOK  |Scale |     |         |Select to use indicator spheres (0/1 values) for blobs
+        |Radiobutton|$   88    0    0    0 |gaussian                                  |RB_NeuroElf_MKDA_scgauss|    |left  |      |       |PLPOK  |Scale |$ 1  |         |Select to use gaussian kernels (scaled to max := 1) for blobs
+        |Label      |$   88    0   96  -18 |spheres with a                            |                        |    |left  |      |       |       |      |     |         |
+        |Edit       |$  102    0   48  -24 |12.0                                      |ED_NeuroElf_MKDA_smkern |$ 9 |center|      |       |PLPOK  |      |     |         |Sphere/kernel size in mm
+        |Label      |$   54    0   80  -18 |mm radius                                 |                        |    |left  |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Label      |$ -564  -30  144  -18 |Null hypothesis is:                       |                        |    |left  |      |       |       |      |     |         |
+        |Radiobutton|$  152    0   72  -18 |spatial                                   |RB_NeuroElf_MKDA_spatnul|    |left  |      |       |PLPOK  |SUNull|$ 1  |         |Select to use a spatial scrambling as null distribution (spatial specificity)
+        |Radiobutton|$   80    0  -88    0 |unit labels                               |RB_NeuroElf_MKDA_unitnul|    |left  |      |       |PLPOK  |SUNull|     |         |Select to use a label-permutation as null distribution (functional specificity)
+        |Label      |$  110    0  168  -18 |sphere tapering off starts at             |                        |    |left  |      |       |       |      |     |         |
+        |Edit       |$  168    0   48  -24 |0.0                                       |ED_NeuroElf_MKDA_smkdist|$ 9 |center|      |off    |Gauss  |      |     |         |Distance from kernel center where tapering off begins (0 = standard kernel)
+        |Label      |$   54    0   80  -18 |mm                                        |                        |    |left  |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Frame      |$ -568   -6  638   -1 |                                          |                        |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+        |Button     |$    4  -30  160  -26 |Close MKDA dialog                         |BT_NeuroElf_MKDA_closeui|    |center|      |       |       |      |     |         |Closes this dialog
+        |Button     |$  270    0 -192    0 |Run current analysis                      |BT_NeuroElf_MKDA_runana |    |center|      |       |PLPOK  |      |     |         |Run the currently selected analysis
+        |Button     |$  200    0 -160    0 |Run all analyses                          |BT_NeuroElf_MKDA_runanas|    |center|      |       |PLPOK  |      |     |         |Run all available analyses
+        |           |                      |                                          |                        |    |      |      |       |       |      |     |         |
+---  END_UICONTROLS  ---

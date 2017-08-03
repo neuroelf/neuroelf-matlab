@@ -1,0 +1,173 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.CCC files (Channel Coordinates Configuration)
+# CCC FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Channel coordinates configuration files
+EncodingSyntax:ieee-le
+Extensions:ccc
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# general header
+FIELD !                       !uint32  !double  !1, 1                     !1       !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfDataChannels
+FIELD !                       !uint32  !double  !1, @NrOfDataChannels     !        !DataChannelType      # 1: EEG, 2: MEG-MAG, 3:MEG-GRAD, 4: ICR, 5: POL
+FIELD !                       !cstring !cstring !@NrOfDataChannels, 1     !        !DataChannelLabel
+
+# reference channel info
+FIELD !                       !uint32  !double  !1, 1                     !        !ReferenceType        # 1: free, 2: csd, 3: avg, 4: unipolar, 5: bipolar
+FIELD !@ReferenceType == 4    !uint32  !double  !1, 1                     !        !RererenceChannels
+FIELD !@ReferenceType == 5    !uint32  !double  !1, @NrOfDataChannels     !        !RererenceChannels
+EXPRE !$BFFREAD && ~any([4, 5] == @ReferenceType) !!!!!@ReferenceChannels = [];
+
+# coordinates of data channels
+FIELD !                       !single  !double  !1, 3                     !        !CoordinateOrigin
+EXPRE !$BFFWRITE          !!!!!@DataCoordinates = @DataCoordinates';
+FIELD !                       !single  !double  !9, @NrOfDataChannels     !        !DataCoordinates
+EXPRE !                   !!!!!@DataCoordinates = @DataCoordinates';
+FIELD !                       !uint32  !double  !1, 1                     !        !UseSphericalCoords
+BLOOP !@UseSphericalCoords~=0 ! ! !1 ! !UseSPHC
+EXPRE !$BFFWRITE          !!!!!@SphericalCoords = @SphericalCoords';
+FIELD !                       !single  !double  !3, @NrOfDataChannels     !        !SphericalCoords
+EXPRE !                   !!!!!@SphericalCoords = @SphericalCoords';
+ELOOP !                       ! ! !  ! !UseSPHC
+EXPRE !$BFFREAD && @UseSphericalCoords == 0 !!!!!@SphericalCoords = zeros(@NrOfDataChannels, 3);
+
+# channel parameters
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfDataChannelParams
+FIELD !                       !uint32  !double  !1, @NrOfDataChannelParams!        !DataChannelParamType
+FIELD !                       !single  !double  !@NrOfDataChannelParams, @NrOfDataChannels ! !DataChannelParameter
+
+# basic transformations
+EXPRE !$BFFWRITE          !!!!!@NrOfTransformations = numel(@Transformation);
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTransformations
+BLOOP !                       ! ! !@NrOfTransformations ! !TrfNo
+EXPRE !$BFFWRITE          !!!!!@Transformation($TrfNo).Matrix = @Transformation($TrfNo).Matrix';
+FIELD !                       !single  !double  !4, 4                     !        !Transformation($TrfNo).Matrix
+EXPRE !                   !!!!!@Transformation($TrfNo).Matrix = @Transformation($TrfNo).Matrix';
+ELOOP !                       ! ! !  ! !TrfNo
+
+# virtual channel configurations
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVirtualConfigs
+EXPRE !$BFFREAD           !!!!!@VirtualConfig = emptystruct({ ...
+    'Name', 'NrOfVirtualChannels', 'VirtChannelType', 'VirtChannelLabel', ...
+    'ReferenceType', 'ReferenceChannels', 'CoordinateOrigin', 'Coordinates', ...
+    'UseSphericalCoords', 'SphericalCoords', 'NrOfChannelParams', 'ChannelParamType', ...
+    'ChannelParameter', 'NrOfTransformations', 'Transformations', 'InterpChannel'});
+
+# loop ...
+BLOOP !                       ! ! !@NrOfVirtualConfigs ! !VCNo
+FIELD !                       !cstring !cstring !1, 1                     !        !VirtualConfig($VCNo).Name
+
+# number, type, and label of channels
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).NrOfVirtualChannels
+EXPRE !                   !!!!!$NrVCC = @VirtualConfig($VCNo).NrOfVirtualChannels;
+FIELD !                       !uint32  !double  !1, $NrVCC                !        !VirtualConfig($VCNo).VirtChannelType
+FIELD !                       !cstring !cstring !$NrVCC, 1                !        !VirtualConfig($VCNo).VirtChannelLabel
+
+# virtual channel reference type / references
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).ReferenceType
+EXPRE !                   !!!!!$RefType = @VirtualConfig($VCNo).ReferenceType;
+FIELD !$RefType == 4          !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).RererenceChannels
+FIELD !$RefType == 5          !uint32  !double  !1, $NrVCC                !        !VirtualConfig($VCNo).RererenceChannels
+EXPRE !$BFFREAD && ~any([4, 5] == $RefType) !!!!!@VirtualConfig($VCNo).RererenceChannels = [];
+
+# coordinates of virtual channels
+FIELD !                       !single  !double  !1, 3                     !        !VirtualConfig($VCNo).CoordinateOrigin
+EXPRE !$BFFWRITE          !!!!!@VirtualConfig($VCNo).Coordinates = @VirtualConfig($VCNo).Coordinates';
+FIELD !                       !single  !double  !9, $NrVCC                !        !VirtualConfig($VCNo).Coordinates
+EXPRE !                   !!!!!@VirtualConfig($VCNo).Coordinates = @VirtualConfig($VCNo).Coordinates';
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).UseSphericalCoords
+BLOOP !@VirtualConfig($VCNo).UseSphericalCoords~=0 ! ! !1 ! !VCUseSPHC
+EXPRE !$BFFWRITE          !!!!!@VirtualConfig($VCNo).SphericalCoords = @VirtualConfig($VCNo).SphericalCoords';
+FIELD !                       !single  !double  !3, $NrVCC                !        !VirtualConfig($VCNo).SphericalCoords
+EXPRE !                   !!!!!@VirtualConfig($VCNo).SphericalCoords = @VirtualConfig($VCNo).SphericalCoords';
+ELOOP !                       ! ! !  ! !VCUseSPHC
+
+# channel parameters
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).NrOfChannelParams
+EXPRE !                   !!!!!$NrCP = @VirtualConfig($VCNo).NrOfChannelParams;
+FIELD !                       !uint32  !double  !1, $NrCP                 !        !VirtualConfig($VCNo).ChannelParamType
+FIELD !                       !single  !double  !$NrCP, $NrVCC            !        !VirtualConfig($VCNo).ChannelParameter
+
+# basic transformations
+EXPRE !$BFFWRITE          !!!!!@VirtualConfig($VCNo).NrOfTransformations = numel(@VirtualConfig($VCNo).Transformation);
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).NrOfTransformations
+EXPRE !                   !!!!!$NrTrf = @VirtualConfig($VCNo).NrOfTransformations;
+BLOOP !                       ! ! !$NrTrf ! !VCTrfNo
+EXPRE !$BFFWRITE          !!!!!@VirtualConfig($VCNo).Transformation($VCTrfNo).Matrix = @VirtualConfig($VCNo).Transformation($VCTrfNo).Matrix';
+FIELD !                       !single  !double  !4, 4                     !        !VirtualConfig($VCNo).Transformation($VCTrfNo).Matrix
+EXPRE !                   !!!!!@VirtualConfig($VCNo).Transformation($VCTrfNo).Matrix = @VirtualConfig($VCNo).Transformation($VCTrfNo).Matrix';
+ELOOP !                       ! ! !  ! !VCTrfNo
+
+# channel interpolation
+EXPRE !$BFFREAD           !!!!!@VirtualConfig($VCNo).InterpChannel = emptystruct({ ...
+    'Type', 'ValuesPerChannel', 'NrOfSourceChannels', 'SourceChannels', 'InterpValues'});
+BLOOP !                       ! ! !$NrVCC ! !VCCNo
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).InterpChannel($VCCNo).Type # 1: nearest neighbor, 2...N to be implemented
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).InterpChannel($VCCNo).ValuesPerChannel
+FIELD !                       !uint32  !double  !1, 1                     !        !VirtualConfig($VCNo).InterpChannel($VCCNo).NrOfSourceChannels
+EXPRE !                   !!!!!$VPIPS = @VirtualConfig($VCNo).InterpChannel($VCCNo).ValuesPerChannel;
+EXPRE !                   !!!!!$NrIPS = @VirtualConfig($VCNo).InterpChannel($VCCNo).NrOfSourceChannels;
+FIELD !                       !uint32  !double  !1, $NrIPS                !        !VirtualConfig($VCNo).InterpChannel($VCCNo).SourceChannels
+FIELD !                       !single  !double  !$VPIPS, $NrIPS           !        !VirtualConfig($VCNo).InterpChannel($VCCNo).InterpValues
+ELOOP !                       ! ! !  ! !VCCNo
+
+# end loop over virtual configurations
+ELOOP !                       ! ! !  ! !VCNo
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfDataChannels = 1;
+@DataChannelType = 5;
+@DataChannelLabel = {'Polygraphic channel'};
+@ReferenceType = 1;
+@ReferenceChannels = [];
+@CoordinateOrigin = [0, 0, 0];
+@DataCoordinates = zeros(1, 9);
+@UseSphericalCoords = 1;
+@SphericalCoords = [1, 0, 0];
+@NrOfDataChannelParams = 0;
+@DataChannelParamType = zeros(1, 0);
+@DataChannelParameter = zeros(0, 1);
+@NrOfTransformations = 0;
+@Transformations = emptystruct({'Matrix'});
+@NrOfVirtualConfigs = 1;
+@VirtualConfig.Name = 'Configuration copy';
+@VirtualConfig.NrOfVirtualChannels = 1;
+@VirtualConfig.VirtChannelType = 5;
+@VirtualConfig.VirtChannelLabel = {'Polygraphic channel copy'};
+@VirtualConfig.ReferenceType = 1;
+@VirtualConfig.ReferenceChannels = [];
+@VirtualConfig.CoordinateOrigin = [0, 0, 0];
+@VirtualConfig.Coordinates = zeros(1, 9);
+@VirtualConfig.UseSphericalCoords = 1;
+@VirtualConfig.SphericalCoords = [1, 0, 0];
+@VirtualConfig.NrOfChannelParams = 0;
+@VirtualConfig.ChannelParamType = zeros(1, 0);
+@VirtualConfig.ChannelParameter = zeros(0, 1);
+@VirtualConfig.NrOfTransformations = 0;
+@VirtualConfig.Transformations = {};
+@VirtualConfig.InterpChannel.Type = 1;
+@VirtualConfig.InterpChannel.ValuesPerChannel = 0;
+@VirtualConfig.InterpChannel.NrOfSourceChannels = 1;
+@VirtualConfig.InterpChannel.SourceChannels = 1;
+@VirtualConfig.InterpChannel.InterpValues = zeros(0, 1);
+EndNewFileCode

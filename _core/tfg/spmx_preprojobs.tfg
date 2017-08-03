@@ -1,0 +1,217 @@
+---  BEGIN_COMMENTS  ---
+
+spmx_preprojobs
+
+Version:  1.1
+Build:    16060816
+Date:     Jun-08 2016, 4:29 PM EST
+Figure:   NeuroElf - configure SPM preprocessing
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf - spmx_preprojobs.m
+
+% Copyright (c) 2010 - 2016, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position           |Title                                          |Tag                           |CallbackClReq
+        |pixels|off    |$ -1  -1  634  748 |NeuroElf - configure (SPM based) preprocessing |Wnd_NeuroElf_spmxprepro       |
+---    END_FIGURE    ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+nrmtypes|]{'Segment anatomical and apply determined parameters to all data';'Segment anatomical, then DARTEL c1/c2 files to template and apply flowfield';'Normalize anatomical image using (configurable) T1 template';'Normalize mean functional image using SPM''s EPI template'}
+---  END_VARIABLES   ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|Enabled|EGroups|Value|MinMaxTop|SliderStep|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |||||||||||||
+        |Label      |$   10  714  608   30 |]'1. select a subject folder (or pattern; last part=subject ID); 2. configure the subfolder and filename patterns; 3. hit search (and remove subjects not to be processed); 4. configure the required settings; 5. run the preprocessing'||    |left ||AllUIC |||||||
+        |Label      |$    0  -27  168  -18 |Subject folder pattern:                   |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  174    0  292  -24 | <either enter or browse...>              |ED_spmxprepro_sf       |$ 9 |left  |on     |AllUIC |||||||
+        |Button     |$  296    0  -74    0 |Browse...                                 |BT_spmxprepro_sf_browse|    |center|       |AllUIC |||||||
+        |Button     |$   76    0    0    0 |Search...                                 |BT_spmxprepro_sf_search|    |center|off    |FoldOK |||||||
+        |Label      |$ -546  -27  174  -18 |Anatomical subfolder pattern:             |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  174    0  140  -24 | anat*/*                                  |ED_spmxprepro_ap       |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$  148    0  144  -18 |Image filename pattern:                   |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  148    0  148  -24 | *.img, *.nii                             |ED_spmxprepro_afp      |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$ -470  -27  174  -18 |Functional subfolder pattern:             |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  174    0  140  -24 | fun*/run*                                |ED_spmxprepro_fp       |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$  148    0  144  -18 |Image filename pattern:                   |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  148    0  148  -24 | *.img, *.nii                             |ED_spmxprepro_ffp      |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$ -470  -27  174  -18 |Optional DTI subfolder pattern:           |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  174    0  140  -24 | dti*/scan*                               |ED_spmxprepro_dp       |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$  148    0  144  -18 |Image filename pattern:                   |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  148    0  148  -24 | *.img, *.nii                             |ED_spmxprepro_dfp      |$ 9 |left  |on     |AllUIC |||||||
+        |Label      |$ -470  -27  174  -18 |Display advanced options:                 |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  174    0   24  -24 |                                          |CB_spmxprepro_advanced |    |center|       |AllUIC |$ 0  ||||||
+        |Label      |$   30    0  266  -18 |Deselect subjects with VTCs already imported: |                   |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  266    0   24  -24 |                                          |CB_spmxprepro_dedouble |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$ -470  -27  174  -18 |Force data to single precision:           |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  174    0   24  -24 |                                          |CB_spmxprepro_single   |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   29    0  140  -18 |Brain-extract anatomical:                 |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  144    0  -24  -24 |                                          |CB_spmxprepro_bextract |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   29    0  138  -18 |Register to T1 template:                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  138    0  -24  -24 |                                          |CB_spmxprepro_reganat  |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   28    0   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cupx     |    |center|off    |       |$ 0  |||||Remove "x..." brain-extracted files after preprocessing|
+        |           |                      |||||||||||||
+        |Frame      |$ -596   -4  624   -1 |||||||||||||
+        |Label      |$    4  -27  100  -18 |Subjects found:                           |                       |    |left  |       |AllUIC |||||||
+        |Label      |$  104    0  210  -18 |(0 subject folders)                       |TX_spmxprepro_subffound|    |left  |       |AllUIC |||||||
+        |Label      |$  216    0 -148    0 |Skip volumes per run:                     |                       |    |right |       |AllUIC |||||||
+        |Dropdown   |$  158   -2   64  -24 |0                                         |DD_spmxprepro_skipvols |$ 9 |right |       |AllUIC |||||||
+        |Label      |$   64    2   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cupk     |    |center|       |AllUIC |$ 1  |||||Remove "k..." volume-skipped files after preprocessing|
+        |ListBox    |$ -592 -112 -592 -108 |empty                                     |LB_spmxprepro_sf_found |$ 9 |left  |off    |FoldOK |     ||||||
+        |Button     |$  598    1   20  -20 |][neuroelf_path('icons') '/trash.tif']    |BT_spmxprepro_delsubj  |    |center|off    |FilesOK|     ||||||
+        |           |                      |||||||||||||
+        |Frame      |$ -602   -5  624   -1 |||||||||||||
+        |Label      |$    4  -27  140  -18 |Slice-Timing settings:                    |                       |    |left  |       |AllUIC |||||||
+        |Label      |$  344    0 -162    0 |Perform slice-timing:                     |                       |    |right |       |AllUIC |||||||
+        |Checkbox   |$  170    0   24  -24 |                                          |CB_spmxprepro_st       |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   28    0   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cupa     |    |center|       |AllUIC |$ 1  |||||Remove "a..." slice-time corrected files after preprocessing|
+        |Label      |$ -592  -27  168  -18 |Slice acquisition order:                  |                       |    |left  |       |AllUIC |||||||
+        |DropDown   |$  174   -2  160  -24 |1,3,5, ... 2,4,6, ...                     |DD_spmxprepro_sto      |$ 9 |left  |off    |FilesOK|     ||||||
+        |Checkbox   |$  166    2  -24    0 |                                          |CB_spmxprepro_stom     |    |center|       |AllUIC |$ 0  ||||||
+        |Label      |$   30    0  -64  -18 |Edit order:                               |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$   64    0  184  -24 | <pre-specified>                          |ED_spmxprepro_stol     |$ 9 |left  |off    |AllUIC |||||||
+        |Label      |$ -434  -27   40  -18 |TR:                                       |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$   48    0   60  -24 |]'2.000'                                  |ED_spmxprepro_sttr     |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   88    0   40  -18 |TA:                                       |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$   44    0   76  -24 |<auto>                                    |ED_spmxprepro_stta     |$ 9 |center|off    |AllUIC |||||||
+        |Label      |$   92    0   64  -18 |auto-TA:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   68    0  -24  -24 |                                          |CB_spmxprepro_sttaa    |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   30    0   56  -18 |Ref-slice:                                |                       |    |left  |       |AllUIC |||||||
+        |DropDown   |$   60   -2   76  -24 |1                                         |DD_spmxprepro_str      |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   82    2   32  -18 |MUX:                                      |                       |    |left  |off    |AllUIC |||||||
+        |DropDown   |$   40   -2   72  -24 |1                                         |DD_spmxprepro_mux      |$ 9 |center|off    |       |||||||
+        |           |                      |||||||||||||
+        |Frame      |$ -556   -2  624   -1 |||||||||||||
+        |Label      |$    4  -27  172  -18 |Realignment settings:                     |                       |    |left  |       |AllUIC |||||||
+        |DropDown   |$  174   -2  450  -24 |]{'Coregister mean (+ other) functional(s) to anatomical';'Coregister anatomical to mean functional'} |DD_spmxprepro_regtype     |$ 9 |center||AllUIC |$ 1 ||||||
+        |Label      |$ -174  -25  176  -18 |Quality (accuracy trade-off):             |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  180    0   72  -24 |0.9                                       |ED_spmxprepro_rqual    |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   80    0  120  -18 |Sampling grid (mm):                       |                       |    |left  |       |AllUIC |||||||
+        |Edit       |$  124    0   72  -24 |3                                         |ED_spmxprepro_rsep     |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   82    0  120  -18 |To-mean (2-pass):                         |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$  126    0   24  -24 |                                          |CB_spmxprepro_rrtm     |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$ -592  -27  174  -18 |Spline interpolation degree:              |                       |    |left  |       |AllUIC |||||||
+        |DropDown   |$  174   -2   64  -24 |2                                         |DD_spmxprepro_rinterpe |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   64    2   72  -18 |(estimation)                              |                       |    |left  |       |AllUIC |||||||
+        |DropDown   |$   72   -2   64  -24 |4                                         |DD_spmxprepro_rinterpr |$ 9 |center|       |AllUIC |||||||
+        |Label      |$   64    2   64  -18 |(reslicing)                               |                       |    |left  |       |AllUIC |||||||
+        |Label      |$   92    0   48  -18 |Reslice:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   48    0   24  -24 |                                          |CB_spmxprepro_reslice  |    |center|       |AllUIC |$ 1  ||||||
+        |Label      |$   28    0   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cupr     |    |center|       |AllUIC |$ 1  |||||Remove "r..." resliced (realigned) files after preprocessing|
+        |           |                      |||||||||||||
+        |Frame      |$ -596   -4  624   -1 |||||||||||||
+        |Label      |$    4  -27  168  -18 |Normalization settings:                   |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  174   -2  450  -24 |]tfgtv.nrmtypes                           |DD_spmxprepro_nrmtype  |$ 9 |center|       |AllUIC |$ 1  |||||select the type of normalization to template space|
+        |Label      |$ -174  -25  172  -18 |T1 anatomical template:                   |                       |    |left  |off    |NrT1   |     ||||||
+        |Edit       |$  180    0  362  -24 |T1.nii                                    |ED_spmxprepro_t1temp   |$ 9 |left  |off    |NrT1   |     |||||filename of selected T1 template|
+        |Button     |$  370    0  -70    0 |Browse...                                 |BT_spmxprepro_t1_browse|    |center|off    |NrT1   |     |||||click to select the T1 template used for normalization|
+        |Label      |$ -550  -27  176  -18 |Normalization bounding box:               |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  180    0  254  -24 |]'[-84, -114, -66 ; 84, 84, 90]'          |ED_spmxprepro_wbb      |$ 9 |left  |       |AllUIC |     |||||normalization bounding box|
+        |Label      |$  262    0  104  -18 |Resolution (mm):                          |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  106   -2   76  -24 |3.0                                       |DD_spmxprepro_wvox     |$ 9 |center|       |AllUIC |     |||||select the voxel size that is used when normalized functional data is resliced|
+        |Label      |$ -548  -25  176  -18 |Write normalized anatomical:              |                       |    |left  |       |NrANA  |     ||||||
+        |Checkbox   |$  180    0   24  -24 |                                          |CB_spmxprepro_writesn  |$ 9 |center|       |NrANA  |$ 1  |||||write out a normalized anatomical file (e.g. for data overlay or averaging)|
+        |Label      |$   48    0  268  -18 |Normalize each of the EPI runs separately:|                       |    |right |off    |NrEPI  |     ||||||
+        |Checkbox   |$  286    0   24  -24 |                                          |CB_spmxprepro_nrmsess  |$ 9 |center|off    |NrEPI  |$ 0  |||||check if you would like to normalize each fMRI session separately (only for EPI-template normalization)|
+        |Label      |$   28    0   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cupw     |    |center|       |AllUIC |$ 1  |||||Remove "w..." normalized files after preprocessing|
+        |           |                      |||||||||||||
+        |Frame      |$ -596   -4  624   -1 |||||||||||||
+        |Label      |$    4  -27  144  -18 |Smoothing kernel (mm):                    |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  180    0   64  -24 |6.0                                       |ED_spmxprepro_smk      |$ 9 |center|       |AllUIC |     |||||smoothing kernel in millimeters|
+        |Label      |$  164    0  160  -18 |Perform smoothing:                        |                       |    |right |       |AllUIC |     ||||||
+        |Checkbox   |$  170    0   24  -24 |                                          |CB_spmxprepro_sm       |$ 9 |center|       |AllUIC |$ 1  |||||perform smoothing as part of preprocessing|
+        |Label      |$   28    0   54  -18 |cleanup:                                  |                       |    |left  |       |AllUIC |||||||
+        |Checkbox   |$   50    0   24  -24 |                                          |CB_spmxprepro_cups     |    |center|       |AllUIC |$ 0  |||||Remove "s..." smoothed files after preprocessing|
+        |           |                      |||||||||||||
+        |Frame      |$ -596   -4  624   -1 |||||||||||||
+        |Label      |$    4  -27  160  -18 |Run fmriquality (pre/post):               |                       |    |left  |       |AllUIC |     ||||||
+        |Checkbox   |$  180    0   24  -24 |                                          |CB_spmxprepro_fquality |$ 9 |center|       |AllUIC |$ 1  |||||compute fMRI quality measures on raw functional data|
+        |Checkbox   |$   26    0    0    0 |                                          |CB_spmxprepro_fqualvtc |$ 9 |center|       |DoVTCs |$ 1  |||||compute fMRI quality measures on VTC files|
+        |Label      |$   56    0  176  -18 |create VTCs after realignment:            |                       |    |left  |       |AllUIC |     ||||||
+        |Checkbox   |$  184    0   24  -24 |                                          |CB_spmxprepro_reavtc   |$ 9 |center|       |AllUIC |$ 0  |||||create VTC files after realignment (motion correction, but no normalization and smoothing)|
+        |Label      |$   34    0  112  -18 |after preprocessing:                      |                       |    |left  |       |AllUIC |     ||||||
+        |Checkbox   |$  112    0   24  -24 |                                          |CB_spmxprepro_autovtc  |$ 9 |center|       |AllUIC |$ 1  |||||create VTC files after full preprocessing (incl. normalization and smoothing)|
+        |Label      |$ -592  -27  160  -18 |VTC filename pattern:                     |                       |    |left  |       |DoVTCs |     ||||||
+        |Edit       |$  180    0  292  -24 |%s/%s_RUN%02d_MNI.vtc                     |ED_spmxprepro_vtcfpat  |$ 9 |center|       |DoVTCs |     |||||VTC output filename pattern|
+        |Label      |$  302    0   64  -18 |first index:                              |                       |    |left  |       |DoVTCs |     ||||||
+        |Edit       |$   70    0   64  -24 |1                                         |ED_spmxprepro_vtcfidx  |$ 9 |center|       |DoVTCs |     |||||enter the number that will be placed into the VTC filenames|
+        |           |                      |||||||||||||
+        |Frame      |$  636    4    1  740 |||||||||||||
+        |           |                      |||||||||||||
+        |Label      |$  644  720  300   18 |Advanced temporal filtering options:      |                       |    |left  |       |AllUIC |     ||||||
+        |Label      |$    0  -33    0    0 |Raw data (detection and artefact reduction) |                     |    |left  |       |AllUIC |     ||||||
+        |Frame      |$   -2    0  312   -1 |||||||||||||
+        |Label      |$    2  -27  300  -18 |HPF prior to noise detection:             |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'none';'linear detrend only';'240-second cutoff';'180-second cutoff';'120-second cutoff';'90-second cutoff';'60-second cutoff';'30-second cutoff'} |DD_spmxprepro_afrawtf |$9|left|off|AdvFl1|$ 5|||||apply a high-pass filtering prior to detecting noisy samples|
+        |Label      |$ -160  -25  240  -18 |Noise threshold (number of STDevs):       |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  246    0   60  -24 |]'3.0'                                    |ED_spmxprepro_afstdsnt |$ 9 |center|off    |AdvFl1 |     |||||Number of standard deviations for which to consider a sample as noise|
+        |Label      |$ -246  -27  160  -18 |Replace noise in time series:             |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'leave data as is';'with interpolated data';'with fitted data'} |DD_spmxprepro_afrepln|$9|left||AllUIC|$ 1|||||replace noisy time points in the raw data with either interpolated data or a smooth estimate of data without noise|
+        |Frame      |$ -162   -4  312   -1 |||||||||||||
+        |           |                      |||||||||||||
+        |Label      |$    2  -27  300  -18 |Advanced spatial+temporal filtering options: |                    |    |left  |       |AllUIC |     ||||||
+        |Label      |$    0  -33    0    0 |Subject-space VTC files (masking/filtering) |                     |    |left  |       |AllUIC |     ||||||
+        |Frame      |$   -2    0  312   -1 |||||||||||||
+        |Label      |$    2  -27 -160  -18 |Mask blood vessel voxels:                 |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'leave data as is';'within vessel atlas';'throughout the brain'} |DD_spmxprepro_afvessp|$9|left||AllUIC|$ 1|||||spatial selection of where to replace vessel voxels|
+        |Label      |$ -160  -25  240  -18 |Temporal STDev threshold (per cent):      |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  246    0   60  -24 |]'3.0'                                    |ED_spmxprepro_afvesstd |$ 9 |center|off    |AdvFl2 |     |||||Number of standard deviations for which to consider a voxel a potential big vessel|
+        |Label      |$ -246  -27  240  -18 |Extract WM+CSF global signal components:  |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  246    0   60  -24 |]'6'                                      |ED_spmxprepro_afgsigpcs|$ 9 |center|on     |AllUIC |     |||||Number of global signal principal components to estimate from white matter (WM) and cerebro-spinal fluid (CSF) voxels, set to 0 to disable|
+        |Label      |$ -246  -27  276  -18 |Regress out WM+CSF global signal components: |                    |    |left  |       |AllUIC |     ||||||
+        |Checkbox   |$  280    0   24  -24 |                                          |CB_spmxprepro_afgsigssr|$ 9 |center|       |AllUIC |$ 0  |||||Regress global signal PCs out of subject-space data|
+        |Label      |$ -280  -27  160  -18 |Apply temporal HPF:                       |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'none';'linear detrend only';'240-second cutoff';'180-second cutoff';'120-second cutoff';'90-second cutoff';'60-second cutoff';'30-second cutoff'} |DD_spmxprepro_afssptf |$9|left||AllUIC|$ 1|||||apply a high-pass filtering as part of the preprocessing|
+        |Label      |$ -160  -25  240  -18 |Apply temporal smoothing (FWHM secs):     |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  246    0   60  -24 |]'0.0'                                    |ED_spmxprepro_afsslpf  |$ 9 |center|       |AllUIC |     |||||Temporal smoothing of subject-space VTC data (FWHM in seconds Gaussian kernel)|
+        |Label      |$ -246  -27  160  -18 |Apply transformation:                     |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'none';'% signal change';'z transform'} |DD_spmxprepro_afsstrans|$ 9 |left  |       |AllUIC |$ 1  |||||apply a transformation to the time courses|
+        |Label      |$ -160  -25  200  -18 |Replace ".vtc" in filename with:          |                       |    |left  |       |AllUIC |     ||||||
+        |Edit       |$  206    0  100  -24 |]'_filtered.vtc'                          |ED_spmxprepro_afssvtcfp|$ 9 |center|       |AllUIC |     |||||Filename extension replacement pattern (to avoid overwriting files)|
+        |Frame      |$ -208   -4  312   -1 |||||||||||||
+        |           |                      |||||||||||||
+        |Label      |$    2  -39  300  -18 |Template-space VTC files (masking/filtering): |                   |    |left  |       |AllUIC |     ||||||
+        |Frame      |$   -3    0  312   -1 |||||||||||||
+        |Label      |$    2  -27 -160  -18 |Apply spatial mask to VTC:                |                       |    |left  |       |AllUIC |     ||||||
+        |DropDown   |$  160   -2  152  -24 |]{'none';'GM only';'GM+WM'}               |DD_spmxprepro_aftssmask|$ 9 |left  |       |AllUIC |$ 1  |||||apply a spatial mask to the group-space VTC|
+        |           |                      |||||||||||||
+        |Button     |$   12    8   74   24 |Cancel                                    |BT_spmxprepro_cancel   |    |center|       |AllUIC |     |||||close dialog without further action|
+        |XProgress  |$    0    1 -612    0 |x: SPM preprocessing progress             |PB_spmxprepro_progress |$ 9 |left  |on     |       |     |        |$[ 1, 24]  |$ 0.9 0.3 0.2 |$ 0.6 0.1 0.1 |progress indicator|
+        |Button     |$   96   -1 -108    0 |Load config                               |BT_spmxprepro_loadcfg  |    |center|       |AllUIC |     |||||load configuration|
+        |Button     |$  114    0    0    0 |Save config                               |BT_spmxprepro_savecfg  |    |center|       |AllUIC |     |||||save configuration|
+        |Button     |$  132    0    0    0 |Create jobs                               |BT_spmxprepro_createjob|    |center|off    |FilesOK|     |||||only create the jobs variable|
+        |Button     |$  114    0 -160    0 |Create and run jobs...                    |BT_spmxprepro_candrjob |    |center|off    |FilesOK|     |||||create the jobs variable *and* feed into spm_jobman.m|
+        |           |                      ||||||||
+---  END_UICONTROLS  ---

@@ -1,0 +1,13 @@
+This file represents a relatively unordered list of changes and additions that
+are yet to be implemented into NeuroElf
+
+ - High priority
+
+   - check aft_SliceToTransimg with alpha settings
+
+ - Mid priority
+
+   - general clean-up of class code
+   - ND histogram (histcountn) based clustering (compute peak in ND, then compute
+     distances from peak, select points closest to peak, remove from dataset, repeat)
+

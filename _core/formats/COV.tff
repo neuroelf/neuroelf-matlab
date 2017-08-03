@@ -1,0 +1,38 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.COV files (COVariates)
+# COV FileVersions supported: ?
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Covariates
+Description:Covariate files
+Extensions:cov
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+COV_Header    |1, 64       |regexp  |^NrOfSubjectRows:\s*\d+\s+NrOfCovariateColumns:\s*\d+
+EndMagic
+
+# Field description
+ListOfFields:!
+type !cond               !field            !datatype!format !dim    !default !varname
+FIELD!                   !NrOfSubjectRows  !double  !%d     !1      !        !NrOfSubjectRows
+FIELD!                   !NrOfCovariateColumns !double !%d  !1      !        !NrOfCovariateColumns
+ARRAY!                   !Covariates       !double  !%d     !@NrOfSubjectRows, @NrOfCovariateColumns ! !Covariates
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@NrOfSubjectRows = 0;
+@NrOfCovariateColumns = 1;
+@Covariates = zeros(0, 1);
+EndNewFileCode

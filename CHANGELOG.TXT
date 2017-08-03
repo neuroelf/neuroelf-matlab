@@ -1,0 +1,83 @@
+This file describes, in reverse order, important changes made to the toolbox.
+For a more comprehensive list, please check out
+
+http://neuroelf.net/wiki/doku.php?id=neuroelf_changelog
+
+Changes made since version 1.0 (after September 14, 2014)
+ - global signal can now be regressed out in the GLM beta plotter (invoked from a VMP)
+ - robust weights for RFX-based t- and r-maps (contrast manager) can be stored in output VMP
+
+Changes made since release v0.9d  (after March 13, 2014)
+ - instantaneous VTC seed-correlation
+ - SPM-based preprocessing now has DARTEL, file cleanup, and configuration saving/loading options
+ - added the @neuroelf class as method interface (to reduce the number of visible M-files)
+ - findfiles options can now be given as shorthands: f = findfiles(D, P, '-d1D');
+ - all MEX files are now precompiled for currently supported platforms
+ - libSVM was updated to v3.18
+ - added SMP::ComputeFormula (also to GUI)
+ - more flexible formatting of the cluster table output in the GUI (File -> Options)
+ - added support for resizing the main GUI, and size changes are faster
+ - the GUI now displays map type and DF in the VMP map list
+ - tool to average anatomical scans completed
+ - preliminary support for RSA added (non-normalized VTCs in GLMs, t-maps instead of betas)
+ - option to export a VMR into an RGB-NIftI file for RGB drawing
+
+Changes made since release v0.9c (after April 29, 2011)
+ - completed the rendering engine with statistical overlay and RGB-volume rendering
+ - added SVC (small-volume correction) to the GUI
+ - making using of Chris Rorden's DICOM-to-NIftI conversion tool, dcm2nii, as an option
+ - auto-detection of Unicode files for asciiread
+ - if exactly two statistical maps are shown, a maximally-distance hue can be chosen for the overlap
+ - better support for compressed NIftI files
+ - importing SPM t-Maps also imports available RPV information for smoothness estimates
+ - preprocessing GUI now gives the option to brain-extract the anatomical scans
+ - full-brain onset-locked average time-courses can be created with MDM::VTCCondAverage
+ - model-comparison function (modelcomp) to allow flexible F-testing of models
+ - added support for Vince Calhoun's HRFboost method
+ - computation of auto-regression (lagged) correlation in cov_nd
+ - improvements for sub-clustering (taking the distance of voxels to the peak into account)
+ - the contrast manager now also allows to compute maps "per group" instead of comparing groups
+ - multiple-filetype selection in xff constructor with file = xff('*.(glm|vmp)'); pattern
+ - added remote-control capabilities for the GUI via HTTP/webbrowser link
+ - performance improvement for renamedicom function, read all first, then write out
+ - MDM::ComputeGLM also supports 4D NIftIs direction (instead of VTCs)
+ - new functions to estimate smoothness of data (mapestsmooth) and residuals (resestsmooth)
+ - added fixed-effects support to MDM::ComputeGLM
+ - MKDA analysis added to GUI (implementation in PLP::MKDA)
+ - several keyboard shortcuts added to GLM beta plotter
+ - new function allowing to concatenate partially matching structs (catstruct)
+ - AutoSave field in RunTimeVars of objects added to ensure consistency of information
+ - PRT (protocol) files now allow mulitple parameters per condition
+ - preliminary support for BrainVoyager-style ANOVAs in mrmanova and GLM::Anova
+ - new feature to "concatenate" series of 3D NIftIs with h = xff('path/pattern*.nii');
+
+Changes made since release v0.9b (after June 15, 2010)
+ - added support to display two anatomical datasets "overlaid" (underlay option)
+ - exporting BrainVoyager formats into 4D NIftI (GLM, VMP, VTC, etc.)
+ - option to plot a confidence ellipse over a beta plotter (scatter view)
+ - VOI-based event-related averaging plots (MDM::VOICondAverage)
+ - new function to convert activation-cluster MAT files (TW code) to VMPs, ac2vmp
+ - conversion of regular to single-trial PRTs
+ - added backwards compatibility with scripts for BVQXtools (using BVQXfile and isBVQXfile)
+ - conversion from and to TAL is now done with icbm2tal and tal2icbm using DCT-based transform
+ - implementation of Stouffer's Z added in function stoufferz
+ - added (single-level) mediation GUI (implementation in mediationpset)
+ - new function to regress data against as many models, mmregress
+ - colorspace conversion function hsvconv added (MEX)
+ - RunTimeVars now keeps track of discarded volumes for VTCs
+ - added rendering capabilities to the GUI
+ - neuroelf_gui function split into sub-functions in different files to simplify editing
+ - new function, neuroelf_makefiles, to create a more feature-rich base dataset
+ - added high-quality, manual segmentation of Colin brain to archive
+ - faster marching-cubes algorithm for direct-border reconstruction of VMRs
+ - function and methods to apply SPM's DCT-based normalization: applyspmsnc
+ - new method to regress out confounds from VTC data, VTC::RegressOut
+ - added GUI for computing MDM-based GLMs
+
+Changes made since release v0.9a (first release, after May 17, 2010)
+ - added "echo mode" in GUI to show what calls are made
+ - any2ascii now supports the objects held in configurations (for @xini class)
+ - fast and reliable implementation of reading text file tables in u8str2double (MEX)
+ - support for physio data analysis (heart beats)
+ - compact display of SPM-based motion parameters in showspmrparams
+

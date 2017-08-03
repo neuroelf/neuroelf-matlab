@@ -1,0 +1,327 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# SPSS file format for *.SAV files (SPSS SAV System File Format)
+# SAV FileVersions supported: $FL2
+#
+# See http://cvs.savannah.gnu.org/viewvc/*checkout*/pspp/doc/dev/system-file-format.texi?root=pspp&revision=1.2&content-type=text%2Fplain
+# for details (some notes copied below)
+#
+# Internally used datatypes:
+# -  8-bit characters
+# - 32-bit integers
+# - 64-bit floating points (double)
+#
+# Data is not necessarily aligned on a word or double-word boundary
+# and can therefore cause all data coming after in the file to be misaligned.
+#
+# Integer data in system files may be big-endian or little-endian. A
+# reader may detect the endianness of a system file by examining the
+# LayoutCode variable in the file header record.
+#
+# Floating point data in system files may nominally be in IEEE 754, IBM,
+# or VAX formats. A reader may detect the floating-point format in use
+# by examining the CompressionBias variable in the file header record.
+#
+# System files are divided into records, each of which begins with a
+# 4-byte RecordType, usually regarded as a 32-bit integer. These records
+# must appear in the following order:
+#
+# - file header record
+# - variable records
+# - all pairs of value labels records and value label variables records,
+#   if present
+# - document record, if present
+# - any of the following records, if present, in any order
+#   - machine integer info record
+#   - machine floating-point info record
+#   - variable display parameter record
+#   - long variable names record
+#   - miscellaneous informational records
+# - dictionary termination record
+# - data record
+#
+# The WeightIndex variable gives, if ~= 0, the variable from the
+# dictionary that is used as a weighting variable.
+#
+# The print and write format in the variable records are coded in three
+# bytes.  The least-significant byte of the format code represents the
+# number of decimal places, and the next two bytes in order of
+# increasing significance represent field width and format type,
+# respectively.  The most-significant byte is not used and should be
+# set to zero.
+#
+# Format types are defined as follows:
+#
+# -  1: A
+# -  2: AHEX
+# -  3: COMMA
+# -  4: DOLLAR
+# -  5: F
+# -  6: IB
+# -  7: PIBHEX
+# -  8: P
+# -  9: PIB
+# - 10: PK
+# - 11: RB
+# - 12: RBHEX
+# - 15: Z
+# - 16: N
+# - 17: E
+# - 20: Date
+# - 21: Time
+# - 22: Date/Time
+# - 23: ADate
+# - 24: JDate
+# - 25: DTime
+# - 26: Weekday
+# - 27: Month
+# - 28: MOYear
+# - 29: QYear
+# - 30: Week/Year
+# - 31: PCT
+# - 32: DOT
+# - 33: CCA
+# - 34: CCB
+# - 35: CCC
+# - 36: CCD
+# - 37: CCE
+# - 38: EDate
+# - 39: SDate
+#
+# Version:  v0.9a
+# Build:    11052216
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:SPSS SAV System Files (*.sav)
+EncodingSyntax:ieee-le
+Extensions:spss # dummy extension
+Magic:|
+name          |range       |type    |magic
+SPSS_FHRecType|1, 4        |hex     |24, 46, 4c, 32
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# check layout code in file header and, potentially, switch endian-ness
+EXPRE !$BFFREAD           !!!!!...
+$fetypel = true; ...
+try, ...
+    fseek(fid, 64, -1); ...
+    if ftell(fid) ~= 64, ...
+        error('SEEK_ERROR'); ...
+    end, ...
+    loc = fread(fid, [1, 1], 'int32=>double'); ...
+    if ~any([2, 3] == loc), ...
+        fclose(fid); ...
+        fid = fopen($FILENAME, 'r', 'ieee-be'); ...
+        $fetypel = false; ...
+    end, ...
+    fseek(fid, 0, -1); ...
+catch ne_eo; ...
+    neuroelf_lasterr(ne_eo); ...
+    error('File too short or re-open error.'); ...
+end
+
+# read file header record
+EXPRE !$BFFWRITE          !!!!!...
+$fetypel = true; ...
+@FileHeader.RecordType = [char(36) 'FL2']; ...
+@FileHeader.ProductName = deblank(@FileHeader.ProductName(:)'); ...
+@FileHeader.ProductName = [@FileHeader.ProductName(1:min(60, numel(@FileHeader.ProductName))), ...
+    repmat(' ', 1, max(0, 60 - numel(@FileHeader.ProductName)))]; ...
+@FileHeader.NrOfCases = size(@DataRecords, 1); ...
+@FileHeader.FileLabel = deblank(@FileHeader.FileLabel); ...
+@FileHeader.FileLabel = [@FileHeader.FileLabel(1:min(64, numel(@FileHeader.FileLabel))), ...
+    repmat(' ', 1, max(0, 64 - numel(@FileHeader.FileLabel)))]; ...
+@FileHeader.RecordPadding = char([0, 0, 0]); ...
+@InfoRecords(1).Data(:, 7) = uint8([2; 0; 0; 0]); ...
+@InfoRecords(1).Parsed.Endianness = 2;
+
+FIELD !                       !char    !char    !1, 4                     !        !FileHeader.RecordType
+EXPRE !$BFFREAD && ~strcmp(@FileHeader.RecordType, [char(36) 'FL2']) !!!!!error('Invalid SPSS SAV file.');
+FIELD !                       !char    !char    !1, 60                    !        !FileHeader.ProductName
+FIELD !                       !int32   !double  !1, 1                     !        !FileHeader.LayoutCode
+FIELD !                       !int32   !double  !1, 1                     !        !FileHeader.NominalCaseSize
+FIELD !                       !int32   !double  !1, 1                     !        !FileHeader.Compressed
+FIELD !                       !int32   !double  !1, 1                     !        !FileHeader.WeightIndex
+FIELD !                       !int32   !double  !1, 1                     !        !FileHeader.NrOfCases
+FIELD !                       !double  !double  !1, 1                     !        !FileHeader.CompressionBias
+FIELD !                       !char    !char    !1, 9                     !        !FileHeader.CreationDate
+FIELD !                       !char    !char    !1, 8                     !        !FileHeader.CreationTime
+FIELD !                       !char    !char    !1, 64                    !        !FileHeader.FileLabel
+FIELD !                       !char    !char    !1, 3                     !        !FileHeader.RecordPadding
+EXPRE !                   !!!!!@FileHeader.ProductName = deblank(@FileHeader.ProductName(:)'); @FileHeader.FileLabel = deblank(@FileHeader.FileLabel); @FileHeader = rmfield(@FileHeader, 'RecordPadding');
+
+# read/write variable records
+EXPRE !$BFFWRITE          !!!!!$NumVR = numel(@Variables);
+EXPRE !$BFFREAD           !!!!!...
+@Variables = emptystruct( ...
+    {'RecordType', 'VarType', 'HasLabel', 'LabelLen', 'Label', ...
+     'NrOfMissingValues', 'MissingValues', 'MissingValueRange', ...
+     'PrintFormat', 'WriteFormat', 'Name'}); ...
+rt = fread(fid, [1, 1], 'int32=>double'); ...
+fseek(fid, -4, 0); ...
+if rt == 2, ...
+    $NumVR = 1000; ...
+else, ...
+    $NumVR = 0; ...
+end
+
+BLOOP !$NumVR > 0             ! ! !$NumVR ! !VR
+EXPRE !$BFFWRITE          !!!!!if numel(@Variables($VR).MissingValueRange) == 2, @Variables($VR).NrOfMissingValues = -2 - numel(@Variables($VR).MissingValues); else, @Variables($VR).NrOfMissingValues = numel(@Variables($VR).MissingValues); end, @Variables($VR).Name = deblank(@Variables($VR).Name(:)'); @Variables($VR).Name = [upper(@Variables($VR).Name(1:min(8, numel(@Variables($VR).Name)))), repmat(' ', 1, max(0, 8 - numel(@Variables($VR).Name)))];
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).RecordType
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).VarType
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).HasLabel
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).NrOfMissingValues
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).PrintFormat
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).WriteFormat
+FIELD !                       !char    !char    !1, 8                     !        !Variables($VR).Name
+EXPRE !                   !!!!!@Variables($VR).Name = deblank(@Variables($VR).Name); $VarTypes = {@Variables(:).VarType}; $VarTypeN = zeros(1, numel($VarTypes)); for vtcnt = 1:numel($VarTypes), $VarTypeN(vtcnt) = $VarTypes{vtcnt}(1); end, $VarTypeR = $VarTypeN($VarTypeN>=0); vrcmax = numel($VarTypeR); 
+
+BLOOP !@Variables($VR).HasLabel == 1 ! ! !1 ! !VRL
+EXPRE !$BFFWRITE          !!!!!@Variables($VR).LabelLen = numel(@Variables($VR).Label); 
+FIELD !                       !int32   !double  !1, 1                     !        !Variables($VR).LabelLen
+EXPRE !                   !!!!!$llen = 4 * ceil(@Variables($VR).LabelLen / 4); if $BFFWRITE, @Variables($VR).Label = [@Variables($VR).Label, repmat(' ', 1, $llen - numel(@Variables($VR).Label))]; end
+FIELD !                       !char    !char    !1, $llen !     !Variables($VR).Label
+EXPRE !                   !!!!!@Variables($VR).Label = deblank(@Variables($VR).Label);
+ELOOP !                   !!!!!VRL
+
+BLOOP !@Variables($VR).NrOfMissingValues ~= 0 ! ! !1 ! !VRM
+EXPRE !                   !!!!!if @Variables($VR).NrOfMissingValues < 0, $nmv = -2 - @Variables($VR).NrOfMissingValues; else $nmv = @Variables($VR).NrOfMissingValues; end
+FIELD !@Variables($VR).NrOfMissingValues < 0 !double !double !1, 2        !        !Variables($VR).MissingValueRange
+FIELD !                       !double  !double  !1, $nmv                  !        !Variables($VR).MissingValues
+ELOOP !                   !!!!!VRM
+
+# check whether another variable record follows
+EXPRE !$BFFREAD           !!!!!rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt ~= 2, $VR = 1001; end
+ELOOP !                   !!!!!VR
+
+# read/write value label records
+EXPRE !$BFFWRITE          !!!!!$NumLR = numel(@ValueLabels);
+EXPRE !$BFFREAD           !!!!!@ValueLabels = emptystruct({'RecordType', 'LabelCount', 'Labels', 'Variables'}); rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt == 3, $NumLR = 1000; else, $NumLR = 0; end
+BLOOP !$NumLR > 0             ! ! !$NumLR ! !LR
+EXPRE !$BFFWRITE          !!!!!$lrlc = numel(@ValueLabels($LR).Labels); @ValueLabels($LR).LabelCount = $lrlc;
+FIELD !                       !int32   !double  !1, 1                     !        !ValueLabels($LR).RecordType
+FIELD !                       !int32   !double  !1, 1                     !        !ValueLabels($LR).LabelCount
+EXPRE !$BFFREAD           !!!!!@ValueLabels($LR).Labels = emptystruct({'Value', 'LabelLen', 'Label'}); $lrlc = @ValueLabels($LR).LabelCount;
+
+BLOOP !                       ! ! !$lrlc ! !LRLC
+EXPRE !$BFFWRITE          !!!!!if ~ischar(@ValueLabels($LR).Labels($LRLC).Value), labval = hxdouble(@ValueLabels($LR).Labels($LRLC).Value(1)); labval = hex2dec(reshape(labval, 2, 8)'); if $fetypel, labval = labval(end:-1:1); end, @ValueLabels($LR).Labels($LRLC).Value = char(labval(:)'); end, @ValueLabels($LR).Labels($LRLC).Label = deblank(@ValueLabels($LR).Labels($LRLC).Label(:)'); @ValueLabels($LR).Labels($LRLC).LabelLen = numel(@ValueLabels($LR).Labels($LRLC).Label); $lrll = 8 * ceil((@ValueLabels($LR).Labels($LRLC).LabelLen + 1) / 8) - 1; @ValueLabels($LR).Labels($LRLC).Label = [@ValueLabels($LR).Labels($LRLC).Label, repmat(' ', 1, $lrll - @ValueLabels($LR).Labels($LRLC).LabelLen)];
+FIELD !                       !char    !char    !1, 8                     !        !ValueLabels($LR).Labels($LRLC).Value
+FIELD !                       !uint8   !double  !1, 1                     !        !ValueLabels($LR).Labels($LRLC).LabelLen
+EXPRE !$BFFREAD           !!!!!$lrll = 8 * ceil((@ValueLabels($LR).Labels($LRLC).LabelLen + 1) / 8) - 1;
+FIELD !                       !char    !char    !1, $lrll                 !        !ValueLabels($LR).Labels($LRLC).Label
+EXPRE !                   !!!!!@ValueLabels($LR).Labels($LRLC).Label = deblank(@ValueLabels($LR).Labels($LRLC).Label);
+ELOOP !                   !!!!!LRLC
+
+EXPRE !$BFFWRITE          !!!!!@ValueLabels($LR).Variables = @ValueLabels($LR).Variables(:)'; $lrnv = numel(@ValueLabels($LR).Variables); fwrite(fid, [4, $lrnv], 'int32');
+EXPRE !$BFFREAD           !!!!!$lrnv = fread(fid, [1, 2], 'int32=>double'); $lrnv = $lrnv(2);
+FIELD !                       !int32   !double  !1, $lrnv                 !        !ValueLabels($LR).Variables
+EXPRE !                   !!!!!if $VarTypeR(@ValueLabels($LR).Variables(1)) == 0, for vlablc = 1:numel(@ValueLabels($LR).Labels), labval = @ValueLabels($LR).Labels(vlablc).Value; if $fetypel, labval = labval(end:-1:1); end, @ValueLabels($LR).Labels(vlablc).Value = hxdouble(sprintf('%02x', double(labval))); end, end
+
+# check whether another variable record follows
+EXPRE !$BFFREAD           !!!!!rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt ~= 3, $LR = 1001; end
+ELOOP !                   !!!!!LR
+
+# read/write any existing document record
+EXPRE !$BFFWRITE          !!!!!if ~iscell(@DocumentRecord), @DocumentRecord = cell(0, 1); end, for drc = numel(@DocumentRecord):-1:1, if ~ischar(@DocumentRecord{drc}), @DocumentRecord(drc) = []; continue; end, @DocumentRecord{drc} = deblank(@DocumentRecord{drc}(:)'); @DocumentRecord{drc} = [@DocumentRecord{drc}(1:min(80, numel(@DocumentRecord{drc}))), repmat(' ', 1, max(0, 80 - numel(@DocumentRecord{drc})))]; end, drnl = numel(@DocumentRecord); if drnl > 0, fwrite(fid, [6, drnl], 'int32'); end, for drc = 1:drnl, fwrite(fid, @DocumentRecord{drc}, 'char'); end
+EXPRE !$BFFREAD           !!!!!@DocumentRecord = cell(0, 1); rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt == 6, drnl = fread(fid, [1, 2], 'int32=>double'); drnl = drnl(2); @DocumentRecord = cell(drnl, 1); for drc = 1:drnl, @DocumentRecord{drc} = fread(fid, [1, 80], 'uint8=>char'); end, end
+EXPRE !                   !!!!!for drc = 1:numel(@DocumentRecord), @DocumentRecord{drc} = deblank(@DocumentRecord{drc}); end
+
+# read/write any existing information records
+EXPRE !$BFFREAD           !!!!!@InfoRecords = emptystruct({'RecordType', 'SubType', 'ElementSize', 'NrOfElements', 'Data', 'Parsed'}); rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt == 7, $NumIR = 1000; end
+EXPRE !$BFFWRITE          !!!!!$NumIR = numel(@InfoRecords);
+BLOOP !$NumIR > 0             ! ! !$NumIR ! !IR
+
+# record fields
+FIELD !                       !int32   !double  !1, 1                     !        !InfoRecords($IR).RecordType
+FIELD !                       !int32   !double  !1, 1                     !        !InfoRecords($IR).SubType
+EXPRE !$BFFWRITE          !!!!!@InfoRecords($IR).ElementSize = size(@InfoRecords($IR).Data, 1); @InfoRecords($IR).NrOfElements = size(@InfoRecords($IR).Data, 2);
+FIELD !                       !int32   !double  !1, 1                     !        !InfoRecords($IR).ElementSize
+FIELD !                       !int32   !double  !1, 1                     !        !InfoRecords($IR).NrOfElements
+EXPRE !                   !!!!!$ires = @InfoRecords($IR).ElementSize; $irne = @InfoRecords($IR).NrOfElements;
+FIELD !                       !uint8   !uint8   !$ires, $irne             !        !InfoRecords($IR).Data
+
+# parse field on read
+EXPRE !                   !!!!!irdata = @InfoRecords($IR).Data; if @InfoRecords($IR).ElementSize > 1, irdata = double(irdata'); if $fetypel, irdata = irdata(:, end:-1:1); end, else, irdata = char(irdata); end
+EXPRE !@InfoRecords($IR).SubType == 3 && @InfoRecords($IR).ElementSize == 4 && @InfoRecords($IR).NrOfElements == 8 !!!!!@InfoRecords($IR).Parsed = struct('VersionMajor', 256 * irdata(1, 3) + irdata(1, 4), 'VersionMinor', 256 * irdata(2, 3) + irdata(2, 4), 'VersionRevision', 256 * irdata(3, 3) + irdata(3, 4), 'MachineCode', 16777216 * irdata(4, 1) + 65536 * irdata(4, 2) + 256 * irdata(4, 3) + irdata(4, 4), 'FloatingPointRep', irdata(5, 4),'CompressionCode', irdata(6, 4),'Endianness', irdata(7, 4), 'CharacterCode', 256 * irdata(8, 3) + irdata(8, 4));
+EXPRE !@InfoRecords($IR).SubType == 4 && @InfoRecords($IR).ElementSize == 8 && @InfoRecords($IR).NrOfElements == 3 !!!!!@InfoRecords($IR).Parsed = struct('SystemMiss', hxdouble(sprintf('%02x', irdata(1, :))), 'Highest', hxdouble(sprintf('%02x', irdata(2, :))), 'Lowest', hxdouble(sprintf('%02x', irdata(3, :))));
+EXPRE !@InfoRecords($IR).SubType == 11 && @InfoRecords($IR).ElementSize == 4 && (2 * numel($VarTypeR)) == @InfoRecords($IR).NrOfElements !!!!!@InfoRecords($IR).Parsed = emptystruct({'VarMeasure', 'VarAlignment'}); irdata = reshape(irdata, [2, numel($VarTypeR), 4]); for vrcnt = 1:size(irdata, 2), @InfoRecords($IR).Parsed(vrcnt) = struct('VarMeasure', irdata(1, vrcnt, 4), 'VarAlignment', irdata(2, vrcnt, 4)); end
+EXPRE !@InfoRecords($IR).SubType == 11 && @InfoRecords($IR).ElementSize == 4 && (3 * numel($VarTypeR)) == @InfoRecords($IR).NrOfElements !!!!!@InfoRecords($IR).Parsed = emptystruct({'VarMeasure', 'VarWidth', 'VarAlignment'}); irdata = reshape(irdata, [3, numel($VarTypeR), 4]);for vrcnt = 1:size(irdata, 2), @InfoRecords($IR).Parsed(vrcnt) = struct('VarMeasure', irdata(1, vrcnt, 4), 'VarWidth', irdata(2, vrcnt, 4), 'VarAlignment', irdata(3, vrcnt, 4)); end
+EXPRE !@InfoRecords($IR).SubType == 13 && @InfoRecords($IR).ElementSize == 1 !!!!!@InfoRecords($IR).Parsed = struct; irdata = splittocell(irdata, char(9)); for vrcnt = 1:numel(irdata); irdate = splittocell(irdata{vrcnt}, '='); if numel(irdate) == 2, @InfoRecords($IR).Parsed.(makelabel(irdate{1})) = deblank(irdate{2}); end, end
+EXPRE !~isstruct(@InfoRecords($IR).Parsed) !!!!!@InfoRecords($IR).Parsed = struct;
+
+# check whether another information record follows
+EXPRE !$BFFREAD           !!!!!rt = fread(fid, [1, 1], 'int32=>double'); fseek(fid, -4, 0); if rt ~= 7, $IR = 1001; end
+ELOOP !                   !!!!!IR
+
+# now we expect the dictionary termination record
+EXPRE !$BFFREAD           !!!!!dtrecord = fread(fid, [1, 2], 'int32=>double'); if ~all(dtrecord == [999, 0]), error('Invalid dictionary termination record.'); end
+EXPRE !$BFFWRITE          !!!!!fwrite(fid, [999, 0], 'int32');
+
+# and now we parse the data records...
+EXPRE !$BFFREAD           !!!!!cmpbias = @FileHeader.CompressionBias; drecs = cell(@FileHeader.NrOfCases, vrcmax); cscount = 1; vrcount = 1; vrtyper = $VarTypeR; cmdbytes = fread(fid, [1, 8], 'uint8=>double'); nxtcmdb = 1; nxtval = []; nxtstr = ''; try, while(true), nextvsz = vrtyper(vrcount); switch (cmdbytes(nxtcmdb)), case {0}, case {252}, break; case {253}, if nextvsz == 0, nxtval = fread(fid, [1, 1], 'double=>double'); else, nxtval = fread(fid, [1, 8], 'uint8=>char'); end, case {254}, nxtval = '        '; case {255}, if nextvsz == 0, nxtval = NaN; else, nxtval = blanks(nextvsz); end, otherwise, nxtval = cmdbytes(nxtcmdb) - cmpbias; end, if nextvsz > 0, nxtstr = [nxtstr nxtval]; if numel(nxtstr) < nextvsz, vrcount = vrcount - 1; else, drecs{cscount, vrcount} = nxtstr; nxtstr = ''; end, else, drecs{cscount, vrcount} = nxtval; end, vrcount = vrcount + 1; if vrcount > vrcmax, vrcount = 1; cscount = cscount + 1; end, nxtcmdb = nxtcmdb + 1; if nxtcmdb > 8, cmdbytes = fread(fid, [1, 8], 'uint8=>double'); nxtcmdb = 1; end, if cscount > size(drecs, 1) break; end, end, catch ne_eo; neuroelf_lasterr(ne_eo); warning('Invalid SPSS/SAV file content.'); fseek(fid, 0, 1); end, @DataRecords = drecs;
+# or write them back to disk
+EXPRE !$BFFWRITE          !!!!!cmpbias = @FileHeader.CompressionBias; vrcmax = size(@DataRecords, 2); cscmax = size(@DataRecords, 1); cscount = 1; vrcount = 1; nxtcmdb = 1; cmdbytes = zeros(1, 8); cmdvals = cell(1, 16); cmdnval = 1; vrtypr = $VarTypeR; dtrecs = @DataRecords; while (cscount <= cscmax), vrtyp = vrtypr(vrcount); vrval = dtrecs{cscount, vrcount}; vrcount = vrcount + 1; if vrcount > vrcmax, cscount = cscount + 1; vrcount = 1; end, if isnumeric(vrval) && vrtyp == 0, if isempty(vrval) || isnan(vrval(1)), cmdbytes(nxtcmdb) = 255; else, vrval = vrval(1); if vrval == round(vrval) && vrval > -cmpbias && vrval < (251 - cmpbias), cmdbytes(nxtcmdb) = cmpbias + vrval; else, cmdbytes(nxtcmdb) = 253; cmdvals{cmdnval} = vrval; cmdnval = cmdnval + 1; end, end, elseif ischar(vrval) && vrtyp > 0, vrval = deblank(vrval); vrtyp = 8 * ceil(vrtyp / 8); vrval = vrval(1:min(vrtyp, numel(vrval))); vrval = [vrval, repmat(' ', 1, vrtyp - numel(vrval))]; while ~isempty(vrval), vrvals = vrval(1:8); vrval(1:8) = []; if all(vrvals == ' '), cmdbytes(nxtcmdb) = 254; else, cmdbytes(nxtcmdb) = 253; cmdvals{cmdnval} = vrvals; cmdnval = cmdnval + 1; end, if ~isempty(vrval), nxtcmdb = nxtcmdb + 1; end, if nxtcmdb > 8, fwrite(fid, cmdbytes, 'uint8'); nxtcmdb = 1; for wrcmc = 1:(cmdnval - 1), if ischar(cmdvals{wrcmc}), fwrite(fid, cmdvals{wrcmc}, 'char'); else, fwrite(fid, cmdvals{wrcmc}, 'double'); end, end, cmdnval = 1; end, end, else, cmdbytes(nxtcmdb) = 255; end, nxtcmdb = nxtcmdb + 1; if nxtcmdb > 8, fwrite(fid, cmdbytes, 'uint8'); nxtcmdb = 1; for wrcmc = 1:(cmdnval - 1), if ischar(cmdvals{wrcmc}), fwrite(fid, cmdvals{wrcmc}, 'char'); else, fwrite(fid, cmdvals{wrcmc}, 'double'); end, end, cmdnval = 1; end, end, cmdbytes(nxtcmdb) = 252; cmdbytes(nxtcmdb+1:8) = 0; fwrite(fid, cmdbytes, 'uint8'); for wrcmc = 1:(cmdnval - 1), if ischar(cmdvals{wrcmc}), fwrite(fid, cmdvals{wrcmc}, 'char'); else, fwrite(fid, cmdvals{wrcmc}, 'double'); end, end
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileHeader.RecordType = [char(36) 'FL2'];
+@FileHeader.ProductName = [char(64) '(' char(35) ') SPSS DATA FILE xff v0.9a'];
+@FileHeader.LayoutCode = 2;
+@FileHeader.NominalCaseSize = 0;
+@FileHeader.Compressed = 1;
+@FileHeader.WeightIndex = 0;
+@FileHeader.NrOfCases = 0;
+@FileHeader.CompressionBias = 100;
+@FileHeader.CreationDate = datestr(now, 'dd mmm yy');
+@FileHeader.CreationTime = datestr(now, 13);
+@FileHeader.FileLabel = '';
+@Variables = emptystruct({'RecordType', 'VarType', 'HasLabel', 'LabelLen', 'Label', 'NrOfMissingValues', 'MissingValues', 'MissingValueRange', 'PrintFormat', 'WriteFormat', 'Name'});
+@ValueLabels = emptystruct({'RecordType', 'LabelCount', 'Labels', 'Variables'});
+@DocumentRecord = cell(0, 1);
+@InfoRecords = emptystruct({'RecordType', 'SubType', 'ElementSize', 'NrOfElements', 'Data', 'Parsed'});
+@InfoRecords(1).RecordType = 7;
+@InfoRecords(1).SubType = 3;
+@InfoRecords(1).ElementSize = 4;
+@InfoRecords(1).NrOfElements = 8;
+@InfoRecords(1).Data = uint8([16, 0, 1, 208, 1, 1, 2, 175; 0, 0, 0, 2, 0, 0, 0, 111; zeros(2,8)]);
+@InfoRecords(1).Parsed = struct('VersionMajor', 16, 'VersionMinor', 0, 'VersionRevision', 1, 'MachineCode', 720, 'FloatingPointRep', 1, 'CompressionCode', 1, 'Endianness', 2, 'CharacterCode', 28591);
+@InfoRecords(2).RecordType = 7;
+@InfoRecords(2).SubType = 4;
+@InfoRecords(2).ElementSize = 8;
+@InfoRecords(2).NrOfElements = 3;
+@InfoRecords(2).Data = uint8(255 - [0, 0, 1; zeros(5, 3); 16, 16, 16; 0, 128, 0]);
+@InfoRecords(2).Parsed = struct('SystemMiss', hxdouble('ffefffffffffffff'), 'Highest', hxdouble('7fefffffffffffff'), 'Lowest', hxdouble('ffeffffffffffffe'));
+@InfoRecords(3).RecordType = 7;
+@InfoRecords(3).SubType = 11;
+@InfoRecords(3).ElementSize = 4;
+@InfoRecords(3).NrOfElements = 0;
+@InfoRecords(3).Data = uint8(zeros(4, 0));
+@InfoRecords(3).Parsed = emptystruct({'VarMeasure', 'VarWidth', 'VarAlignment'});
+@InfoRecords(4).RecordType = 7;
+@InfoRecords(4).SubType = 13;
+@InfoRecords(4).ElementSize = 1;
+@InfoRecords(4).NrOfElements = 0;
+@InfoRecords(4).Data = uint8(zeros(1, 0));
+@InfoRecords(4).Parsed = struct;
+@InfoRecords(5).RecordType = 7;
+@InfoRecords(5).SubType = 16;
+@InfoRecords(5).ElementSize = 8;
+@InfoRecords(5).NrOfElements = 2;
+@InfoRecords(5).Data = uint8([1, 0; zeros(7, 2)]);
+@InfoRecords(5).Parsed = struct;
+@DataRecords = cell(0, 0);
+EndNewFileCode

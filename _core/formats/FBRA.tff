@@ -1,0 +1,105 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX/Trackmark file format for *.FBR files (FiBeR ASCII file)
+# FBR FileVersions supported: 3, 4
+#
+# FBR files contain coordinates of a group voxels of interest.
+#
+# Version:  v1.0
+# Build:    16011310
+# Date:     Jan-13 2016, 10:49 AM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:BrainVoyager FiBeR files (*.fbr)
+Extensions:fbra
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+FBRA_NrOfFibers|1, 320      |regexpi |\s+nroffibers\:\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!$TFFWRITE     !!!!!!@NrOfGroups = numel(@Group);
+FIELD!                   !FileVersion         !double  !%d     !1      !3       !FileVersion
+FIELD!                   !CoordsType          !string  !%s     !1      !BVI     !CoordsType
+FLIST!@FileVersion > 3   !FibersOriginX       !double  !%d     !1      !128     !FibersOriginX
+FLIST!@FileVersion > 3   !FibersOriginY       !double  !%d     !1      !128     !FibersOriginY
+FLIST!@FileVersion > 3   !FibersOriginZ       !double  !%d     !1      !128     !FibersOriginZ
+WRTLN!@FileVersion > 3   !!!!!!!# empty line
+FIELD!                   !NrOfGroups          !double  !%d     !1      !1       !NrOfGroups
+
+# determine array width
+EXPRE!!!!!!!if @FileVersion < 4, $aw = 3; else $aw = 6; end
+
+# loop over Groups
+EXPRE!$TFFREAD      !!!!!! ...
+$Group = emptystruct({'Name', 'Visible', 'Animate', 'Thickness', ...
+    'Color', 'NrOfFibers', 'Fiber'}); ...
+if @NrOfGroups > 0, ...
+    @Group(@NrOfGroups).Name = ''; ...
+end
+
+BLOOP!                   ! ! ! !@NrOfGroups ! !GroupNo
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@Group($GroupNo).NrOfFibers = numel(@Group($GroupNo).Fiber);
+FLIST!                   !Name                !string  !%s     !1      !1       !Group($GroupNo).Name
+FLIST!                   !Visible             !double  !%d     !1      !1       !Group($GroupNo).Visible
+FLIST!                   !Animate             !double  !%d     !1      !0       !Group($GroupNo).Animate
+FLIST!                   !Thickness           !double  !%.1f   !1      !0.3     !Group($GroupNo).Thickness
+FLIST!                   !Color               !double  !%d     !3      !        !Group($GroupNo).Color
+WRTLN!@FileVersion > 3   !!!!!!!# empty line
+FLIST!                   !NrOfFibers          !double  !%d     !1      !1       !Group($GroupNo).NrOfFibers
+
+# loop over Groups
+EXPRE!!!!!!!$NrOfFibers = @Group($GroupNo).NrOfFibers;
+EXPRE!$TFFREAD      !!!!!!@Group($GroupNo).Fiber = emptystruct({'NrOfPoints', 'FiberPoints'}); ...
+if $NrOfFibers > 0, ...
+    @Group($GroupNo).Fiber($NrOfFibers).NrOfPoints = 0; ...
+end
+
+BLOOP!                   ! ! ! !$NrOfFibers ! !FiberNo
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!! ...
+$NrOfFPts = size(@Group($GroupNo).Fiber($FiberNo).FiberPoints, 1); ...
+@Group($GroupNo).Fiber($FiberNo).NrOfPoints = $NrOfFPts; ...
+if isfield(@Group($GroupNo).Fiber($FiberNo), 'PointColors') && ...
+   ~isempty(@Group($GroupNo).Fiber($FiberNo).PointColors) && ...
+    size(@Group($GroupNo).Fiber($FiberNo).PointColors, 2) == 3, ...
+    @Group($GroupNo).Fiber($FiberNo).FiberPoints = [@Group($GroupNo).Fiber($FiberNo).FiberPoints(:, 1:3), @Group($GroupNo).Fiber($FiberNo).PointColors(:, 1:3)]; ...
+end, ...
+if $aw > 3, ...
+    @Group($GroupNo).Fiber($FiberNo).FiberPoints(:, 4:6) = min(255, round(@Group($GroupNo).Fiber($FiberNo).FiberPoints(:, 4:6))); ...
+end
+FIELD!                   !NrOfPoints          !double  !%d     !1      !1       !Group($GroupNo).Fiber($FiberNo).NrOfPoints
+EXPRE!$TFFREAD      !!!!!!$NrOfFPts = @Group($GroupNo).Fiber($FiberNo).NrOfPoints;
+ARRAY!$aw < 6            !FiberPoints         !double  ! %8.3f %8.3f %8.3f\n!$NrOfFPts, 3 !!Group($GroupNo).Fiber($FiberNo).FiberPoints
+ARRAY!$aw > 5            !FiberPoints         !double  ! %8.3f %8.3f %8.3f %4d %4d %4d\n!$NrOfFPts, 6 !!Group($GroupNo).Fiber($FiberNo).FiberPoints
+ELOOP!                   ! ! ! !  ! !FiberNo
+
+ELOOP!                   ! ! ! !  ! !GroupNo
+
+WRTLN!!!!!!!!  # empty line
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 4;
+@CoordsType = 'BVI';
+@FibersOriginX = 128;
+@FibersOriginY = 128;
+@FibersOriginZ = 128;
+@NrOfGroups = 1;
+@Group.Name = 'default';
+@Group.Visible = 1;
+@Group.Animate = 0;
+@Group.Thickness = 0.3;
+@Group.Color = [64, 64, 192];
+@Group.NrOfFibers = 0;
+@Group.Fiber = emptystruct({'NrOfPoints', 'FiberPoints'});
+EndNewFileCode

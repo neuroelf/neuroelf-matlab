@@ -1,0 +1,88 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.MAP files (MAP of slice statistics)
+# MAP FileVersions supported: 2, 3
+#
+# Version:  v0.9b
+# Build:    11050213
+# Date:     Aug-10 2010, 12:04 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Functional MRI map files
+EncodingSyntax:ieee-le
+Extensions:map
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# correctly handle Type, NrOfSlices
+EXPRE !$BFFWRITE          !!!!!@CombinedTypeSlices = 10000 * @Type + @NrOfSlices; if @Type == 0, @NrOfSlices = 0; end
+EXPRE !$BFFREAD           !!!!!@Type = 1; @NrOfSlices = 25;
+FIELD !                       !uint16  !double  !1, 1                     !        !CombinedTypeSlices
+EXPRE !$BFFREAD           !!!!!@Type = fix(@CombinedTypeSlices / 10000); @NrOfSlices = mod(@CombinedTypeSlices, 10000);
+
+# more header fields
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfSlices
+EXPRE !@NrOfSlices == 0   !!!!!@NrOfSlices = mod(@CombinedTypeSlices, 10000);
+FIELD !                       !uint16  !double  !1, 1                     !        !DimY
+FIELD !                       !uint16  !double  !1, 1                     !        !DimX
+FIELD !                       !uint16  !double  !1, 1                     !        !ClusterSize
+FIELD !                       !single  !double  !1, 1                     !        !LowerThreshold
+FIELD !                       !single  !double  !1, 1                     !        !UpperThreshold
+FIELD !@Type == 2             !uint16  !double  !1, 1                     !        !NrOfLags
+EXPRE !$BFFREAD && @Type ~= 2 !!!!!@NrOfLags = [];
+
+# value to dissociate Type/Slices ?
+FIELD !                       !uint16  !double  !1, 1                     !9999    !ReservedToken
+
+# FileVersion MUST be 2++
+FIELD !                       !uint16  !double  !1, 1                     !2       !FileVersion
+FIELD !@FileVersion > 2       !uint32  !double  !1, 1                     !0       !DF1
+FIELD !@FileVersion > 2       !uint32  !double  !1, 1                     !0       !DF2
+
+# further header fields
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSDMFile
+
+# slices (maps)
+EXPRE !$BFFREAD           !!!!!@Map = emptystruct({'Number', 'Data'}); if @NrOfSlices > 0, @Map(@NrOfSlices).Number = @NrOfSlices; end
+BLOOP !~$HEADERONLY           ! ! !@NrOfSlices ! !MapNo
+EXPRE !$BFFWRITE          !!!!!@Map($MapNo).Number = @Map($MapNo).Number - 1;
+FIELD !                       !uint16  !double  !1, 1                     !        !Map($MapNo).Number
+EXPRE !                   !!!!!@Map($MapNo).Number = @Map($MapNo).Number + 1;
+FIELD !                       !single  !single  !@DimX, @DimY             !        !Map($MapNo).Data
+ELOOP !                       ! ! !  ! !MapNo
+EXPRE ! $HEADERONLY       !!!!!@Map(@NrOfSlices).Data = []; fseek(fid, @NrOfSlices * (2 + 4 * @DimX * @DimY), 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+# default MapCT field is empty
+EXPRE !$BFFREAD           !!!!!@MapCT = logical([]);
+EndListOfFields
+
+NewFileCode:!
+@Type = 1;
+@NrOfSlices = 25;
+@CombinedTypeSlices = 10000 * @Type + @NrOfSlices;
+@DimY = 64;
+@DimX = 64;
+@ClusterSize = 10;
+@LowerThreshold = 2.5;
+@UpperThreshold = 8;
+@NrOfLags = [];
+@ReservedToken = 9999;
+@FileVersion = 2;
+@DF1 = 0;
+@DF2 = 0;
+@NameOfSDMFile = '';
+tv_data = single(0); tv_data(@DimX, @DimY) = tv_data(1);
+for tv_count=1:@NrOfSlices, @Map(tv_count).Number = tv_count; @Map(tv_count).Data = tv_data; end
+clear tv_data;
+@MapCT = logical([]);
+EndNewFileCode

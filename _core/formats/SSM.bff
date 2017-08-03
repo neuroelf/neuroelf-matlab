@@ -1,0 +1,43 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.SSM files (Sphere to Sphere Mapping info)
+# SSM FileVersions supported: 1, 2
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:SourceOfTarget
+Description:Sphere-to-sphere mapping files
+EncodingSyntax:ieee-le
+Extensions:ssm
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTargetVertices
+EXPRE !@FileVersion == 1  !!!!!@NrOfSourceVertices = [];
+FIELD !@FileVersion > 1       !uint32  !double  !1, 1                     !        !NrOfSourceVertices
+EXPRE !$BFFWRITE          !!!!!@SourceOfTarget = @SourceOfTarget - 1;
+FIELD !~$HEADERONLY           !uint32  !double  !@NrOfTargetVertices, 1   !        !SourceOfTarget
+EXPRE ! $HEADERONLY       !!!!!@SourceOfTarget = []; fseek(fid, 4 * @NrOfTargetVertices, 0);
+EXPRE !                   !!!!!@SourceOfTarget = @SourceOfTarget + 1;
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 2;
+@NrOfTargetVertices = 0;
+@NrOfSourceVertices = 0;
+@SourceOfTarget = zeros(0, 1);
+EndNewFileCode

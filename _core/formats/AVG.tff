@@ -1,0 +1,142 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.AVG files (event-related AVeraGing file)
+# AVG FileVersions supported: 3, 4
+#
+# Version:  v0.9a
+# Build:    11050315
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Event-related averaging files
+Extensions:avg
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+AVG_funcdata  |1, 128      |regexpi |fileversion\:\s*\d\s*funcdatatype\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion         !double  !%d     !1      !4       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!@FileVersion > 3   !FuncDataType        !string  !%s     !1      !        !FuncDataType           # 'FMR', 'VTC', 'MTC'
+EXPRE!$TFFREAD && @FileVersion < 4 !!!!!!@FuncDataType = 'Unused';
+EXPRE!$TFFWRITE     !!!!!!...
+@NrOfCurves = numel(@Curve); ...
+@NrOfFiles = numel(@FileNames); ...
+if isnumeric(@ResolutionOfDataPoints), ...
+    @ResolutionOfDataPoints = sprintf('%.0f', @ResolutionOfDataPoints); ...
+end
+
+WRTLN!@FileVersion > 3   !!!!!!!  # empty line
+FLIST!@FileVersion < 4   !ProtocolResolutionOfTime!string!%s   !1      !        !ProtocolTimeResolution # 'MS', 'Volumes'
+FLIST!@FileVersion > 3   !ProtocolTimeResolution!string!%s     !1      !        !ProtocolTimeResolution # 'MS', 'Volumes'
+FLIST!                   !ResolutionOfDataPoints!string!%s     !1      !        !ResolutionOfDataPoints # 'MS', 'Volumes'
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NrOfTimePoints      !double  !%d     !1      !        !NrOfTimePoints
+FLIST!                   !PreInterval         !double  !%d     !1      !        !PreInterval            # display option
+FLIST!                   !PostInterval        !double  !%d     !1      !        !PostInterval           # display option
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfCurves          !double  !%d     !1      !        !NrOfCurves
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NrOfFiles           !double  !%d     !1      !        !NrOfFiles              # no. of linked files
+FLIST!                   !BaseDirectory       !string  !"%s"   !1      !        !BaseDirectory
+ARRAY!                   !FileNames           !string  !"%s"   !@NrOfFiles, 1!  !FileNames
+WRTLN!!!!!!!!  # empty line
+
+# loop over curves
+EXPRE!$TFFREAD      !!!!!!...
+@Curve = emptystruct({ ...
+    'Name', 'NrOfConditionEvents', 'File', 'EventDuration', 'TimeCourseColor1', 'TimeCourseColor2', ...
+    'TimeCourseThick', 'StdErrColor', 'StdErrThick', 'PreIntervalColor', 'PostIntervalColor'}); ...
+if all(@ResolutionOfDataPoints >= '0' & @ResolutionOfDataPoints <= '9'), ...
+    @ResolutionOfDataPoints = str2double(@ResolutionOfDataPoints); ...
+end
+BLOOP!                   ! ! ! !@NrOfCurves ! !CurveNo
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !CurveName           !string  !"%s"   !1      !        !Curve($CurveNo).Name
+EXPRE!$TFFWRITE     !!!!!!...
+$NrOfCEpRem = 0; ...
+for b_linec = 1:numel(@Curve($CurveNo).File), ...
+    $NrOfCEpRem = $NrOfCEpRem + numel(@Curve($CurveNo).File(b_linec).Points); ...
+end, ...
+@Curve($CurveNo).NrOfConditionEvents = $NrOfCEpRem;
+
+FLIST!                   !NrOfConditionEvents !double  !%d     !1      !        !Curve($CurveNo).NrOfConditionEvents
+EXPRE!$TFFREAD      !!!!!!$NrOfCEpRem = @Curve($CurveNo).NrOfConditionEvents;
+
+BLOOP!                   ! ! ! !@NrOfFiles  ! !FileNo
+SKIPN!$TFFWRITE && isempty(@Curve($CurveNo).File($FileNo).Points) !!!!4!!!
+FLIST!                   !EventPointsInFile   !double  !%d     !1      !        !Curve($CurveNo).File($FileNo).EventPointsInFile  # 0-based counter
+EXPRE!$TFFREAD      !!!!!!...
+if ($FileNo < @NrOfFiles), ...
+    $NrOfCEpFile = 0; ...
+    b_linec = linec; ...
+    while all(deblank(linecont{linec}) >= 48 & deblank(linecont{linec}) <= 57), ...
+        linec = linec + 1; ...
+        $NrOfCEpFile = $NrOfCEpFile + 1; ...
+    end, ...
+    linec = b_linec; ...
+    $NrOfCEpRem = $NrOfCEpRem - $NrOfCEpFile; ...
+else, ...
+    $NrOfCEpFile = $NrOfCEpRem; ...
+end, ...
+if $NrOfCEpRem < 0, ...
+    error('BAD_NUMBERS_IN_FILE'); ...
+end
+EXPRE!$TFFWRITE     !!!!!!$NrOfCEpFile = numel(@Curve($CurveNo).File($FileNo).Points);
+ARRAY!                   !CurvePoints         !double  !%d     !$NrOfCEpFile, 1!!Curve($CurveNo).File($FileNo).Points             # onsets from PRT
+ELOOP!                   ! ! ! !   ! !FileNo
+
+FLIST!                   !EventDuration       !double  !%d     !1      !        !Curve($CurveNo).EventDuration     # average duration
+FLIST!                   !TimeCourseColor1    !double  !%d     !3      !        !Curve($CurveNo).TimeCourseColor1
+FLIST!                   !TimeCourseColor2    !double  !%d     !3      !        !Curve($CurveNo).TimeCourseColor2
+FLIST!                   !TimeCourseThick     !double  !%d     !1      !        !Curve($CurveNo).TimeCourseThick
+FLIST!                   !StdErrColor         !double  !%d     !3      !        !Curve($CurveNo).StdErrColor
+FLIST!                   !StdErrThick         !double  !%d     !1      !        !Curve($CurveNo).StdErrThick
+FLIST!                   !PreIntervalColor    !double  !%d     !3      !        !Curve($CurveNo).PreIntervalColor
+FLIST!                   !PostIntervalColor   !double  !%d     !3      !        !Curve($CurveNo).PostIntervalColor
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !CurveNo
+
+# rest
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !BackgroundColor     !double  !%d     !3      !        !BackgroundColor
+FLIST!                   !TextColor           !double  !%d     !3      !        !TextColor
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !BaselineMode        !double  !%d     !1      !1       !BaselineMode        # 1: file (all conds), 2: cond/file, 3: epoch based
+FLIST!                   !AverageBaselineFrom !double  !%d     !1      !-1      !AverageBaselineFrom # relative from-volume index and
+FLIST!                   !AverageBaslineTo    !double  !%d     !1      !0       !AverageBaselineTo   # relative up-to-volume index for baseline
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !VariationBars       !string  !%s     !1      !        !VariationBars       # naming variationbar(s)
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 4;
+@FuncDataType = 'VTC';
+@ProtocolTimeResolution = 'Volumes';
+@ResolutionOfDataPoints = 'Volumes';
+@NrOfTimePoints = 0;
+@PreInterval = 0;
+@PostInterval = 0;
+@NrOfCurves = 0;
+@NrOfFiles = 0;
+@BaseDirectory = './';
+@FileNames = cell(0, 1);
+@Curve = emptystruct({ ...
+    'Name', 'NrOfConditionEvents', 'File', 'EventDuration', 'TimeCourseColor1', 'TimeCourseColor2', ...
+    'TimeCourseThick', 'StdErrColor', 'StdErrThick', 'PreIntervalColor', 'PostIntervalColor'});
+@BackgroundColor = [0, 0, 0];
+@TextColor = [255, 255, 255];
+@BaselineMode = 1;
+@AverageBaselineFrom = -2;
+@AverageBaselineTo = 0;
+@VariationBars = 'StdErr';
+EndNewFileCode

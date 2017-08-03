@@ -1,0 +1,85 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.CDD files (Channel Data Definition)
+# CDD FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Channel data definition files
+Extensions:cdd
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+CDD_CTCACT    |1, 256      |regexpi |ctcfile\:\s+.*actfile\:\s+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field                  !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+
+# first draft version, might change!
+FIELD!                   !FileVersion            !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+
+# dimension/temporal information
+FIELD!                   !NrOfChannels           !double  !%d     !1      !        !NrOfChannels
+FIELD!                   !NrOfSamples            !double  !%d     !1      !        !NrOfSamples
+FLIST!                   !SamplingFrequency      !double  !%.1f   !1      !20000   !SamplingFrequency
+FIELD!                   !TimeOffsetMu           !double  !%.1f   !1      !0       !TimeOffsetMu
+
+# linked files
+FLIST!                   !CTCFile                !string  !%s     !1      !        !CTCFile
+FLIST!                   !ACTFile                !string  !%s     !1      !        !ACTFile
+FIELD!                   !CCCFile                !string  !%s     !1      !        !CCCFile
+FIELD!                   !ProtocolFile           !string  !%s     !1      !        !ProtocolFile
+
+# channel labels
+WRTLN!!!!!!!!  # empty line
+ARRAY!                   !ChannelLabels          !string  !"%s"   !@NrOfChannels,2!!ChannelLabels
+
+# temp. files
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfPrecalculatedFiles !double  !%d     !1      !0       !NrOfPrecalculatedFiles
+ARRAY!                   !PrecalculatedFiles     !string  !"%s"   !@NrOfPrecalculatedFiles, 1 ! !PrecalculatedFiles
+
+# markers
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfMarkers            !double  !%d     !1      !0       !NrOfMarkers
+EXPRE!$TFFREAD      !!!!!!@Markers = emptystruct({'MarkerName', 'TemporalPosition', 'Duration', 'RGBColor', 'Comment'});
+
+# read markers
+BLOOP!                   ! ! ! !@NrOfMarkers ! !MarkerNo
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !MarkerName             !string  !%s     !1      !        !Markers($MarkerNo).MarkerName
+FIELD!                   !TemporalPosition       !double  !%.6f   !1      !        !Markers($MarkerNo).TemporalPosition
+FIELD!                   !Duration               !double  !%.6f   !1      !0       !Markers($MarkerNo).Duration
+FIELD!                   !RGBColor               !double  !%d     !3      !        !Markers($MarkerNo).RGBColor
+FIELD!                   !Comment                !string  !%s     !1      !        !Markers($MarkerNo).Comment
+ELOOP!                   ! ! ! !  ! !MarkerNo
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfChannels = 1;
+@NrOfSamples = 40000;
+@SamplingFrequency = 20000;
+@TimeOffsetMu = 0;
+@CTCFile = '<none>';
+@ACTFile = '<none>';
+@CCCFile = '<none>';
+@ProtocolFile = '<none>';
+@ChannelLabels = {'POL', 'Empty polygraphic channel'};
+@NrOfPrecalculatedFiles = 0;
+@PrecalculatedFiles = cell(0, 1);
+@NrOfMarkers = 0;
+@Markers = emptystruct({'MarkerName', 'TemporalPosition', 'Duration', 'RGBColor', 'Comment'});
+EndNewFileCode

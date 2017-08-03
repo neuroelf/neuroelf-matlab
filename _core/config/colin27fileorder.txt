@@ -1,0 +1,137 @@
+Basic datasets.vmr
+colin.vmr
+colin_ICBMnorm.vmr
+separator.vmr
+Brain extracted versions.vmr
+colin_brain.vmr
+colin_brain_ICBMnorm.vmr
+colin_brain_WMmasked.vmr
+colin_brain_WMmasked_ICBMnorm.vmr
+separator.vmr
+High-resolution VMRs.vmr
+colin_hires.vmr
+colin_hires_ICBMnorm.vmr
+colin_hires_brain.vmr
+colin_hires_brain_ICBMnorm.vmr
+separator.vmr
+Segmentations (0.5mm).vmr
+colin_hires_BH_seg.vmr
+colin_hires_LH_seg.vmr
+colin_hires_RH_seg.vmr
+separator.vmr
+Back-projected from surfaces.vmr
+colin_hires_BH_segback.vmr
+colin_hires_BH_segback_ICBMnorm.vmr
+colin_hires_LH_segback.vmr
+colin_hires_LH_segback_hull.vmr
+colin_hires_LH_segback_ICBMnorm.vmr
+colin_hires_LH_segback_ICBMnorm_hull.vmr
+colin_hires_RH_segback.vmr
+colin_hires_RH_segback_hull.vmr
+colin_hires_RH_segback_ICBMnorm.vmr
+colin_hires_RH_segback_ICBMnorm_hull.vmr
+Render alpha volumes.vmr
+colin_brain_rendskull.vmr
+colin_brain_rendskull_ICBMnorm.vmr
+separator.srf
+High-resolution Icosahedron (160k).srf
+colin_hires_LH_SPH160k.srf
+colin_hires_LH_SPH160k_ICBMnorm.srf
+colin_hires_RH_SPH160k.srf
+colin_hires_RH_SPH160k_ICBMnorm.srf
+Mid-resolution Icosahedron (40k).srf
+colin_midres_LH_SPH40k.srf
+colin_midres_LH_SPH40k_ICBMnorm.srf
+colin_midres_RH_SPH40k.srf
+colin_midres_RH_SPH40k_ICBMnorm.srf
+Joined mid-resolution (40k->80k).srf
+colin_BH_SPH_joined.srf
+colin_BH_SPH_joined_ICBMnorm.srf
+Low-resolution Icosahedron (10k).srf
+colin_lowres_LH_SPH10k.srf
+colin_lowres_LH_SPH10k_ICBMnorm.srf
+colin_lowres_RH_SPH10k.srf
+colin_lowres_RH_SPH10k_ICBMnorm.srf
+Original reconstructions.srf
+colin_hires_LH_seg_RECOSM.srf
+colin_hires_LH_seg_RECOSM_ICBMnorm.srf
+colin_hires_RH_seg_RECOSM.srf
+colin_hires_RH_seg_RECOSM_ICBMnorm.srf
+Smoothed reconstructions
+colin_hires_LH_seg_RECOSM_sm500_05_inf125_05.srf
+colin_hires_LH_seg_RECOSM_ICBMnorm_sm500_05_inf125_05.srf
+colin_hires_LH_seg_RECOSM_sm1000_05_inf250_05.srf
+colin_hires_LH_seg_RECOSM_ICBMnorm_sm1000_05_inf250_05.srf
+colin_hires_RH_seg_RECOSM_sm500_05_inf125_05.srf
+colin_hires_RH_seg_RECOSM_ICBMnorm_sm500_05_inf125_05.srf
+colin_hires_RH_seg_RECOSM_sm1000_05_inf250_05.srf
+colin_hires_RH_seg_RECOSM_ICBMnorm_sm1000_05_inf250_05.srf
+separator.srf
+Both-hemisphere (unified) meshes.special
+colin_hires_BH_SPH160k.special
+colin_hires_BH_SPH160k_ICBMnorm.special
+colin_midres_BH_SPH40k.special
+colin_midres_BH_SPH40k_ICBMnorm.special
+colin_lowres_BH_SPH10k.special
+colin_lowres_BH_SPH10k_ICBMnorm.special
+colin_hires_BH_seg_RECOSM.special
+colin_hires_BH_seg_RECOSM_ICBMnorm.special
+colin_hires_BH_seg_RECOSM_sm500_05_inf125_05.special
+colin_hires_BH_seg_RECOSM_ICBMnorm_sm500_05_inf125_05.special
+colin_hires_BH_seg_RECOSM_sm1000_05_inf250_05.special
+colin_hires_BH_seg_RECOSM_ICBMnorm_sm1000_05_inf250_05.special
+Head (and dura mater) surfaces.special
+colin_head.special
+colin_head_ICBMnorm.special
+colin_dura.special
+colin_dura_ICBMnorm.special
+Flattened surfaces (2D meshes).special
+colin_hires_LH_SPH160k_FLAT.special
+colin_hires_RH_SPH160k_FLAT.special
+colin_midres_LH_SPH40k_FLAT.special
+colin_midres_RH_SPH40k_FLAT.special
+colin_hires_LH_seg_FLAT.special
+colin_hires_RH_seg_FLAT.special
+CBA-compatible surfaces (BV segmentation).special
+colin_LH_SPH.special
+colin_LH_SPH_ICBMnorm.special
+colin_RH_SPH.special
+colin_RH_SPH_ICBMnorm.special
+Shen et al. 268-parcellation Atlas files.special
+shen_parcels_BH.special
+shen_parcels_LH.special
+shen_parcels_RH.special
+colin_subcort.subcort
+colin_subcort_ICBMnorm.subcort
+colin_subcort_combined.subcort
+colin_subcort_combined_ICBMnorm.subcort
+colin_subcort_BStem.subcort
+colin_subcort_BStem_ICBMnorm.subcort
+colin_subcort_lAmyg.subcort
+colin_subcort_lAmyg_ICBMnorm.subcort
+colin_subcort_lCaud.subcort
+colin_subcort_lCaud_ICBMnorm.subcort
+colin_subcort_lGPal.subcort
+colin_subcort_lGPal_ICBMnorm.subcort
+colin_subcort_lHipp.subcort
+colin_subcort_lHipp_ICBMnorm.subcort
+colin_subcort_lNAcc.subcort
+colin_subcort_lNAcc_ICBMnorm.subcort
+colin_subcort_lPut.subcort
+colin_subcort_lPut_ICBMnorm.subcort
+colin_subcort_lThal.subcort
+colin_subcort_lThal_ICBMnorm.subcort
+colin_subcort_rAmyg.subcort
+colin_subcort_rAmyg_ICBMnorm.subcort
+colin_subcort_rCaud.subcort
+colin_subcort_rCaud_ICBMnorm.subcort
+colin_subcort_rGPal.subcort
+colin_subcort_rGPal_ICBMnorm.subcort
+colin_subcort_rHipp.subcort
+colin_subcort_rHipp_ICBMnorm.subcort
+colin_subcort_rNAcc.subcort
+colin_subcort_rNAcc_ICBMnorm.subcort
+colin_subcort_rPut.subcort
+colin_subcort_rPut_ICBMnorm.subcort
+colin_subcort_rThal.subcort
+colin_subcort_rThal_ICBMnorm.subcort

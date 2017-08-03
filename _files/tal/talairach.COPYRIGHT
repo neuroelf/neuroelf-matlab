@@ -1,0 +1,171 @@
+talairach daemon client
+version 2.0
+
+http://ric.uthscsa.edu/resources
+http://ric.uthscsa.edu/projects/tdc/
+
+Programmers: Mick Fox, Angela Uecker
+
+(c) 2005, The Research Imaging Center - UTHSCSA
+
+----
+
+The Talairach Daemon Client will read tab or space delimited records from
+text files containing lists of Talairach coordinates arranged in x-y-z
+order. Or, using the Single Point Processing dialog, one can input in a
+single coordinate to label. It will then look up the coordinate in the
+Talairach Daemon database for the Talairach label. There are options to
+search for the single point, search range or nearest gray matter. The
+output is written to a file which can be viewed in the program, a
+third-party text editor or imported into a third-party spreadsheet.
+
+
+Installation
+
+   1. Install Java
+          * Macintosh:
+            Java is installed by default and updated by Apple's Software
+            Update.
+
+          * All other platforms:
+            Your computer must have a Java Virtual Machine installed.
+
+   2. Download the software at http://ric.uthscsa.edu/projects/tdc/
+
+   3. Unzip the file (if it wasn't done automatically at download)
+
+
+Command-Line Iterfaces
+
+There are two command line interface (CLI) methods that provide access to
+the Talairach Daemon (TD) databases. They are both based on Java code
+provided in a single .jar file. The methods, PointToTD and ExcelToTD, open
+a communication socket to the TD server, submit data, receive results,
+close the communication socket, and return the results.
+
+The graphical Talairach Daemon Client can also be started via the command
+line.
+
+    * PointtoTD is a CLI that sends a Talairach coordinate to the daemon
+      and prints the returned labels to the terminal. The program is run
+      as follows:
+
+      java -classpath talairach.jar org.brainmap.talairach.PointToTD 2, 15, 10, 12
+
+      In this example the 2 is the code for Talairach Atlas labels
+      database, and 15,10,12 is the x-y-z coordinate.
+
+      A code of 1 will select the SP Maps database while a code of 3:n
+      will perform a search around the coordinate in the Talairach Labels
+      database in a range designated by n (e.g. 3:5 would be a 5x5x5 mm
+      region).
+
+    * ExceltoTD is a CLI that takes a tab-delimited text file containing
+      any number of "x y z" coordinates for input, and creates a new
+      tab-delimited text file with labels appended line-by-line with the
+      coordinates. This file can be easily opened in a spreadsheet program
+      (such as Microsoft Excel) for further analysis, sorting, etc. The
+      program is run as follows:
+
+      java -classpath talairach.jar org.brainmap.talairach.ExcelToTD 2, Myfile.txt
+
+      In this example the 2 is the code for Talairach Atlas database and
+      Myfile.txt is a tab delimited text file. A new file named Myfile.td
+      is output. This file contains the original coordinates along with
+      the 5 levels of labels for each coordinate. The 3:n search mode is
+      supported with this application as well.
+
+    * Talairach Daemon Client is the graphical client that includes the
+      functionality of both CLI methods. The program is run as follows:
+
+      java -classpath talairach.jar org.brainmap.talairach.TalairachClient
+
+
+Batch File Format
+
+Before you begin searching you must create a text file with a list of the
+x-y-z Talairach coordinates that you want to label. The file "test.txt" is
+an example of the required format. The current version of the TD Java
+Search client will read files containing up to 40,000 records (x-y-z
+coordinates).
+
+
+Graphical Interface Instructions
+
+Batch Processing:
+
+   1. Once file(s) are created for batch processing, select your file(s)
+      using the "Open Input File" menu item or the "Choose File..."
+      button. The number of coordinates will be printed in the information
+      window.
+
+   2. Press the "Search" button to begin. Several messages will be printed
+      in the information window to inform you of the file loading
+      progress. A progress bar is updated every 10th coordinate to give
+      you an idea of how long it will take to retrieve all of the labels.
+      As each label is retrieved it is appended to the output file along
+      with the Talairach coordinates. The output file will be created
+      dependent on the input file name (i.e. If your input file is
+      test.txt, your output file will be test.td. Note the different
+      extensions.)
+
+   3. When all labels have been retrieved you are given the option to view
+      the result file in the program's text area. Also, the result file
+      can be viewed by any text editor or import it into a spreadsheet.
+
+Single Point Processing:
+
+   1. Enter in your coordinates into the "Coordinate Search" fields for x,
+      y, and z.
+
+   2. Choose your options for processing (i.e. Single Point, Range Search
+      or Nearest Gray Matter)
+
+   3. Choose your options for saving to a file. If you want to save to a
+      file, you must check the checkbox and pick a file. The file will
+      stay open for writing as long as the Single Point Processing dialog
+      is open. Once it closes, the file is closed. If the dialog is opened
+      again for processing, you would need to pick another file for the
+      next set of processing or the program will write over the current
+      file.
+
+   4. Click Search to process the point.
+
+
+Suggested Uses
+
+Brodmann Area (BA) Labels for Cortical Activations:
+
+When seeking Brodmann Area labels for cortical activation sites it is
+possible to extend the search diameter to find the nearest BA label. For
+an experiment designed to activate the M1 mouth motor region only 38% of
+the sites were found to fall within Brodmann Areas, but as the search
+diameter was increased to 3 mm, 5 mm, and 7 mm, BA labels were obtained
+for 62%, 92%, and 100% of the sites. This example shows the utility of
+obtaining BA labels for cortical activation sites. While the appropriate
+search range may vary from site to site within the brain, this is easy to
+test. The current release of the Java TD client only supports the 5 mm
+search diameter, but ranges from 3-11 mm will be made available soon. As
+the search range increases the number of labels found increases. This
+presents two problemsto the user. First, the label retrieval process
+becomes much slower. For a 5x5x5 mm search range 125 voxels are searched
+and many labels are found. The TD client reduces the number of labels by
+only responding with unique labels. The unique labels are organized by
+incidence within the search range, with the highest label incidence being
+the first label returned. Along with each of the unique labels is the
+number of voxel within the search range with that label. Second, with
+large search ranges, the user has to deal with much larger files to sort
+through. The recommended strategy is to search with a small search region
+initially, remove coordinates with BA labels, and proceed using smaller
+input files for larger search ranges.
+
+Anatomical Organization of Coordinate Data:
+
+For application that provide Talairach coordinates (SPM, MEDx, etc.), it
+is helpful to use anatomical labels from the TD to organize findings
+anatomically. The data saved by the Java Talairach Daemon client can be
+used to create a labeled file. A common use of this labeled file is to
+open it in Excel and rearrange the original slice-ordered data into 3-D
+anatomical groupings by sorting by lobe and gyrus. This provides users
+with a good sense of which activation sites to group together
+anatomically.

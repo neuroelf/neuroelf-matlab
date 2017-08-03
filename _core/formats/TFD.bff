@@ -1,0 +1,76 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.TFD/STD (Time Frequency Data/Single Trial Data files)
+# TFD FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Time Frequency Data files,Single Trial Data files
+EncodingSyntax:ieee-le
+Extensions:tfd,std
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# parse header
+FIELD !                       !uint32  !double  !1, 1                     !1       !FileVersion
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSourceTCFile      # e.g. *.ctc, *.mtc
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSourceCCFile      # e.g. *.ccc, *.srf
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSignals
+EXPRE !$BFFWRITE          !!!!!@SignalSources = @SignalSources - 1;
+FIELD !                       !uint32  !double  !1, @NrOfSignals          !        !SignalSources           # references to SourceTC/SourceCC file
+EXPRE !                   !!!!!@SignalSources = @SignalSources + 1;
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTrials
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfFrequencies
+FIELD !                       !single  !double  !1, @NrOfFrequencies      !        !Frequencies
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfLatencies
+FIELD !                       !single  !double  !1, 1                     !        !LatencyOffset
+FIELD !                       !single  !double  !1, 1                     !        !LatencyStepsize
+FIELD !                       !single  !double  !1, 1                     !        !OriginalSamplingFrequency
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSkippedTrials
+EXPRE !$BFFWRITE          !!!!!@SkippedTrials = @SkippedTrials - 1;
+FIELD !                       !uint32  !double  !1, @NrOfSkippedTrials    !        !SkippedTrials           # from Protocol Parameters (art. rejection)
+EXPRE !                   !!!!!@SkippedTrials = @SkippedTrials + 1;
+EXPRE !                   !!!!!$TensorDim = [@NrOfLatencies, @NrOfFrequencies, @NrOfTrials];
+
+# file requires basic knowledge about NrOfConditions / NrOfOnsets...
+EXPRE !$BFFREAD           !!!!!@Signal = emptystruct({'TensorReal', 'TensorImag'});
+BLOOP !~$HEADERONLY           ! ! !@NrOfSignals ! !SigNo
+FIELD !                       !single  !single  !$TensorDim               !        !Signal($SigNo).TensorReal
+FIELD !                       !single  !single  !$TensorDim               !        !Signal($SigNo).TensorImag
+ELOOP !                       ! ! !  ! !SigNo
+EXPRE ! $HEADERONLY       !!!!!@Signal(@NrOfSignals).TensorReal = []; fseek(fid, 8 * @NrOfSignals * prod($TensorDim), 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NameOfSourceTCFile = '<none>';
+@NameOfSourceCCFile = '<none>';
+@NrOfSignals = 1;
+@SignalSources = 1;
+@NrOfTrials = 1;
+@NrOfFrequencies = 1;
+@Frequencies = 1;
+@NrOfLatencies = 1;
+@LatencyOffset = 0;
+@LatencyStepsize = 1;
+@OriginalSamplingFrequency = 400;
+@NrOfSkippedTrials = 0;
+@SkippedTrials = zeros(1, 0);
+@Signal.TensorReal = single(1);
+@Signal.TensorImag = single(0);
+EndNewFileCode

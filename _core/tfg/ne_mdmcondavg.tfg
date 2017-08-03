@@ -1,0 +1,144 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - MDM condition average plots
+
+Version:  0.9d
+Build:    15090116
+Date:     Sep-01 2015, 4:46 PM EST
+Figure:   NeuroElf GUI - MDM condition average plots
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - MDM condition average plots
+
+% Copyright (c) 2011, 2014, 2015, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+rtag    |]sprintf('CA%06x_', floor(2^24 * rand(1, 1)))
+types   |]{'FFX'; 'RFX'; 'RFX (weighted)'}
+plusbt  |]imread([neuroelf_path('icons') '/plus.tif'])
+minusbt |]imread([neuroelf_path('icons') '/minus.tif'])
+rgbbt   |]permute(uint8(cat(2, repmat([255; 0; 0], [1, 6, 12]), repmat([0; 255; 0], [1, 6, 12]), repmat([0; 0; 255], [1, 6, 12]))), [3, 2, 1])
+colbt   |]repmat(uint8(reshape([0, 0, 255], [1, 1, 3])), [12, 18]);
+whibt   |]repmat(uint8(reshape([255, 255, 255], [1, 1, 3])), [12, 18]);
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                 |Tag                          |Page|Resizeable|CallbackClReq
+        |pixels|off    |$   -1   -1   720  480 |NeuroElf GUI - MDM condition averages |][tfgtv.rtag 'Figure']       |$ 1 |on        |]['neuroelf_gui(''closesatwindow'', ''' tfgtv.rtag(1:8) ''');']
+---    END_FIGURE    ---
+
+---    BEGIN_MENU    ---
+Comment |Level |Enabled |Checked |Separator |EGroups|VGroups|Caption      |Accelerator|Tag                          |Callback
+        |      |        |        |          |       |       |                        ||                             |
+Main menu ->
+
+  File ->
+        |$1    |        |        |          |       |Opt    |&File                   ||]['UIM_' tfgtv.rtag 'File']  |
+        |$2    |        |        |          |       |       |Save extract datafile...||]['UIM_' tfgtv.rtag 'SData'] |
+        |$2    |        |        |on        |       |       |Save figure screenshot...||]['UIM_' tfgtv.rtag 'SFig']  |
+        |$2    |        |        |          |       |       |Save axes screenshot... ||]['UIM_' tfgtv.rtag 'SAxes'] |
+
+  Data ->
+        |$1    |        |        |          |       |Opt    |&Data                   ||]['UIM_' tfgtv.rtag 'Data']  |
+        |$2    |        |        |          |       |       |Set data in Base Workspace||]['UIM_' tfgtv.rtag 'CData']|
+        |$2    |        |        |          |       |       |Set raw data in Base Workspace||]['UIM_' tfgtv.rtag 'CRaw']|
+        |$2    |        |        |on        |       |       |Copy to separate plot   ||]['UIM_' tfgtv.rtag 'CPlot'] |
+
+  Options ->
+        |$1    |        |        |          |       |Opt    |&Options                ||]['UIM_' tfgtv.rtag 'Opt']   |
+        |$2    |        |        |          |       |       |Confidence intervals    ||]['UIM_' tfgtv.rtag 'OptSP'] |
+        |$2    |off     |        |on        |       |       |Legend location         ||]['UIM_' tfgtv.rtag 'OptLL'] |
+        |$2    |        |on      |          |       |       |   NorthWest            ||]['UIM_' tfgtv.rtag 'OptLNW']|
+        |$2    |        |        |          |       |       |   NorthEast            ||]['UIM_' tfgtv.rtag 'OptLNE']|
+        |$2    |        |        |          |       |       |   SouthWest            ||]['UIM_' tfgtv.rtag 'OptLSW']|
+        |$2    |        |        |          |       |       |   SouthEast            ||]['UIM_' tfgtv.rtag 'OptLSE']|
+        |$2    |off     |        |on        |       |       |RFX difference          ||]['UIM_' tfgtv.rtag 'OptD']  |
+        |$3    |        |        |          |       |       |A - B                   ||]['UIM_' tfgtv.rtag 'OptD1'] |
+        |$3    |        |        |          |       |       |B - A                   ||]['UIM_' tfgtv.rtag 'OptD2'] |
+        |$2    |        |        |          |       |       |Subject selection       ||]['UIM_' tfgtv.rtag 'OptSS'] |
+        |$2    |        |        |          |       |       |Temporal smoothing (0s) ||]['UIM_' tfgtv.rtag 'OptTS'] |
+---     END_MENU     ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|Page|RGroup|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+controls (position fix on X/Y) | |         |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$    8  460  100   16 |Select cluster:                           |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |CheckBox   |$  106    1   18  -18 |                                          |]['CB_' tfgtv.rtag 'UVOI']||$ 9|         ||] 1  |left  |      |       |All    |       |Opt    |    |      |||Update main GUI cluster selection (when checked)|
+        |DropDown   |$ -106  -23  128  -20 |none                                      |]['DD_' tfgtv.rtag 'VOI'] ||$ 9|         ||     |left  |      |       |All    |       |Opt    |    |      |||Switch between VOIs|
+        |Label      |$    0  -24    0  -16 |Grouping:                                 |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |DropDown   |$    0  -22    0  -20 |]tfgtv.types                              |]['DD_' tfgtv.rtag 'Type']||$ 9|         ||     |left  |      |       |All    |       |Opt    |    |      |||Switch between types of grouping computation|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$    0  -26   96  -16 |Select conditions:                        |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Button     |$  104    3  -24    0 |]tfgtv.rgbbt                              |]['BT_' tfgtv.rtag 'CndC']|| |           ||     |left  |      |       |All    |       |Opt    |    |      |||Pick (alter) colors for conditions|
+        |Listbox    |$ -104 -111  128 -108 |empty                                     |]['LB_' tfgtv.rtag 'Cond']||$ 9|$[1, 3, 1]||    |left  |      |       |All    |       |Opt    |    |      |||Select conditions to display|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$    0  -24   60  -16 |Collapsed:                                |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Button     |$   60    2   18  -18 |]tfgtv.plusbt                             |]['BT_' tfgtv.rtag 'CPls']|| |           ||     |left  |      |       |All    |       |Opt    |    |      |||Collapse selected conditions|
+        |Button     |$   22    0    0    0 |]tfgtv.minusbt                            |]['BT_' tfgtv.rtag 'CMns']|| |           ||     |left  |      |       |All,CGrp |     |Opt    |    |      |||Un-collapse selected collapsed conditions|
+        |Button     |$   22    1  -24  -16 |]tfgtv.rgbbt                              |]['BT_' tfgtv.rtag 'ColC']|| |           ||     |left  |      |       |All,CGrp |     |Opt    |    |      |||Pick (alter) colors for condition lines|
+        |Listbox    |$ -104  -73  128  -70 |empty                                     |]['LB_' tfgtv.rtag 'Coll']||$ 9|$[1, 3, 1]||    |left  |      |       |All,CGrp |     |Opt    |    |      |||Select collapsed conditions to display|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$    0  -24  106  -16 |Selected groups:                          |                       ||$ 9 |           ||     |left  |      |       |All,UGrp |     |Opt    |    |      ||||
+        |Listbox    |$    0  -48  128  -48 |empty                                     |]['LB_' tfgtv.rtag 'Grps']||$ 9|$[1, 3, 1]||    |left  |      |       |All,UGrp |     |Opt    |    |      |||Select groups to display|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |CheckBox   |$    0  -24   18  -18 |                                          |]['CB_' tfgtv.rtag 'Rob'] ||$ 9|         ||     |left  |      |       |All    |       |Opt    |    |      |||Use robust estimation (throughout)|
+        |Label      |$   22   -2  106  -16 |Robust estimates                          |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |CheckBox   |$  -22  -24   18  -18 |                                          |]['CB_' tfgtv.rtag 'SDSE']||$ 9|         ||     |left  |      |       |All    |       |Opt    |    |      |||Use standard error instead of standard deviation|
+        |Label      |$   22   -2  106  -16 |SE instead of SD                          |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |CheckBox   |$  -22  -24   18  -18 |                                          |]['CB_' tfgtv.rtag 'OVis']||$ 9|         ||] 1  |left  |      |       |All    |       |       |    |      ||||
+        |Label      |$   22   -2  106  -16 |Options visible                           |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$  132   28   88  -16 |Baseline window:                          |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Edit       |$   92    0  112  -24 |]['-2:1:0']                               |]['ED_' tfgtv.rtag 'BWin']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||baseline window (s)|
+        |Label      |$  118    0  128  -16 |Averaging window length:                  |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Edit       |$  136    0   58  -24 |]['0.0:20.0']                             |]['ED_' tfgtv.rtag 'AWin']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||averaging window length (s)|
+        |Label      |$   70    0   60  -16 |virtual TR:                               |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Edit       |$   68    0   64  -24 |0.1                                       |]['ED_' tfgtv.rtag 'AVTR']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||averaging sampling rate (virtual TR, s)|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$ -484  -28   72  -16 |Axes range                                |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Label      |$   76    0   16  -16 |X:                                        |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Edit       |$   16    0   54  -24 |0.0                                       |]['ED_' tfgtv.rtag 'AxX1']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||X-axes from-value|
+        |Edit       |$   58    0    0    0 |20.0                                      |]['ED_' tfgtv.rtag 'AxX2']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||X-axes to-value|
+        |Label      |$   60    0   16  -16 |Y:                                        |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |Edit       |$   16    0   54  -24 |['-1.0']                                  |]['ED_' tfgtv.rtag 'AxY1']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||Y-axes from-value|
+        |Edit       |$   58    0    0    0 |1.0                                       |]['ED_' tfgtv.rtag 'AxY2']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||Y-axes to-value|
+        |Label      |$   60    0   64  -16 |Error bands:                              |                       ||$ 9 |           ||     |left  |      |       |All    |       |Opt    |    |      ||||
+        |CheckBox   |$   68    3   18  -18 |                                          |]['CB_' tfgtv.rtag 'EBnd']||$ 9|         ||] 1  |left  |      |       |All    |       |Opt    |    |      |||En-/disable error bands display|
+        |CheckBox   |$   22    0    0    0 |                                          |]['CB_' tfgtv.rtag 'ECrv']||$ 9|         ||     |left  |      |       |All    |       |Opt    |    |      |||En-/disable source curves display|
+        |Button     |$   24    1   20  -16 |]tfgtv.whibt                              |]['BT_' tfgtv.rtag 'BGrC']|| |           ||     |left  |      |       |All    |       |Opt    |    |      |||Pick (alter) color for axes background
+        |Edit       |$   26   -4   64  -24 |0.25                                      |]['ED_' tfgtv.rtag 'EAlp']||$ 9 |        ||     |center|      |       |All    |       |Opt    |    |      |||X-axes from-value|
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Frame      |$  140    0    1 1600 |                                          |                       ||    |           ||     |      |      |       |       |       |Opt    |    |      ||||
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+plot axes (resizing with figure) |    |    |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XAxes      |$  176   86  536  374 |                                          |]['AX_' tfgtv.rtag 'Plot'] |||           ||     |      |      |       |       |       |       |    |      ||||
+        |           |                      |                                          |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+---  END_UICONTROLS  ---

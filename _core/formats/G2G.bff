@@ -1,0 +1,68 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BVQX file format for *.G2G files (Granger 2 Granger)
+# G2G FileVersions supported: 1
+#
+# Version:  v1.1
+# Build:    16012320
+# Date:     Jan-23 2016, 8:32 PM EST
+# Author:   Lawrie McKay, Netherlands Institute for Neuroscience, Amsterdam, NL, EU
+# Editor:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:G2GData
+Description:Brain to brain surface based granger values
+EncodingSyntax:ieee-le
+Extensions:g2g
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# preset all values
+EXPRE !$BFFREAD           !!!!!eval(bffspec.NewFileCode);
+
+# read/write IO
+FIELD !                       !uint32  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSeeds
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTargets
+FIELD !@FileVersion > 256     !uint32  !double  !1, 1                     !        !NrOfConditions
+FIELD !@FileVersion > 256     !uint32  !double  !1, 1                     !        !NrOfSubjects
+FIELD !@FileVersion > 256     !cstring !cstring !@NrOfSeeds, 1            !        !NameOfSeed
+FIELD !@FileVersion > 256     !cstring !cstring !@NrOfTargets, 1          !        !NameOfTarget
+FIELD !@FileVersion > 256     !cstring !cstring !@NrOfConditions, 1       !        !NameOfCondition
+FIELD !@FileVersion > 256     !cstring !cstring !@NrOfSubjects, 1         !        !SubjectID
+EXPRE !@FileVersion < 257 !!!!!@NrOfConditions = 1; @NrOfSubjects = 1; @NameOfSeed = repmat({''}, @NrOfSeeds, 1); @NameOfTarget = repmat({''}, @NrOfTargets, 1); @NameOfCondition = ''; @SubjectID = ''; if $BFFWRITE && ~isempty(@G2GData), @G2GData = @G2GData(:, :, 1, 1); end
+FIELD !                       !double  !double  !1, 1                     !        !ScaleFactor
+FIELD !                       !uint8   !double  !1, 1                     !        !G2GDataType
+EXPRE !                   !!!!!if ~any(@G2GDataType == [1, 2]), error('Invalid datatype.'); end
+FIELD !@G2GDataType == 1 && ~$HEADERONLY !single !single !@NrOfTargets, @NrOfSeeds, @NrOfConditions, @NrOfSubjects ! !G2GData
+FIELD !@G2GDataType == 2 && ~$HEADERONLY !double !double !@NrOfTargets, @NrOfSeeds, @NrOfConditions, @NrOfSubjects ! !G2GData
+EXPRE !@G2GDataType == 1 &&  $HEADERONLY !!!!!@G2GData = []; fseek(fid, 4 * @NrOfTargets * @NrOfSeeds * @NrOfConditions * @NrOfSubjects, 0);
+EXPRE !@G2GDataType == 2 &&  $HEADERONLY !!!!!@G2GData = []; fseek(fid, 8 * @NrOfTargets * @NrOfSeeds * @NrOfConditions * @NrOfSubjects, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NrOfSeeds = 1000;
+@NrOfTargets = 1000;
+@NrOfConditions = 1;
+@NrOfSubjects = 1;
+@NameOfSeed = repmat({''}, @NrOfSeeds, 1);
+@NameOfTarget = repmat({''}, @NrOfTargets, 1);
+@NameOfCondition = {'Condition'};
+@SubjectID = {'subject'};
+@ScaleFactor = 1;
+@G2GDataType = 1;
+@G2GData = single(zeros([@NrOfSeeds, @NrOfTargets, @NrOfConditions, @NrOfSubjects]));
+EndNewFileCode
+

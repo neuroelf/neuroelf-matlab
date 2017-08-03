@@ -1,0 +1,48 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.MVP files (MVPa files)
+# MVP FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:MVPa files
+Extensions:mvp
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!
+FIELD!                   !NrOfExemplars       !double  !%d     !1      !        !NrOfExemplars
+FIELD!                   !NrOfFeatures        !double  !%d     !1      !        !NrOfFeatures
+EXPRE!!!!!!!$NrOfFeaturesPP = @NrOfFeatures + 1;
+WRTLN!!!!!!!!
+
+# read array
+BLOOP!$TFFREAD           ! ! ! !1 ! !MVPRead
+ARRAY!                   !FeatureValues       !double  !%.6f   !@NrOfExemplars, $NrOfFeaturesPP ! !FeatureValues
+EXPRE!!!!!!!@ClassValues = @FeatureValues(:, 1); @FeatureValues(:, 1) = [];
+ELOOP!                   ! ! ! !  ! !MVPRead
+
+# write array
+BLOOP!$TFFWRITE          ! ! ! !1 ! !MVPWrite
+EXPRE!!!!!!!error('Not yet implemented.');
+ELOOP!                   ! ! ! !  ! !MVPWrite
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfExemplars = 2;
+@NrOfFeatures = 1;
+@FeatureValues = [1; -1];
+@ClassValues = [1; -1];
+EndNewFileCode

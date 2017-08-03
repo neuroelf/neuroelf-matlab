@@ -1,0 +1,72 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# DTi Studio file format for *.dat files (Fiberdat)
+# DTSF FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:DTI Studio FiberDat files (*.dat)
+EncodingSyntax:ieee-le
+Extensions:dtsf # dummy extension !
+Magic:|
+name          |range       |type    |magic
+DTSF_FiberDat |1, 8        |regexp  |^FiberDat$
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+EXPRE !$BFFWRITE          !!!!!@FiberDatMagic = 'FiberDat'; @HeaderPadding = uint8(zeros(1, 82));       # just to make sure!
+
+# Header
+FIELD !                       !char    !char    !1, 8                     !        !FiberDatMagic       # 'FiberDat'     0x0000
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfFibers          #                0x0008
+FIELD !                       !uint32  !double  !1, 1                     !        !ReservedN           #                0x000c
+FIELD !                       !single  !double  !1, 1                     !        !ReservedF           #                0x0010
+FIELD !                       !uint32  !double  !1, 1                     !        !DimX                #                0x0014
+FIELD !                       !uint32  !double  !1, 1                     !        !DimY                # pix            0x0018
+FIELD !                       !uint32  !double  !1, 1                     !        !DimZ                #                0x001c
+FIELD !                       !single  !double  !1, 1                     !        !ResX                #                0x0020
+FIELD !                       !single  !double  !1, 1                     !        !ResY                # mm/pix         0x0024
+FIELD !                       !single  !double  !1, 1                     !        !ResZ                #                0x0028
+FIELD !                       !uint8   !double  !1, 1                     !        !SliceOrientation    # 0: cor, 1: axial, 2: sag
+FIELD !                       !uint8   !double  !1, 1                     !        !SliceSequencing     # 0: normal, 1: z-flipped
+FIELD !                       !uint8   !uint8   !1, 82                    !        !HeaderPadding       #                0x002e
+
+# Fibers
+EXPRE !$HEADERONLY        !!!!! ...
+@Fibers = emptystruct({'NrOfPoints', 'Selected', 'RGB', 'FromToPoint', 'Coord'}); ...
+fseek(fid, 0, 1); ...
+rulec = 999;
+
+EXPRE !$BFFREAD           !!!!!@Fibers = xffdtsfparsefibers(fid, @NrOfFibers);
+EXPRE !$BFFWRITE          !!!!!xffdtsfwritefibers(fid, @Fibers);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FiberDatMagic = 'FiberDat';
+@NrOfFibers = 0;
+@ReservedN = 0;
+@ReservedF = 0;
+@DimX = 128;
+@DimY = 128;
+@DimZ = 64;
+@ResX = 2;
+@ResY = 2;
+@ResZ = 2;
+@SliceOrientation = 1;
+@SliceSequencing = 0;
+@HeaderPadding = uint8(zeros(1, 82));
+@Fibers = emptystruct({'NrOfPoints', 'Selected', 'RGB', 'FromToPoint', 'Coord'});
+EndNewFileCode

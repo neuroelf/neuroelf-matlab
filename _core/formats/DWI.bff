@@ -1,0 +1,48 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.DWI files (Diffusion Weighted Image data)
+# DWI FileVersions supported: (no versioning information yet)
+#
+# DWI files currently contain only data, no header fields at all!
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:DWIData
+Description:Diffusion weighted image
+EncodingSyntax:ieee-le
+Extensions:dwi
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# Layout information from DMR file, otherwise error
+EXPRE !$BFFREAD           !!!!![t_file{1:3}] = fileparts($FILENAME); if isempty(t_file{1}), t_file{1} = '.'; end, try, t_dmr = xff([t_file{1} filesep t_file{2} '.dmr']); catch ne_eo; neuroelf_lasterr(ne_eo); error('Missing required information from DMR.'); end, try, @DataStorageFormat = t_dmr.DataStorageFormat; @NrOfVolumes = t_dmr.NrOfVolumes; @NrOfSlices = t_dmr.NrOfSlices; @ResolutionX = t_dmr.ResolutionX; @ResolutionY = t_dmr.ResolutionY; catch ne_eo; neuroelf_lasterr(ne_eo); t_dmr.ClearObject; error('Missing fields in DMR.'); end, t_dmr.ClearObject;
+EXPRE !                   !!!!!$DataDims = []; switch (@DataStorageFormat), case {3}, $DataDims = [@ResolutionX, @ResolutionY, @NrOfSlices, @NrOfVolumes]; case {4}, $DataDims = [@NrOfVolumes, @ResolutionX, @ResolutionY, @NrOfSlices]; otherwise, error('Invalid DataStorageFormat in DMR.'); end
+
+# Data
+FIELD !~$HEADERONLY           !uint16  !uint16  !$DataDims                !        !DWIData
+EXPRE ! $HEADERONLY       !!!!!@DWIData = []; fseek(fid, 2 * prod($DataDims), 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@DataStorageFormat = 3;
+@NrOfVolumes = 1;
+@NrOfSlices = 64;
+@ResolutionX = 128;
+@ResolutionY = 128;
+@DWIData = uint16(0); @DWIData(@ResolutionX, @ResolutionY, @NrOfSlices, @NrOfVolumes) = @DWIData(1);
+EndNewFileCode

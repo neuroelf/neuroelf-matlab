@@ -1,0 +1,87 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.DAT files (AVeraGing Data file)
+# DAT FileVersions supported: 1.0
+#
+# Version:  v0.9a
+# Build:    11050315
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Event-related averaging plot value files (*.dat)
+Extensions:avgd # bogus extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+AVGD_segivals |1, 384      |regexpi |nrofsegintervals
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!!!!!!!$DDim2 = 1;
+FIELD!                   !FileVersion         !double  !%.1f   !1      !1       !FileVersion
+EXPRE!$TFFWRITE     !!!!!!@NrOfCurves = numel(@Curve);
+FIELD!                   !NrOfCurves          !double  !%d     !1      !        !NrOfCurves
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !StdDevErrs          !double  !%d     !1      !1       !StdDevErrs
+EXPRE!@StdDevErrs == 1   !!!!!!$DDim2 = $DDim2 + 1;
+
+% loop over curves
+EXPRE!$TFFREAD      !!!!!!...
+@Curve = emptystruct({ ...
+    'NrOfCurveDataPoints', 'TimeCourseThick', 'TimeCourseColorR', 'TimeCourseColorG', 'TimeCourseColorB', ...
+    'StdDevErrThick', 'StdDevErrColorR', 'StdDevErrColorG', 'StdDevErrColorB', ...
+    'NrOfSegIntervals', 'SegInterval'});
+BLOOP!                   ! ! ! !@NrOfCurves ! !CurveNo
+FIELD!                   !NrOfCurveDataPoints !double  !%d     !1      !1       !Curve($CurveNo).NrOfCurveDataPoints
+FIELD!                   !TimeCourseThick     !double  !%d     !1      !3       !Curve($CurveNo).TimeCourseThick
+FLIST!                   !TimeCourseColorR    !double  !%d     !1      !        !Curve($CurveNo).TimeCourseColorR
+FLIST!                   !TimeCourseColorG    !double  !%d     !1      !        !Curve($CurveNo).TimeCourseColorG
+FLIST!                   !TimeCourseColorB    !double  !%d     !1      !        !Curve($CurveNo).TimeCourseColorB
+FIELD!@StdDevErrs == 1   !StdDevErrThick      !double  !%d     !1      !2       !Curve($CurveNo).StdDevErrThick
+FLIST!@StdDevErrs == 1   !StdDevErrColorR     !double  !%d     !1      !        !Curve($CurveNo).StdDevErrColorR
+FLIST!@StdDevErrs == 1   !StdDevErrColorG     !double  !%d     !1      !        !Curve($CurveNo).StdDevErrColorG
+FLIST!@StdDevErrs == 1   !StdDevErrColorB     !double  !%d     !1      !        !Curve($CurveNo).StdDevErrColorB
+EXPRE!$TFFREAD && @StdDevErrs < 1 !!!!!!...
+@Curve($CurveNo).StdDevErrThick = 0; ...
+@Curve($CurveNo).StdDevErrColorR = 0; ...
+@Curve($CurveNo).StdDevErrColorG = 0; ...
+@Curve($CurveNo).StdDevErrColorB = 0;
+
+FIELD!                   !NrOfSegIntervals    !double  !%d     !1      !        !Curve($CurveNo).NrOfSegIntervals
+EXPRE!!!!!!!$NrOfSegInts = @Curve($CurveNo).NrOfSegIntervals;
+BLOOP!                   ! ! ! !$NrOfSegInts !!IntNo
+ARRAY!                   !OnOffset            !double  !%d     !1, 2   !        !Curve($CurveNo).SegInterval($IntNo).OnOffset
+ARRAY!                   !ColorRGB            !double  !%d     !1, 3   !        !Curve($CurveNo).SegInterval($IntNo).ColorRGB
+ELOOP!                   ! ! ! !  ! !IntNo
+WRTLN!!!!!!!<data>
+EXPRE!!!!!!!$NrOfCP = @Curve($CurveNo).NrOfCurveDataPoints;
+ARRAY!                   !PlotData            !double  !%.6f   !$NrOfCP, $DDim2!!Curve($CurveNo).PlotData
+WRTLN!!!!!!!<data>
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !CurveNo
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfCurves = 0;
+@StdDevErrs = 1;
+@TimeCourseThick = 3;
+@TimeCourseColorR = 75;
+@TimeCourseColorG = 255;
+@TimeCourseColorB = 165;
+@StdDevErrThick = 2;
+@StdDevErrColorR = 75;
+@StdDevErrColorG = 255;
+@StdDevErrColorB = 165;
+@Curve = emptystruct({ ...
+    'NrOfCurveDataPoints', 'TimeCourseThick', 'TimeCourseColorR', 'TimeCourseColorG', 'TimeCourseColorB', ...
+    'StdDevErrThick', 'StdDevErrColorR', 'StdDevErrColorG', 'StdDevErrColorB', ...
+    'NrOfSegIntervals', 'SegInterval'});
+EndNewFileCode

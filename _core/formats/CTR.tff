@@ -1,0 +1,50 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.CTR files (ConTRast)
+# CTR FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Contrast files
+Extensions:ctr
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+CTR_nocontrast|1, 256      |regexpi |nrofcontrasts\:\s*\d+.*nrofvalues\:\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# header
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+FLIST!                   !NrOfContrasts       !double  !%d     !1      !        !NrOfContrasts
+FLIST!                   !NrOfValues          !double  !%d     !1      !        !NrOfValues
+
+# data
+WRTLN!!!!!!!!  # empty line
+ARRAY!                   !ContrastNames       !string  !"%s"   !1, @NrOfContrasts !!ContrastNames
+EXPRE!$TFFWRITE          !!!!!!@ContrastValues = @ContrastValues';
+ARRAY!                   !ContrastValues      !double  !%d     !@NrOfValues, @NrOfContrasts !!ContrastValues
+EXPRE!                   !!!!!!@ContrastValues = @ContrastValues';
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NrOfContrasts = 1;
+@NrOfValues = 1;
+@ContrastNames = {'Empty contrast'};
+@ContrastValues = 0;
+EndNewFileCode

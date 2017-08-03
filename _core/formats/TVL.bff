@@ -1,0 +1,47 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# TrackMark file format for *.TVL files (Trackmark VoLume)
+# TVL FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Trackmark volume files
+EncodingSyntax:ieee-le
+Extensions:tvl
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !DimX
+FIELD !                       !single  !double  !1, 6                     !        !DimXValues
+FIELD !                       !uint32  !double  !1, 1                     !        !DimY
+FIELD !                       !single  !double  !1, 6                     !        !DimYValues
+FIELD !                       !uint32  !double  !1, 1                     !        !DimZ
+FIELD !                       !single  !double  !1, 6                     !        !DimZValues
+FIELD !~$HEADERONLY           !single  !single  !12, @DimZ, @DimY, @DimX  !        !TrackValues
+EXPRE ! $HEADERONLY       !!!!!@TrackValues = []; fseek(fid, 48 * @DimZ * @DimY * @DimX, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@DimX = 0;
+@DimXValues = [0, 2, 0, 0, 0, 2];
+@DimY = 0;
+@DimYValues = [0, 2, 0, 0, 0, 2];
+@DimZ = 0;
+@DimZValues = [0, 2, 0, 0, 0, 2];
+@TrackValues = zeros([12, 0, 0, 0]);
+EndNewFileCode

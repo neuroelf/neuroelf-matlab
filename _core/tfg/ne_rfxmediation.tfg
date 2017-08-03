@@ -1,0 +1,96 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - single-level mediation UI
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:39 PM EST
+Figure:   NeuroElf GUI - Single-level RFX mediation
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - Single-level RFX mediation
+
+% Copyright (c) 2010, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                     |Tag                        |CallbackClReq
+        |pixels|off    |$   -1   -1  632  480  |NeuroElf GUI - Single-level RFX mediation |Wnd_NeuroElf_rfxmediation  |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Value|MinMaxTop|ToolTip
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$   12  450   32   18 |GLM:                                      |                       |$ 9 |left  |      |       |       |      |     |         |
+        |DropDown   |$   36   -4  192  -26 |<no GLM with cons loaded>                 |DD_NeuroElf_RM_GLMs    |$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$  -36  -26  180  -18 |Subject selection:                        |                       |$ 9 |left  |      |       |       |      |     |         |
+        |ListBox    |$    0 -160  224 -160 |empty                                     |LB_NeuroElf_RM_subjects|$ 9 |      |      |       |       |      |     |$ 0 2 1  |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Frame      |$   -6   -8  234   -1 |                                          |                       |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$    6  -28  224  -18 |ab-path(s) Null-hypothesis test strategy: |                       |$ 9 |left  |      |       |       |      |     |         |
+        |RadioButton|$    0  -24    0    0 |Bootstrapping                             |RB_NeuroElf_RM_abboot  |$ 9 |left  |      |       |       |abmeth|$ 1  |         |
+        |RadioButton|$    0  -24    0    0 |Monte-Carlo simulation                    |RB_NeuroElf_RM_abmcmam |$ 9 |left  |      |       |       |abmeth|     |         |
+        |RadioButton|$    0  -24    0    0 |Sobel-Test                                |RB_NeuroElf_RM_absobel |$ 9 |left  |      |       |       |abmeth|     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Frame      |$   -6   -8  234   -1 |                                          |                       |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$    6  -28   96  -18 |Robust regression                         |                       |$ 9 |left  |      |       |       |      |     |         |
+        |CheckBox   |$   96    4  -18    0 |                                          |CB_NeuroElf_RM_robust  |    |center|      |off    |robust |noboot|$ 0  |         |
+        |Label      |$   24   -4  -88    0 |z-transformation                          |                       |$ 9 |left  |      |       |       |      |     |         |
+        |CheckBox   |$   88    4  -18    0 |                                          |CB_NeuroElf_RM_ztrans  |    |center|      |on     |       |      |$ 0  |         |
+        |Label      |$ -208  -30 -160    0 |Number of bootstrap samples:              |                       |$ 9 |left  |      |       |       |      |     |         |
+        |Edit       |$  164    2   64  -22 |10000                                     |ED_NeuroElf_RM_numsmp  |$ 9 |center|      |       |numsmp |      |     |         |
+        |Label      |$ -164  -28  160  -18 |Re-use bootstrap samples                  |                       |$ 9 |left  |      |       |       |      |     |         |
+        |CheckBox   |$  208    4  -18    0 |                                          |CB_NeuroElf_RM_bootre  |    |center|      |on     |numsmp |      |$ 0  |         |
+        |Label      |$ -208  -30  224  -18 |Bootstrap SE-method (for ab path):        |                       |$ 9 |left  |      |       |       |      |     |         |
+        |RadioButton|$    0  -24  -80    0 |Percentile                                |RB_NeuroElf_RM_bsperc  |$ 9 |left  |      |       |booted |bstrap|$ 1  |         |
+        |RadioButton|$   88    0  -52    0 |BCa                                       |RB_NeuroElf_RM_bsbca   |$ 9 |left  |      |       |booted |bstrap|     |         |
+        |RadioButton|$   60    0  -72    0 |Variance                                  |RB_NeuroElf_RM_bsvar   |$ 9 |left  |      |       |booted |bstrap|     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Frame      |$  244    4    1  472 |                                          |                       |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$    8  446   16  -18 |X:                                        |                       |$ 10|left  |      |       |       |      |     |         |
+        |DropDown   |$   24   -4  152  -26 |]{'contrast';'covariate'}                 |DD_NeuroElf_RM_Xtype   |$ 9 |left  |      |       |       |      |     |         |
+        |ListBox    |$  -24 -128  176 -128 |empty                                     |LB_NeuroElf_RM_Xlist   |$ 9 |      |      |       |       |      |     |$ 0 1 1  |
+        |Label      |$  192  132   16  -18 |Y:                                        |                       |$ 10|left  |      |       |       |      |     |         |
+        |DropDown   |$   24   -4  152  -26 |]{'contrast';'covariate'}                 |DD_NeuroElf_RM_Ytype   |$ 9 |left  |      |       |       |      |     |         |
+        |ListBox    |$  -24 -128  176 -128 |empty                                     |LB_NeuroElf_RM_Ylist   |$ 9 |      |      |       |       |      |     |$ 0 1 1  |
+        |Frame      |$ -196   -8  380   -1 |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$    4  -28  176  -18 |M: (contrasts/covariates)                 |                       |$ 10|left  |      |       |       |      |     |         |
+        |ListBox    |$    0 -112    0 -112 |empty                                     |LB_NeuroElf_RM_Mconlist|$ 9 |      |      |       |       |      |     |$ 0 2 1  |
+        |ListBox    |$    0 -118    0    0 |empty                                     |LB_NeuroElf_RM_Mcovlist|$ 9 |      |      |       |       |      |     |$ 0 2 1  |
+        |Label      |$  192  230    0  -18 |C: (contrasts/covariates)                 |                       |$ 10|left  |      |       |       |      |     |         |
+        |ListBox    |$    0 -112    0 -112 |empty                                     |LB_NeuroElf_RM_Cconlist|$ 9 |      |      |       |       |      |     |$ 0 2 1  |
+        |ListBox    |$    0 -118    0    0 |empty                                     |LB_NeuroElf_RM_Ccovlist|$ 9 |      |      |       |       |      |     |$ 0 2 1  |
+        |Frame      |$ -196   -8  380   -1 |                                          |                       |    |      |      |       |       |      |     |         |
+        |Frame      |$  188    4   -1  432 |                                          |                       |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Button     |$  252   12   94   24 |Cancel                                    |BT_NeuroElf_RM_cancel  |    |center|      |       |       |      |     |         |
+        |Button     |$  276    0    0    0 |Compute                                   |BT_NeuroElf_RM_compute |    |center|      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+---  END_UICONTROLS  ---

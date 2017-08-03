@@ -1,0 +1,9 @@
+_files/cache/*.*
+_files/colin/colin.v*
+_files/colin/colin_*.*
+_files/neurosynth/rawdata/*.*
+_files/neurosynth/terms/*.*
+_files/shenparcel/shen_parcel*.*
+_files/spm/spm8_dartel_template.mat
+_files/spm/dartel/Template1mm/*.*
+_files/tal/talairach_ICBMnorm.*

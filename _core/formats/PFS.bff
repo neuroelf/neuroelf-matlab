@@ -1,0 +1,93 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# POIFS file format for *.edat files (E-prime DATa files)
+# POIFS FileVersions supported: 3.3e
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:POIFS files,E-Prime data files
+EncodingSyntax:ieee-le
+Extensions:pfs,edat
+TransIOSize:128
+Magic:|
+name             |range       |type    |magic
+PFS_MagicToken   |1, 8        |hex     |d0,cf,11,e0,a1,b1,1a,e1
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# no full-write support
+EXPRE !$BFFWRITE          !!!!!error('No Save/SaveAs/bffio write support for POIFS files.');
+
+# check header
+FIELD !                       !uint8   !uint8   !1, 8                     !        !MagicToken
+EXPRE !                   !!!!!if ~all(@MagicToken == uint8([208, 207, 17, 224, 161, 177, 26, 225])), error('No POIFS file.'); end
+
+# read some more fields
+FIELD !                       !uint8   !uint8   !1, 16                    !        !CLSID
+FIELD !                       !int16   !double  !1, 1                     !        !MinorVersion
+FIELD !                       !int16   !double  !1, 1                     !        !Version
+FIELD !                       !int16   !double  !1, 1                     !        !ByteOrderingType
+FIELD !                       !int16   !double  !1, 1                     !        !LargeBlockExp2
+FIELD !                       !int16   !double  !1, 1                     !        !ShortBlockExp2
+EXPRE !                   !!!!!@LargeBlockSize = 2 .^ @LargeBlockExp2; @ShortBlockSize = 2 .^ @ShortBlockExp2; $FirstBatList = (@LargeBlockSize - 76) / 4; @PropertiesPerBlock = floor(@LargeBlockSize / 128);
+FIELD !                       !int16   !double  !1, 5                     !        !Extensions222426282a
+FIELD !                       !int32   !double  !1, 1                     !        !NrOfBATEntries
+FIELD !                       !int32   !double  !1, 1                     !        !FirstPropertyBlock
+FIELD !                       !int32   !double  !1, 1                     !        !Extensions34
+FIELD !                       !int32   !double  !1, 1                     !        !SBATThresholdSize
+FIELD !                       !int32   !double  !1, 1                     !        !FirstSBATBlock
+FIELD !                       !int32   !double  !1, 1                     !        !NrOfSBATBlocks
+FIELD !                       !int32   !double  !1, 1                     !        !FirstXBATBlock
+FIELD !                       !int32   !double  !1, 1                     !        !NrOfXBATElements
+FIELD !                       !int32   !int32   !1, $FirstBatList         !        !BATBlocksRaw
+EXPRE !                   !!!!!@FirstPropertyBlock = @FirstPropertyBlock + 1; @FirstSBATBlock = @FirstSBATBlock + 1; @FirstXBATBlock = @FirstXBATBlock + 1; @BATBlocksRaw = @BATBlocksRaw + 1; @BATBlocks = @BATBlocksRaw(@BATBlocksRaw > 0); $NrOfTotalBlocks = floor($FILESIZE / @LargeBlockSize) - 1;
+FIELD !                       !int32   !transio !128, $NrOfTotalBlocks    !        !Blocks
+EXPRE !                   !!!!!tioobjt = struct(@Blocks); tioobjt.DataType = 'uint8'; tioobjt.TypeSize = 1; tioobjt.DataDims(1) = 4 * tioobjt.DataDims(1); @StreamBlocks = transio(0, 'makeobject', tioobjt); @BAT = lsqueeze(@Blocks(:, @BATBlocks)) + 1; sbb = zeros(1, @NrOfSBATBlocks); fsbb = @FirstSBATBlock; try, for sbc = 1:numel(sbb), sbb(sbc) = fsbb; fsbb = @BAT(fsbb); end, @SBAT = lsqueeze(@Blocks(:, sbb)) + 1; catch ne_eo; neuroelf_lasterr(ne_eo); @SBAT = []; end, @SBATBlocks = []; @XBAT = []; @Properties = emptystruct({'Name', 'NameSize', 'Type', 'Color', 'Previous', 'Next', 'FirstChild', 'CLSID', 'UserFlags', 'Created', 'Modified', 'FirstBlock', 'Size', 'BlockAccess', 'Reserved7c'}); @CWD = 1;
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@MagicToken = uint8([208, 207, 17, 224, 161, 177, 26, 225]);
+@CLSID = uint8(zeros(1, 16));
+@MinorVersion = 33;
+@Version = 3;
+@ByteOrderingType = -2;
+@LargeBlockExp2 = 9;
+@ShortBlockExp2 = 6;
+@LargeBlockSize = 512;
+@ShortBlockSize = 64;
+@PropertiesPerBlock = 4;
+@Extensions222426282a = zeros(1, 5);
+@NrOfBATEntries = 1;
+@FirstPropertyBlock = 2;
+@Extensions3438 = 0;
+@SBATThresholdSize = 4096;
+@FirstSBATBlock = 3;
+@NrOfSBATBlocks = 1;
+@FirstXBATBlock = -1;
+@NrOfXBATElements = 0;
+@BATBlocksRaw = int32([0, -ones(1, 108)]);
+@BATBlocks = int32(1);
+@Blocks = [];
+@StreamBlocks = [];
+@BAT = [];
+@SBAT = [];
+@SBATBlocks = [];
+@XBAT = [];
+@Properties = emptystruct({'Name', 'NameSize', 'Type', 'Color', 'Previous', 'Next', 'FirstChild', 'CLSID', 'UserFlags', 'Created', 'Modified', 'FirstBlock', 'Size', 'BlockAccess', 'Reserved7c'});
+@CWD = 1;
+EndNewFileCode

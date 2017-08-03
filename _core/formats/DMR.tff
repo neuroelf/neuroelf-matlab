@@ -1,0 +1,288 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.DMR files (Diffusion MR data)
+# DMR FileVersions supported: 1, 2, 3
+#
+# Version:  v0.9c
+# Build:    11050617
+# Date:     May-06 2011, 5:38 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Diffusion MRI files
+Extensions:dmr
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+DMR_grddir    |1, 2048     |regexpi |gradientdirectionsverified\:\s*(yes|no)
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+
+# on read, check file version before attempt
+FIELD!                   !FileVersion            !double  !%d     !1      !1       !FileVersion
+FLIST!                   !NrOfVolumes            !double  !%d     !1      !        !NrOfVolumes
+FLIST!                   !NrOfSlices             !double  !%d     !1      !        !NrOfSlices
+FLIST!                   !NrOfSkippedVolumes     !double  !%d     !1      !        !NrOfSkippedVolumes
+
+# Data link
+FIELD!                   !Prefix                 !string  !"%s"   !1      !        !Prefix
+FIELD!                   !DataStorageFormat      !double  !%d     !1      !        !DataStorageFormat
+EXPRE!$TFFREAD      !!!!!!@DataType = 1;
+FIELD!@FileVersion > 2   !DataType               !double  !%d     !1      !2       !DataType
+
+# Header fields
+FLIST!                   !TR                     !double  !%d     !1      !        !TR
+FLIST!                   !InterSliceTime         !double  !%d     !1      !        !InterSliceTime
+FLIST!                   !TimeResolutionVerified !double  !%d     !1      !        !TimeResolutionVerified
+FLIST!                   !TE                     !double  !%d     !1      !        !TE
+FLIST!                   !SliceAcquisitionOrder  !double  !%d     !1      !        !SliceAcquisitionOrder
+FLIST!                   !SliceAcquisitionOrderVerified !double !%d !1    !        !SliceAcquisitionOrderVerified
+FIELD!                   !ResolutionX            !double  !%d     !1      !        !ResolutionX
+FIELD!                   !ResolutionY            !double  !%d     !1      !        !ResolutionY
+FLIST!                   !LoadAMRFile            !string  !"%s"   !1      !        !LoadAMRFile
+FLIST!                   !ShowAMRFile            !double  !%d     !1      !        !ShowAMRFile
+FLIST!                   !ImageIndex             !double  !%d     !1      !        !ImageIndex
+FLIST!                   !LayoutNColumns         !double  !%d     !1      !        !LayoutNColumns
+FLIST!                   !LayoutNRows            !double  !%d     !1      !        !LayoutNRows
+FLIST!                   !LayoutZoomLevel        !double  !%d     !1      !        !LayoutZoomLevel
+FLIST!                   !SegmentSize            !double  !%d     !1      !        !SegmentSize
+FLIST!                   !SegmentOffset          !double  !%d     !1      !        !SegmentOffset
+EXPRE!$TFFREAD      !!!!!!@DisplayVolume = 1;
+FLIST!@FileVersion > 1   !DisplayVolume          !double  !%d     !1      !0       !DisplayVolume
+FIELD!                   !ProtocolFile           !string  !"%s"   !1      !        !ProtocolFile
+
+# Internal resolution
+FIELD!                   !InplaneResolutionX     !double  !%f     !1      !        !InplaneResolutionX
+FIELD!                   !InplaneResolutionY     !double  !%f     !1      !        !InplaneResolutionY
+FIELD!                   !SliceThickness         !double  !%f     !1      !        !SliceThickness
+FIELD!                   !SliceGap               !double  !%f     !1      !        !SliceGap
+FIELD!                   !VoxelResolutionVerified!double  !%d     !1      !        !VoxelResolutionVerified
+
+# Position information
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!PositionInformationFromImageHeaders
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !PosInfosVerified       !double  !%d     !1      !0       !PosInfosVerified
+FIELD!                   !CoordinateSystem       !double  !%d     !1      !0       !CoordinateSystem
+FLIST!                   !Slice1CenterX          !double  !%8.5f  !1      !        !Slice1CenterX
+FLIST!                   !Slice1CenterY          !double  !%8.5f  !1      !        !Slice1CenterY
+FLIST!                   !Slice1CenterZ          !double  !%8.5f  !1      !        !Slice1CenterZ
+FLIST!                   !SliceNCenterX          !double  !%8.5f  !1      !        !SliceNCenterX
+FLIST!                   !SliceNCenterY          !double  !%8.5f  !1      !        !SliceNCenterY
+FLIST!                   !SliceNCenterZ          !double  !%8.5f  !1      !        !SliceNCenterZ
+EXPRE!1 == 0 !!!!!!; # needed for MATLAB R13, regexp/i bug with too long pattern
+FLIST!                   !RowDirX                !double  !%f     !1      !        !RowDirX
+FLIST!                   !RowDirY                !double  !%f     !1      !        !RowDirY
+FLIST!                   !RowDirZ                !double  !%f     !1      !        !RowDirZ
+FLIST!                   !ColDirX                !double  !%f     !1      !        !ColDirX
+FLIST!                   !ColDirY                !double  !%f     !1      !        !ColDirY
+FLIST!                   !ColDirZ                !double  !%f     !1      !        !ColDirZ
+EXPRE!1 == 0 !!!!!!; # needed for MATLAB R13, regexp/i bug with too long pattern
+FLIST!                   !NRows                  !double  !%d     !1      !        !NRows
+FLIST!                   !NCols                  !double  !%d     !1      !        !NCols
+FLIST!                   !FoVRows                !double  !%d     !1      !        !FoVRows
+FLIST!                   !FoVCols                !double  !%d     !1      !        !FoVCols
+
+# Must be fields (no colon!)
+FIELD!                   !SliceThickness         !double  !%f     !1      !        !SliceThickness
+FIELD!                   !GapThickness           !double  !%f     !1      !        !GapThickness
+
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfPastSpatialTransformations!double !%d !1    !        !NrOfPastSpatialTransformations
+
+# If past transformations
+EXPRE!$TFFREAD      !!!!!!@Trf = emptystruct({ ...
+    'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', ...
+    'AppliedToFile', 'NrOfTransformationValues', 'TrfMatrix'});
+BLOOP!@NrOfPastSpatialTransformations > 0 !PastST!!!@NrOfPastSpatialTransformations !!PastST
+FLIST!                   !NameOfSpatialTransformation !string !"%s"!1     !        !Trf($PastST).NameOfSpatialTransformation
+FLIST!                   !TypeOfSpatialTransformation !string !%d !1      !        !Trf($PastST).TypeOfSpatialTransformation
+FLIST!                   !AppliedToFile          !string  !"%s"   !1      !        !Trf($PastST).AppliedToFile
+FLIST!                   !NrOfTransformationValues!double !%d     !1      !        !Trf($PastST).NrOfTransformationValues
+ARRAY!@Trf($PastST).TypeOfSpatialTransformation == 1 !TrfMatrix!double !%.6f !3, 3 ! !Trf($PastST).TrfMatrix
+ARRAY!@Trf($PastST).TypeOfSpatialTransformation == 2 !TrfMatrix!double !%.6f !4, 4 ! !Trf($PastST).TrfMatrix
+ARRAY!@Trf($PastST).TypeOfSpatialTransformation >  2 !TrfMatrix!double !%.6f !3, 3 ! !Trf($PastST).TrfMatrix
+ELOOP!                   !PastST           !!!  !!PastST
+
+# otherwise
+WRTLN!@NrOfPastSpatialTransformations == 0 !!!!!!!  # empty line
+WRTLN!@NrOfPastSpatialTransformations == 0 !!!!!!!  # empty line
+
+# Convention depends on FileVersion !
+EXPRE!$TFFWRITE     !!!!!!if @FileVersion < 3, if strcmpi(@Convention, 'radiological'), @Convention = 'YES'; else, @Convention = 'NO'; end, end
+FLIST!@FileVersion < 3   !RadiologicalConvention !string  !%s     !1      !YES     !Convention
+FLIST!@FileVersion > 2   !LeftRightConvention    !string  !%s     !1      !        !Convention
+EXPRE!@FileVersion < 3 !!!!!!if strcmpi(@Convention, 'yes'), @Convention = 'Radiological'; else, @Convention = 'Neurological'; end
+
+# FirstDataFile
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FirstDataSourceFile    !string  !"%s"   !1      !        !FirstDataSourceFile
+
+# Gradient information
+BLOOP!@FileVersion ~= 5  !IsFV1To4               !        !       !1      !        !IsFV1To4
+FIELD!                   !GradientDirectionsVerified!string !%s   !1      !YES     !GradientDirectionsVerified
+FIELD!                   !GradientXDirInterpretation!double !%d   !1      !1       !GradientXDirInterpretation
+FIELD!                   !GradientYDirInterpretation!double !%d   !1      !3       !GradientYDirInterpretation
+FIELD!                   !GradientZDirInterpretation!double !%d   !1      !5       !GradientZDirInterpretation
+FIELD!                   !GradientInformationAvailable!string !%s !1      !YES     !GradientInformationAvailable
+EXPRE!$TFFREAD && ~strcmpi(@GradientInformationAvailable, 'yes') !!!!!!@GradientInformation = [];
+ARRAY!strcmpi(@GradientInformationAvailable, 'yes')!GradientInformation!double !%f !@NrOfVolumes, 4 ! !GradientInformation
+ELOOP!                   !IsFV1To4               !        !       !       !        !IsFV1To4
+
+# try to read DWI data
+EXPRE!$TFFREAD      !!!!!!...
+@DWIData = []; ...
+if @DataType == 1, ...
+    dtyp = 'uint16'; ...
+else, ...
+    dtyp = 'single'; ...
+end, ...
+dtsf = @DataStorageFormat; ...
+if dtsf > 1, ...
+    [dmrf{1:3}] = fileparts($FILENAME); ...
+    dwif = ''; ...
+    dwisz = []; ...
+    tname = [dmrf{1} '/' dmrf{2} '.dwi']; ...
+    if exist(tname, 'file') == 2, ...
+        dwif = tname; ...
+    else, ...
+        tname(end-2:end) = 'DWI'; ...
+        if exist(tname, 'file') == 2, ...
+            dwif = tname; ...
+        end, ...
+    end, ...
+    if ~isempty(dwif), ...
+        nov = @NrOfVolumes; ...
+        nos = @NrOfSlices; ...
+        rsx = @ResolutionX; ...
+        rsy = @ResolutionY; ...
+        switch(dtsf), ...
+            case {2}, ...
+                dwisz = [rsx, rsy, nov, nos]; ...
+            case{3}, ...
+                dwisz = [rsx, rsy, nos, nov]; ...
+            case{4}, ...
+                dwisz = [nov, rsx, rsy, nos]; ...
+        end, ...
+    end, ...
+    if ~isempty(dwisz), ...
+        try, ...
+            @DWIData = transio(dwif, 'ieee-le', dtyp, 0, dwisz); ...
+        end, ...
+    end, ...
+end
+
+# try to write DWI data
+EXPRE!$TFFWRITE     !!!!!!...
+if @DataType == 1, ...
+    dtyp = 'uint16'; ...
+else, ...
+    dtyp = 'single'; ...
+end, ...
+[dmrf{1:3}] = fileparts($FILENAME); ...
+if any(dmrf{3}(2:end) == upper(dmrf{3}(2:end))), ...
+    dmrf{3} = '.DWI'; ...
+else, ...
+    dmrf{3} = '.dwi'; ...
+end, ...
+dwif = [dmrf{1} '/' dmrf{2} dmrf{3}]; ...
+try, ...
+    dwid = @DWIData; ...
+    if istransio(dwid), ...
+        tios = struct(dwid); ...
+        if ~strcmpi(tios.FileName, dwif), ...
+            if ~cpfile(tios.FileName, dwif, 1); ...
+                error('FILE_COPY_ERROR'); ...
+            end, ...
+            @DWIData = transio(dwif, 'ieee-le', dtyp, 0, tios.DataDims); ...
+        end, ...
+    elseif ~isempty(dwid), ...
+        dwii = fopen(dwif, 'w', 'ieee-le'); ...
+        if dwii < 1, ...
+            error('FILE_OPEN_ERROR'); ...
+        end, ...
+        fwrite(dwii, @DWIData(:), dtyp); ...
+        fclose(dwii); ...
+    end, ...
+catch ne_eo; ...
+    neuroelf_lasterr(ne_eo); ...
+    error('Error saving DWI data to new file.'); ...
+end
+
+# end of fields
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 3;
+@NrOfVolumes = 1;
+@NrOfSlices = 64;
+@NrOfSkippedVolumes = 0;
+@Prefix = 'untitled-';
+@DataStorageFormat = 3;
+@DataType = 2;
+@TR = 8000;
+@InterSliceTime = @TR / @NrOfSlices;
+@TimeResolutionVerified = 0;
+@TE = 2 * round(@InterSliceTime / 3);
+@SliceAcquisitionOrder = 0;
+@SliceAcquisitionOrderVerified = 0;
+@ResolutionX = 128;
+@ResolutionY = 128;
+@LoadAMRFile = '<none>';
+@ShowAMRFile = 0;
+@ImageIndex = 0;
+@LayoutNColumns = 6;
+@LayoutNRows = fix(0.99 + @NrOfSlices / @LayoutNColumns);
+@LayoutZoomLevel = 1;
+@SegmentSize = 10;
+@SegmentOffset = 0;
+@DisplayVolume = 0;
+@ProtocolFile = '<none>';
+@InplaneResolutionX = 2;
+@InplaneResolutionY = 2;
+@SliceThickness = 2;
+@SliceGap = 0;
+@VoxelResolutionVerified = 0;
+@PosInfosVerified = 0;
+@CoordinateSystem = 1;
+@Slice1CenterX = 0;
+@Slice1CenterY = 0;
+@Slice1CenterZ = -(@NrOfSlices - 1) * (@SliceThickness + @SliceGap) / 2;
+@SliceNCenterX = 0;
+@SliceNCenterY = 0;
+@SliceNCenterZ = (@NrOfSlices - 1) * (@SliceThickness + @SliceGap) / 2;
+@RowDirX = 1;
+@RowDirY = 0;
+@RowDirZ = 0;
+@ColDirX = 0;
+@ColDirY = 1;
+@ColDirZ = 0;
+@NRows = @ResolutionX;
+@NCols = @ResolutionY;
+@FoVRows = @NRows * @InplaneResolutionX;
+@FoVCols = @NCols * @InplaneResolutionY;
+@GapThickness = @SliceGap;
+@NrOfPastSpatialTransformations = 0;
+@Trf = emptystruct({ ...
+    'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', 'AppliedToFile', 'NrOfTransformationValues', 'TrfMatrix'});
+@Convention = 'Radiological';
+@FirstDataSourceFile = '<none>';
+@GradientDirectionsVerified = 'YES';
+@GradientXDirInterpretation = 1;
+@GradientYDirInterpretation = 3;
+@GradientZDirInterpretation = 5;
+@GradientInformationAvailable = 'NO';
+@GradientInformation = zeros(@NrOfVolumes, 4);
+@DWIData = [];
+EndNewFileCode

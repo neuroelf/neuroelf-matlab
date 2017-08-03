@@ -1,0 +1,118 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - visual montage UI
+
+Version:  1.0
+Build:    15122812
+Date:     Dec-28 2015, 12:18 PM EST
+Figure:   NeuroElf GUI - montage configuration
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - Visualization -> Montage
+
+% Copyright (c) 2010 - 2015, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position            |Title                                    |Tag                      |CallbackClReq
+        |pixels|off    |$  -1  -1  400  356 |NeuroElf GUI - configure montage settings|Wnd_NeuroElf_vismontage  |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|Enabled|Value|RGroup|Callback
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$   12  328  124   18 |Slicing direction:                        |                       |    |left  ||||
+        |DropDown   |$  132   -4  136  -24 |sagittal                                  |DD_vismontage_dir      |$ 9 |left  ||||
+        |Label      |$  144    4   24  -18 |flip:                                     |                       |    |right ||||
+        |Checkbox   |$   32   -4    0  -24 |                                          |CB_vismontage_flipord  |$ 9 |right |on     |$0||
+        |Label      |$   32    4  -12  -18 |X:                                        |                       |    |right ||||
+        |Checkbox   |$   16   -4  -24  -24 |                                          |CB_vismontage_flipX    |$ 9 |right |on     |$0||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -356  -26  124  -18 |X-coordinate range:                       |                       |    |left  ||||
+        |Edit       |$  136    0  -48  -24 |-128                                      |ED_vismontage_xfrom    |    |center|on     |||
+        |Label      |$   48    0  -24  -18 |to                                        |                       |$ 9 |center||||
+        |Edit       |$   24    0  -48  -24 |128                                       |ED_vismontage_xto      |    |center|on     |||
+        |Label      |$   48    0  -44  -18 |,   step                                  |                       |    |center||||
+        |Dropdown   |$   44   -4  -64  -24 |4                                         |DD_vismontage_xstep    |    |center|off    |||
+        |Label      |$ -300  -26  124  -18 |Y-coordinate range:                       |                       |    |left  ||||
+        |Edit       |$  136    0  -48  -24 |-128                                      |ED_vismontage_yfrom    |    |center|on     |||
+        |Label      |$   48    0  -24  -18 |to                                        |                       |$ 9 |center||||
+        |Edit       |$   24    0  -48  -24 |128                                       |ED_vismontage_yto      |    |center|on     |||
+        |Label      |$   48    0  -44  -18 |,   step                                  |                       |    |center||||
+        |Dropdown   |$   44   -4  -64  -24 |4                                         |DD_vismontage_ystep    |    |center|off    |||
+        |Label      |$ -300  -26  124  -18 |Z-coordinate range:                       |                       |    |left  ||||
+        |Edit       |$  136    0  -48  -24 |-128                                      |ED_vismontage_zfrom    |    |center|on     |||
+        |Label      |$   48    0  -24  -18 |to                                        |                       |$ 9 |center||||
+        |Edit       |$   24    0  -48  -24 |128                                       |ED_vismontage_zto      |    |center|on     |||
+        |Label      |$   48    0  -44  -18 |,   step                                  |                       |    |center||||
+        |Dropdown   |$   44   -4  -64  -24 |4                                         |DD_vismontage_zstep    |    |center|off    |||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -300  -26  124  -18 |Pixel per voxel:                          |                       |    |left  ||||
+        |Dropdown   |$  132   -4  -72  -24 |1                                         |DD_vismontage_pixpvox  |    |left  |on     |||
+        |Label      |$   80    4  -48  -18 |Layout                                    |                       |    |center||||
+        |Dropdown   |$   56   -4   96  -24 |1 x 1                                     |DD_vismontage_layout   |    |center|on     |||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -268  -26  132  -18 |Anatomic transparency:                    |                       |    |left  ||||
+        |Checkbox   |$  136   -3  -24  -24 |                                          |CB_vismontage_anatransp|$ 9 |right |on     |$0||
+        |Label      |$   40    3  -28  -18 |on:                                       |                       |$ 9 |right ||||
+        |Button     |$   36   -3  -44  -24 |]uint8(zeros(12,36,3))                    |BT_vismontage_anabackgc|$ 9 |center|off    |||
+        |Label      |$   44    3  -44  -18 |border:                                   |                       |$ 9 |right ||||
+        |Dropdown   |$   44   -4  -64  -24 |1                                         |DD_vismontage_imgborder|    |left  |on     |||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -306   -4  388   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -30  124  -18 |Interpolation method:                     |                       |    |left  ||||
+        |Dropdown   |$  132   -4   88  -24 |]{'nearest';'linear';'cubic';'sinc3'}     |DD_vismontage_interpa  |$ 9 |left  ||] 3 ||
+        |Label      |$   88    4   36  -18 |(anat)                                    |                       |$ 9 |left  ||||
+        |Dropdown   |$   40   -4   88  -24 |]{'nearest';'linear';'cubic';'sinc3'}     |DD_vismontage_interpst |$ 9 |left  ||] 3 ||
+        |Label      |$   88    4   36  -18 |(stat)                                    |                       |$ 9 |left  ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -354   -8  388   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -30  124  -18 |Show in new figure:                       |                       |    |left  ||||
+        |Radiobutton|$  132    0  -24    0 |                                          |RB_vismontage_showinfig|$ 9 |left  |on     |$1|VisMOut|
+        |Label      |$   32    0  -84    0 |Display slices:                           |                       |    |left  ||||
+        |Checkbox   |$   84   -4   24  -24 |                                          |CB_vismontage_dspslices|$ 9 |right |on     |$0||
+        |Label      |$   32    4   76  -18 |Label slices:                             |                       |    |left  ||||
+        |Checkbox   |$   76   -4   24  -24 |                                          |CB_vismontage_slcoord  |$ 9 |right |on     |$1||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -356  -26  124  -18 |Slice label font:                         |                       |    |left  ||||
+        |Dropdown   |$  132   -4  112  -24 |]{'default';'Courier';'Fixed';'Helvetica'}|DD_vismontage_fontname |$ 9 |left  ||] 4 ||
+        |Label      |$  116    4   24  -18 |size:                                     |                       |$ 9 |left  ||||
+        |Dropdown   |$   24   -4   80  -24 |]{'6pt';'7pt';'8pt';'9pt';'10pt';'12pt';'14pt';'16pt';'18pt';'24pt';'30pt';'36pt';'48pt';'60pt'} |DD_vismontage_fontsize |$ 9 |left  ||] 10 ||
+        |Button     |$   84    2  -24    0 |]uint8(255 .* ones(12,12,3))              |BT_vismontage_fontcolor|$ 9 |center|on     |||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -356  -30  124  -18 |Write montage to file:                    |                       |   |left  ||||
+        |Radiobutton|$  132    0  -24    0 |                                          |RB_vismontage_writefile|$ 9 |left  |on     |$0|VisMOut|
+        |Edit       |$   32    0 -212  -24 | ./montage.jpg                            |ED_vismontage_filename |    |left  |on     |||
+        |           |                      |                                          |                       |    |      ||||
+        |Button     |$   12    8   64   24 |Close                                     |BT_vismontage_cancel   |    |center||||
+        |Dropdown   |$   80   -1 -112    0 |MNI brain                                 |DD_vismontage_brainbox |    |center|on     |$1||
+        |Button     |$  120    1  -48    0 |]'3S'                                     |BT_vismontage_create3s |    |center||||
+        |Button     |$   56    0 -120    0 |Create montage...                         |BT_vismontage_create   |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+---  END_UICONTROLS  ---

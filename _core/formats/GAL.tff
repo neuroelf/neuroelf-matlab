@@ -1,0 +1,33 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# TrackMark file format for *.GAL files (Group Alignment List information)
+# GAL FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Gradient tensor files
+Extensions:gal
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+EXPRE!$TFFWRITE     !!!!!!@NrOfEntries = numel(@CurvatureMaps); @CurvatureMaps = @CurvatureMaps(:);
+FIELD!                   !NrOfEntries         !double  !%d     !1      !1       !NrOfEntries
+ARRAY!                   !CurvatureMaps       !string  !"%s"   !@NrOfEntries, 1!!CurvatureMaps
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfEntries = 0;
+@CurvatureMaps = cell(0, 1);
+EndNewFileCode

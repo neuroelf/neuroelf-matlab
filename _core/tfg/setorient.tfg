@@ -1,0 +1,126 @@
+---  BEGIN_COMMENTS  ---
+
+AFT::SetOrientation
+
+Version:  0.9d
+Build:    16042116
+Date:     Apr-21 2016, 4:29 PM EST
+Figure:   Set orientation
+Author:   Jochen Weber
+Info:     Figure created for AFT::SetOrientation
+
+% Copyright (c) 2010 - 2014, 2016, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+idd     |]neuroelf_file('i', 'ddown')
+idu     |]neuroelf_file('i', 'dup')
+ihd     |]neuroelf_file('i', 'hdown')
+ihu     |]neuroelf_file('i', 'hup')
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title             |Tag
+        |pixels|off    |$   -1   -1   526  526 |setorient         |FIG_setorient
+---    END_FIGURE    ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                 |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|Page|RGroup|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+3 oblique slicing | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XImage     |$    6  266  256  256 |]zeros(256,256)                         |IM_setorient_Slice_SAG ||    |           ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_setorient_Slice_SAG ||    |           ||     |      |      |       |       |off    |       |    |      ||||
+        |XImage     |$  260    0    0    0 |]zeros(256,256)                         |IM_setorient_Slice_COR ||    |           ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_setorient_Slice_COR ||    |           ||     |      |      |       |       |off    |       |    |      ||||
+        |XImage     |$    0 -260    0    0 |]zeros(256,256)                         |IM_setorient_Slice_TRA ||    |           ||     |      |      |       |       |       |       |$1  |      ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_setorient_Slice_TRA ||    |           ||     |      |      |       |       |off    |       |    |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+translation / rotation boxes   |     |     |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |Label      |$ -256  232   76  -18 |right (mm):                             |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_XT        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |front (mm):                             |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_YT        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |up (mm):                                |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_ZT        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |pitch (deg):                            |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_XR        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |roll (deg):                             |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_YR        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |yaw (deg):                              |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_ZR        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |X (fact):                               |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_XS        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |Y (fact):                               |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_YS        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |Label      |$  -84  -26   76  -18 |Z (fact):                               |                       ||    |           ||     |left  |      |       |       |       |       |$1  |      ||||
+        |Edit       |$   84    0   64  -24 |0.0                                     |ED_setorient_ZS        ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |XImage     |$   72  210  -20  -20 |]tfgtv.idd                              |BT_setorient_XTDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_XTHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_XTHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_XTDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_YTDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_YTHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_YTHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_YTDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_ZTDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_ZTHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_ZTHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_ZTDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_XRDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_XRHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_XRHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_XRDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_YRDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_YRHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_YRHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_YRDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_ZRDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_ZRHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_ZRHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_ZRDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_XSDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_XSHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_XSHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_XSDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_YSDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_YSHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_YSHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_YSDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$  -72  -26    0    0 |]tfgtv.idd                              |BT_setorient_ZSDD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihd                              |BT_setorient_ZSHD      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.ihu                              |BT_setorient_ZSHU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |XImage     |$   24    0    0    0 |]tfgtv.idu                              |BT_setorient_ZSDU      ||    |           ||     |center|      |       |       |       |       |$1  |      |$ 0.6 0.6 0.6|||
+        |Label      |$ -228  -28 -168  -18 |Update HDR/NII information              |                       ||    |           ||     |left  |      |off    |UpdHdr |       |       |$1  |      ||||
+        |CheckBox   |$  168    0  -20  -20 |]' '                                    |CB_setorient_updhdr    ||    |           ||     |left  |      |off    |UpdHdr |       |       |$1  |      ||||
+        |Button     |$   24    0   60  -24 |Accept                                  |BT_setorient_accept    ||    |           ||     |center|      |       |       |       |       |$1  |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+zoomed image   |    |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+        |XImage     |$    8    8  512  512 |]zeros(512,512)                         |IM_setorient_Slice_Zoom||    |           ||     |      |      |       |       |off    |       |$2  |      ||||
+        |XAxes      |$    0    0    0    0 |                                        |AX_setorient_Slice_Zoom||    |           ||     |      |      |       |       |off    |       |$2  |      ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      ||||
+---  END_UICONTROLS  ---

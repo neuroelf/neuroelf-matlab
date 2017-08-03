@@ -1,0 +1,61 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for [POI_Details].TXT files (POI DETAILS)
+# POI_Details FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:POI details files (*.txt)
+Extensions:poid # dummy extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+POID_DETAILSFV|1, 64       |regexp  |^\s+DETAILS\s+FOR\s+POI
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!                DETAILS FOR POI "POI"
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NrOfSurfaceMaps     !double  !%d     !1      !1       !NrOfSurfaceMaps
+FLIST!                   !TypeOfMaps          !double  !%d  !@NrOfSurfaceMaps!1 !TypeOfMaps
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NrOfVertices        !double  !%d     !1      !        !NrOfVertices
+FLIST!                   !Area                !double  !%d     !1      !0       !Area
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFREAD      !!!!!!$dim2 = 4 + @NrOfSurfaceMaps;
+
+# no writing yet
+EXPRE!$TFFWRITE     !!!!!!error('writing of POI DETAILS file not yet supported');
+
+# loop over Vertices
+EXPRE!$TFFWRITE     !!!!!!@VertexData(:, 1) = @VertexData(:, 1) - 1;
+ARRAY!                   !VertexData          !double  !%9f!@NrOfVertices,$dim2!!VertexData
+EXPRE!              !!!!!!@VertexData(:, 1) = @VertexData(:, 1) + 1;
+
+# split data
+EXPRE!!!!!!!@VertexCoords = @VertexData(:, 2:4);
+EXPRE!!!!!!!@VertexIDs = @VertexData(:, 1);
+EXPRE!!!!!!!@VertexStats = @VertexData(:, 5:end);
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfSurfaceMaps = 1;
+@TypeOfMaps = 1;
+@NrOfVertices = 0;
+@VertexData = zeros(0, 5);
+@VertexCoords = zeros(0, 3);
+@VertexIDs = zeros(0, 1);
+@VertexStats = zeros(0, 1);
+EndNewFileCode

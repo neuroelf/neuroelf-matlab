@@ -1,0 +1,59 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.UFF files (User File Format)
+# UFF FileVersions supported: 2
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:User file format files
+Extensions:uff
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+UFF_MultiImage|1, 200      |regexp  |MultiImageFile\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion         !double  !%d     !1      !2       !FileVersion
+
+# further fields
+FLIST!                   !NSpalten            !double  !%d     !1      !256     !NrOfCols
+FLIST!                   !NZeilen             !double  !%d     !1      !256     !NrOfRows
+EXPRE!1 == 0 !!!!!!; # make sure those two are read
+FLIST!                   !HeaderSize          !double  !%d     !1      !0       !HeaderSize
+FLIST!                   !PixelFormat         !double  !%d     !1      !0       !PixelFormat
+FLIST!                   !DICOM               !double  !%d     !1      !0       !IsDICOM
+FLIST!                   !SwapBytes           !double  !%d     !1      !0       !IsBigEndian
+FLIST!                   !ExplicitVR          !double  !%d     !1      !0       !UseExplicitVR
+FLIST!                   !MultiImageFile      !double  !%d     !1      !1       !MultiImageFile
+FLIST!                   !SubHeaderSize       !double  !%d     !1      !0       !SubHeaderSize
+FLIST!                   !ImageIndex          !double  !%d     !1      !1       !ImageIndex
+FLIST!                   !SingleFuncType      !double  !%d     !1      !3       !SingleFuncType
+FLIST!                   !TimeRunsFastest     !double  !%d     !1      !0       !FirstDimIsTime
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 2;
+@NrOfCols = 256;
+@NrOfRows = 256;
+@HeaderSize = 0;
+@PixelFormat = 0;
+@IsDICOM = 0;
+@IsBigEndian = 0;
+@UseExplicitVR = 0;
+@MultiImageFile = 1;
+@SubHeaderSize = 0;
+@ImageIndex = 1;
+@SingleFuncType = 3;
+@FirstDimIsTime = 0;
+EndNewFileCode

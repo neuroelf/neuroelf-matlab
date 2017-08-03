@@ -1,0 +1,35 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# TrackMark file format for *.GRAD files (GRADient information)
+# GRAD FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Gradients
+Description:Gradient tensor files
+Extensions:grad
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+GRAD_NrGrads  |1, 10       |regexp  |^NrGrads\:\s*
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !NrGrads             !double  !%d     !1      !1       !NrOfGradients
+ARRAY!                   !Gradients           !double  !%.10f!@NrOfGradients, 3!!Gradients
+EndListOfFields
+
+NewFileCode:!
+@NrOfGradients = 0;
+@Gradients = zeros(0, 3);
+EndNewFileCode

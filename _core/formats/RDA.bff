@@ -1,0 +1,70 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# RDA file format for *.RDA and *.RDATA files (R Data File Format)
+# RDA FileVersions supported: 2
+#
+# See http://yetanothermathprogrammingconsultant.blogspot.com/2016/02/r-rdata-file-format.html
+# for details (some notes copied below)
+#
+# RDA2/RDX2 (ASCII or binary, with binary being big-endian)
+# A/X (+ char(10)) (ASCII or binary)
+# 2 (uint32) Format version 2
+# 197123 (uint32, hex:0x00030204 for version 3.2.4)
+# 131840 (uint32, hex:0x00020300) more R version information
+#   1026 (uint32, hex:0x00000402) LISTSXP object: whole thing is packaged in a dotted pair list
+#      1 (uint32) SYMSXP object: symbol 
+# 262153 (uint32, hex:0x00040009) CHARSXP object: string
+#      4 (uint32) Length of string
+# '...'  (char)   String: symbol name
+#     14 (uint32)             INTSXP: integer vector
+#      3               Length of integer vector
+#      1               First element
+#      2               Second element
+#      3               Third element
+#    254 (uint32) NILVALUESXP: end of information# - file header record
+
+# Version:  v1.1
+# Build:    16060114
+# Date:     Jun-01 2016, 2:50 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:R Data files (*.rda)
+EncodingSyntax:ieee-be
+Extensions:rda,rdata
+Magic:|
+name          |range       |type    |magic
+RDA_AscFile   |1, 7        |hex     |52, 44, 41, 32, 0a, 41, 0a
+RDA_BinFile   |1, 7        |hex     |52, 44, 58, 32, 0a, 58, 0a
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# no write support at the moment
+EXPRE !$BFFWRITE              !!!!!error('no write support');
+
+# use external reader !
+EXPRE !$BFFREAD               !!!!!...
+try, ...
+    t_obj = rdaio($FILENAME); ...
+    @@ = getcont(t_obj); ...
+    delete(t_obj); ...
+catch ne_eo; ...
+    rethrow(ne_eo); ...
+end
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileCompressed = true;
+@FileMagic = 'RDX2';
+@FileType = 'X';
+@FormatVersion = 2;
+@RVersion = [3,2,4];
+@RXVersion = 131840;
+@Vars = emptystruct({'Name', 'Data'});
+EndNewFileCode

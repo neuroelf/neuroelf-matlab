@@ -1,0 +1,51 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX TMS file format for *.FDP files (FiDucial Points)
+# FDP FileVersions supported: 1
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Fiducial points files
+Extensions:fdp
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+FDP_Nasion    |1, 256      |regexp  |^Nasion\:\s*\d+(\.\d+)?\s+\d+(\.\d+)?\s+\d+(\.\d+)?
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+FIELD!                   !UsedMeshFile        !string  !"%s"   !1      !        !UsedMeshFile
+EXPRE!$TFFREAD      !!!!!!@Fiducials = struct; if isempty(regexpi(linecont{linec}, '^\s*nrof')), @NrOfFiducialPoints = 3; $usenrfid = false; else, $usenrfid = true; end
+EXPRE!$TFFWRITE     !!!!!!t_fidnames = fieldnames(@Fiducials); @NrOfFiducialPoints = numel(t_fidnames); $usenrfid = true;
+FIELD!$usenrfid && @FileVersion > 1 !NrOfFiducialPoints !double !%d !1!3       !NrOfFiducialPoints
+WRTLN!!!!!!!!  # empty line
+
+BLOOP!$TFFREAD !!!!@NrOfFiducialPoints !!RFidNo
+EXPRE!!!!!!![fdm{1:3}] = regexp(linecont{linec}, '^\s*([a-zA-Z]\w*)\s*\:\s*(.*)\s*$'); if isempty(fdm{1}), error('No more fiducials.'); end
+EXPRE!!!!!!!t_fidname = linecont{linec}(fdm{3}{1}(1, 1):fdm{3}{1}(1, 2)); try, @Fiducials.(t_fidname) = str2num(linecont{linec}(fdm{3}{1}(2, 1):fdm{3}{1}(2, 2))); catch ne_eo; neuroelf_lasterr(ne_eo); error(['Bad fiducial: ' t_fidname]); end, linec = linec + 1;
+ELOOP!         !!!! !!RFidNo
+
+BLOOP!$TFFWRITE!!!!@NrOfFiducialPoints !!WFidNo
+EXPRE!!!!!!!linecont{end + 1} = sprintf('%-24s%s', sprintf('%s:', t_fidnames{$WFidNo}), sprintf(' %7g', @Fiducials.(t_fidnames{$WFidNo}))); linecount = linecount + 1;
+ELOOP!         !!!! !!WFidNo
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@UsedMeshFile = '<none>';
+@NrOfFiducialPoints = 3;
+@Fiducials.Nasion = [53, 152, 128];
+@Fiducials.LeftPreauricular = [155, 186, 200];
+@Fiducials.RightPreauricular = [155, 186, 56];
+EndNewFileCode

@@ -1,0 +1,109 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# HEAD file format for ASCII *.HEAD files (AFNI HEAD+BRIK files)
+# HEAD FileVersions supported: ?
+#
+# Version:  v1.1
+# Build:    16012320
+# Date:     Jan-23 2016, 8:36 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+#
+# Note: the information incorporated here-in comes from
+#       http://afni.nimh.nih.gov/pub/dist/src/README.attributes
+
+# FILE FORMAT
+DefaultProperty:Brick
+Description:AFNI HEADer files
+Extensions:head
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:0
+Magic:|
+name          |range       |type    |magic
+HEAD_DATADIMS |1, 65536    |regexpi |name\s+=\s+dataset_dimensions
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# no write support at this time
+EXPRE!$TFFWRITE     !!!!!!error('No HEAD write support yet.');
+
+# read elements
+BLOOP!$TFFREAD           ! ! ! !1 ! !ReadIO
+EXPRE!              !!!!!!@Info = emptystruct({'Name', 'Type', 'Size', 'Data'}, [999, 1]);
+BLOOP!                   ! ! ! !999 ! !EC
+EXPRE!              !!!!!!while isempty(linecont{linec}) || ~isempty(regexpi(linecont{linec}, '^\s*$')), linec = linec + 1; end
+EXPRE!              !!!!!!tlcont = lower(linecont{linec}); linec = linec + 1; tlcont = regexprep(regexprep(tlcont, '\s*type\s*=\s*', ''), '-attribute\s*', ''); if ~any(strcmp(tlcont, {'float', 'integer', 'string'})), tlcont = 'unknown'; end, @Info($EC).Type = tlcont;
+EXPRE!              !!!!!!tlcont = linecont{linec}; linec = linec + 1; tlcont = regexprep(regexprep(tlcont, '\s*name\s*=\s*', ''), '\s+$', ''); @Info($EC).Name = tlcont;
+EXPRE!              !!!!!!tlcont = lower(linecont{linec}); linec = linec + 1; tlcont = regexprep(regexprep(tlcont, '\s*count\s*=\s*', ''), '\s+$', ''); try, tlcont = str2double(tlcont); catch ne_eo; neuroelf_lasterr(ne_eo); tlcont = NaN; @Info($EC).Type = 'unknown'; end, @Info($EC).Size = tlcont;
+EXPRE!any(strcmp(@Info($EC).Type, {'float', 'integer'})) !!!!!!numclines = ceil(tlcont / 5); tlcont = gluetostringc(linecont(linec:linec+numclines-1), ' ', false); linec = linec + numclines; @Info($EC).Data = eval(['[' tlcont ']'], '[NaN]');
+EXPRE!strcmp(@Info($EC).Type, 'string')  !!!!!!tlstring = char(zeros(1, tlcont + 1)); tlstrpos = 0; while tlcont > tlstrpos, tlstrlen = numel(linecont{linec}) + 1; tlstring(tlstrpos+1:tlstrpos+tlstrlen) = [linecont{linec} char(10)]; linec = linec + 1; tlstrpos = tlstrpos + tlstrlen; end, tlstring([1, end]) = []; @Info($EC).Data = tlstring;
+EXPRE!strcmp(@Info($EC).Type, 'unknown') !!!!!!error('Unknown attribute type. Not yet supported');
+EXPRE!              !!!!!!if (linec + 4) > numel(linecont), @Info($EC+1:end) = []; $EC = 1000; linec = numel(linecont)+1; end
+ELOOP!                   ! ! ! !  ! !EC
+EXPRE!              !!!!!!@@ = afni_parse(@Info, $FILENAME);
+EXPRE!              !!!!!!@RunTimeVars = struct( ...
+    'Discard', [], ...
+    'Map', repmat(struct( ...
+        'Type', 0, 'LowerThreshold', 3, 'UpperThreshold', 8, 'Name', '', ...
+        'RGBLowerThreshPos', [255, 0, 0], 'RGBUpperThreshPos', [255, 255, 0], ...
+        'RGBLowerThreshNeg', [255, 0, 255], 'RGBUpperThreshNeg', [0, 0, 255], ...
+        'UseRGBColor', 0, 'LUTName', '<default>', 'TransColorFactor', 1, ...
+        'NrOfLags', 0, 'MinLag', 0, 'MaxLag', 0, 'CCOverlay', 0, ...
+        'ClusterSize', 4, 'EnableClusterCheck', 0, 'UseValuesAboveThresh', 1, ...
+        'DF1', 0, 'DF2', 0, 'ShowPositiveNegativeFlag', 3, ...
+        'BonferroniValue', 0, 'NrOfFDRThresholds', 0, 'FDRThresholds', zeros(0, 3), ...
+        'OverlayColors', []), 1, numel(@Brick)));
+ELOOP!                   ! ! ! !  ! !ReadIO
+EndListOfFields
+
+NewFileCode:!
+@Info = emptystruct({'Name', 'Type', 'Size', 'Data'}, [0, 1]);
+@Endianness = 'ieee-le';
+@IDCode = sprintf('%c', 65 + floor(25 * rand(1, 15)));
+@IDDate = datestr(now);
+@NrOfVolumes = 1;
+@NrOfTimePoints = 0;
+@DataDimensions = [0, 0, 0];
+@AxesOrientation = [1, 3, 5];
+@Origin = [0, 0, 0];
+@Resolution = [1, 1, 1];
+@TimeUnits = 'msec';
+@TypeOfVolumes = '3DIM_GEN_FUNC';
+@SubtypeOfVolumes = 0;
+@ScalingFactor = 0;
+@SceneView = 'Original';
+@SceneVolumeType = 3;
+@NrOfSliceTimes = 0;
+@TimeOrigin = 0;
+@TimeStep = 1;
+@TimeAcquisition = 0;
+@TimeZOffset = 0;
+@TimeZStep = 1;
+@TimeSliceOffsets = [];
+@WarpParent = '';
+@WarpType = -1;
+@WarpValues = emptystruct({ ...
+    'ForwardMat', 'BackwardMat', 'ForwardVec', 'BackwardVec', 'From', 'To'});
+@MarkersType = 1;
+@Markers = emptystruct({'Label', 'Coordinate', 'Help'});
+@Brick = struct( ...
+    'Label', '<none>', 'DataType', 0, 'FuncType', 0, 'FuncParams', [], ...
+    'MinMaxValue', [0, 225], 'ScalingFactor', 0, 'Data', [], 'DataCT', logical([]));
+@RunTimeVars = struct( ...
+    'Discard', [], ...
+    'Map', repmat(struct( ...
+        'Type', 0, 'LowerThreshold', 3, 'UpperThreshold', 8, 'Name', '', ...
+        'RGBLowerThreshPos', [255, 0, 0], 'RGBUpperThreshPos', [255, 255, 0], ...
+        'RGBLowerThreshNeg', [255, 0, 255], 'RGBUpperThreshNeg', [0, 0, 255], ...
+        'UseRGBColor', 0, 'LUTName', '<default>', 'TransColorFactor', 1, ...
+        'NrOfLags', 0, 'MinLag', 0, 'MaxLag', 0, 'CCOverlay', 0, ...
+        'ClusterSize', 4, 'EnableClusterCheck', 0, 'UseValuesAboveThresh', 1, ...
+        'DF1', 0, 'DF2', 0, 'ShowPositiveNegativeFlag', 3, ...
+        'BonferroniValue', 0, 'NrOfFDRThresholds', 0, 'FDRThresholds', zeros(0, 3), ...
+        'OverlayColors', []), 1, numel(@Brick)));
+EndNewFileCode

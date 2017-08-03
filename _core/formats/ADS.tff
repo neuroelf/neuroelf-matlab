@@ -1,0 +1,43 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.ADS files (ANcOVA Design Specification)
+# ADS FileVersions supported: 1
+#
+# ADS files contain the specification for an An(C)OVa statistics analysis
+# in BrainVoyager QX, naming the factors and levels, plus optional covariates
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:AnCova Design Specification files
+Extensions:ads
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+ADS_factors   |1, 128      |regexpi |nrofwithinfactors\:\s*\d+\s+nrofbetweenfactors\:\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfWithinFactors   !double  !%d     !1      !        !NrOfWithinFactors
+FIELD!                   !NrOfBetweenFactors  !double  !%d     !1      !        !NrOfBetweenFactors
+FIELD!                   !NrOfCovariates      !double  !%d     !1      !        !NrOfCovariates
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfWithinFactors = 1;
+@NrOfBetweenFactors = 1;
+@NrOfCovariates = 0;
+EndNewFileCode

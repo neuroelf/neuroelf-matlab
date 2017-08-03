@@ -1,0 +1,71 @@
+function asciirep = any2ascii(sS, varargin)
+%ANY2ASCII  Convert object into string representation. (overloaded)
+%   ASCII = ANY2ASCII(OBJ) converts the object OBJ into an ASCII
+%   representation that can later be restored using eval(ASCII).
+%
+%   See also ANY2ASCII
+
+% Version:  v1.1
+% Build:    16012321
+% Date:     Jan-23 2016, 9:05 PM EST
+% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% URL/Info: http://neuroelf.net/
+
+% Copyright (c) 2010 - 2014, 2016, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+% for multiple objects
+if numel(sS) ~= 1
+    asciirep = cell(1, numel(sS));
+    for sc = 1:numel(sS)
+        asciirep{sc} = any2ascii(sS(sc));
+    end
+    asciirep = sprintf('%s,', asciirep{:});
+    sizearg = sprintf('%d,', size(sS));
+    asciirep = sprintf('[reshape([%s], [%s])]', asciirep(1:end-1), sizearg(1:end-1));
+
+% single object
+else
+
+    % for root object
+    if sS.L(1) == 'X'
+        asciirep = '[xff()]';
+
+    % for file-based object
+    else
+
+        % filename empty
+        if isempty(sS.F)
+
+            % give content
+            asciirep = sprintf('[struct(''%s'',%s)]', sS.S.Extensions{1}, ...
+                any2ascii(sS.C));
+            asciirep = sprintf('[xff(0,''makeobject'',%s)]', asciirep);
+        % filename given
+        else
+            asciirep = sprintf('[xff(0,''object'',%s)]', sprintf('''%s''', sS.F));
+        end
+    end
+end

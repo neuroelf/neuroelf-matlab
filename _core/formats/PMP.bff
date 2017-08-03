@@ -1,0 +1,48 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.PMP files (sPherical MaP)
+# PMP FileVersions supported: 1, 257
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Map
+Description:Spherical map files
+EncodingSyntax:ieee-le
+Extensions:pmp
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfMaps
+EXPRE !$BFFREAD           !!!!!@ThetaResolution = 360; @PhiResolution = 180;
+FIELD !@FileVersion > 256     !uint32  !double  !1, 1                     !        !ThetaResolution
+FIELD !@FileVersion > 256     !uint32  !double  !1, 1                     !        !PhiResolution
+
+# read maps
+EXPRE !$BFFREAD           !!!!!@Map = emptystruct({'PMPData'});
+BLOOP !~$HEADERONLY           ! ! !@NrOfMaps ! !MapNo
+FIELD !                       !single  !single  !@ThetaResolution, @PhiResolution !!Map($MapNo).PMPData
+ELOOP !                       ! ! !  ! !MapNo
+EXPRE ! $HEADERONLY       !!!!!@Map(@NrOfMaps).PMPData = []; fseek(fid, 4 * @NrOfMaps * @ThetaResolution * @PhiResolution, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfMaps = 0;
+@ThetaResolution = 360;
+@PhiResolution = 180;
+@Map = emptystruct({'PMPData'});
+EndNewFileCode

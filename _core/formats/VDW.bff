@@ -1,0 +1,126 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.VDW files (Volumetric Diffusion Weighted)
+# VDW FileVersions supported: 1, 2
+#
+# Version:  v0.9a
+# Build:    11050314
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:VDWData
+Description:Volume diffusion weighted datafiles
+EncodingSyntax:ieee-le
+Extensions:vdw
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# for writing, don't trust values...
+BLOOP !$BFFWRITE              ! ! !1 ! !WriteChecks
+EXPRE !!!!!! $TXYZDim=size(@VDWData); @NrOfVolumes=$TXYZDim(1); $XDim=$TXYZDim(2); $YDim=$TXYZDim(3); $ZDim=$TXYZDim(4);
+EXPRE !!!!!! tv_XDim = (@XEnd - @XStart) / @Resolution; tv_YDim = (@YEnd - @YStart) / @Resolution; tv_ZDim = (@ZEnd - @ZStart) / @Resolution;
+EXPRE !!!!!! if tv_XDim ~= $XDim || tv_YDim ~= $YDim || tv_ZDim ~= $ZDim, error('Wrong dimensions.'); end
+ELOOP !                       ! ! !  ! !WriteChecks
+
+# header fields
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfSourceDMR
+EXPRE !$BFFREAD           !!!!!@NrOfLinkedPRTs = 1; @NameOfLinkedPRT = cell(0, 1);
+FIELD !@FileVersion > 1       !uint16  !double  !1, 1                     !        !NrOfLinkedPRTs
+FIELD !@NrOfLinkedPRTs > 0    !cstring !cstring !@NrOfLinkedPRTs, 1       !        !NameOfLinkedPRT
+EXPRE !$BFFREAD           !!!!!@NrOfCurrentPRT = 0; @DataType = 1;
+EXPRE !$BFFWRITE          !!!!!@NrOfCurrentPRT = @NrOfCurrentPRT - 1;
+FIELD !@FileVersion > 1       !uint16  !double  !1, 1                     !        !NrOfCurrentPRT
+FIELD !@FileVersion > 1       !uint16  !double  !1, 1                     !        !DataType
+EXPRE !                   !!!!!@NrOfCurrentPRT = @NrOfCurrentPRT + 1;
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfVolumes
+FIELD !                       !uint16  !double  !1, 1                     !        !Resolution
+FIELD !                       !uint16  !double  !1, 1                     !        !XStart
+FIELD !                       !uint16  !double  !1, 1                     !        !XEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !YStart
+FIELD !                       !uint16  !double  !1, 1                     !        !YEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !ZStart
+FIELD !                       !uint16  !double  !1, 1                     !        !ZEnd
+EXPRE !$BFFREAD           !!!!!$XDim = (@XEnd - @XStart) / @Resolution;
+EXPRE !$BFFREAD           !!!!!$YDim = (@YEnd - @YStart) / @Resolution;
+EXPRE !$BFFREAD           !!!!!$ZDim = (@ZEnd - @ZStart) / @Resolution;
+EXPRE !$BFFREAD           !!!!!@Convention = 0; @ReferenceSpace = 0;
+FIELD !@FileVersion > 1       !uint8   !double  !1, 1                     !        !Convention
+FIELD !@FileVersion > 1       !uint8   !double  !1, 1                     !        !ReferenceSpace
+FIELD !                       !single  !double  !1, 1                     !        !TR
+FIELD !                       !uint32  !double  !1, 1                     !        !TE
+FIELD !                       !uint8   !double  !1, 1                     !        !GradientDirectionsVerified
+FIELD !                       !uint8   !double  !1, 1                     !        !XDirection # 1: LR, 2: RL, 3: AP, 4: PA, 5: IS, 6: SI
+FIELD !                       !uint8   !double  !1, 1                     !        !YDirection # 1: LR, 2: RL, 3: AP, 4: PA, 5: IS, 6: SI
+FIELD !                       !uint8   !double  !1, 1                     !        !ZDirection # 1: LR, 2: RL, 3: AP, 4: PA, 5: IS, 6: SI
+FIELD !                       !uint8   !double  !1, 1                     !        !GradientInformationAvailable
+EXPRE !$BFFWRITE          !!!!!@GradientBValueTable = @GradientBValueTable';
+FIELD !@GradientInformationAvailable > 0 !single  !double  !4, @NrOfVolumes !      !GradientBValueTable
+EXPRE !@GradientInformationAvailable == 0!!!!!@GradientBValueTable = zeros(4, @NrOfVolumes);
+EXPRE !                   !!!!!@GradientBValueTable = @GradientBValueTable';
+
+# past transformations
+FIELD !                       !uint8   !double  !1, 1                     !        !NrOfPastSpatialTransformations
+EXPRE !$BFFREAD           !!!!!@Trf = emptystruct({'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', 'TransformationValues'});
+BLOOP !                       ! ! !@NrOfPastSpatialTransformations ! !NumTrf
+FIELD !                       !cstring !cstring !1                        !        !Trf($NumTrf).NameOfSpatialTransformation
+FIELD !                       !uint16  !double  !1, 1                     !        !Trf($NumTrf).TypeOfSpatialTransformation
+FIELD !@Trf($NumTrf).TypeOfSpatialTransformation == 1!single!double!3, 3  !        !Trf($NumTrf).TransformationValues
+EXPRE !$BFFWRITE && @Trf($NumTrf).TypeOfSpatialTransformation == 2!!!!!@Trf($NumTrf).TransformationValues = @Trf($NumTrf).TransformationValues';
+FIELD !@Trf($NumTrf).TypeOfSpatialTransformation == 2!single!double!4, 4  !        !Trf($NumTrf).TransformationValues
+EXPRE !$BFFREAD && @Trf($NumTrf).TypeOfSpatialTransformation == 2!!!!!@Trf($NumTrf).TransformationValues = @Trf($NumTrf).TransformationValues';
+ELOOP !                       ! ! !  ! !NumTrf
+
+# if no transformations, yet initialize field
+EXPRE !@NrOfPastSpatialTransformations < 1!!!!!@Trf = emptystruct({'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', 'TransformationValues'});
+
+FIELD !~$HEADERONLY && @DataType == 1 !uint16  !uint16  !@NrOfVolumes, $XDim, $YDim, $ZDim!!VDWData
+FIELD !~$HEADERONLY && @DataType == 2 !single  !single  !@NrOfVolumes, $XDim, $YDim, $ZDim!!VDWData
+EXPRE ! $HEADERONLY       !!!!!@VDWData = []; fseek(fid, 2 * @DataType * @NrOfVolumes * $XDim * $YDim * $ZDim, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NameOfSourceDMR = '';
+@NrOfLinkedPRTs = 1;
+@NameOfLinkedPRT = '';
+@NrOfCurrentPRT = 1;
+@DataType = 1;
+@NrOfVolumes = 0;
+@Resolution = 2;
+@XStart = 57;
+@XEnd = 231;
+@YStart = 52;
+@YEnd = 172;
+@ZStart = 59;
+@ZEnd = 197;
+tXDim = (@XEnd - @XStart) / @Resolution;
+tYDim = (@YEnd - @YStart) / @Resolution;
+tZDim = (@ZEnd - @ZStart) / @Resolution;
+@Convention = 1;
+@ReferenceSpace = 3;
+@TR = 8000;
+@TE = 80;
+@GradientDirectionsVerified = 0;
+@XDirection = 1;
+@YDirection = 3;
+@ZDirection = 5;
+@GradientInformationAvailable = 0;
+@GradientBValueTable = zeros(@NrOfVolumes, 4);
+@GradientInformationAvailable = 0;
+@NrOfPastSpatialTransformations = 0;
+@Trf = emptystruct({'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', 'TransformationValues'});
+@VDWData = uint16(zeros([@NrOfVolumes, tXDim, tYDim, tZDim]));
+EndNewFileCode

@@ -1,0 +1,149 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - render UI
+
+Version:  0.9d
+Build:    14062322
+Date:     Jun-23 2014, 10:24 PM EST
+Figure:   NeuroElf GUI - render configuration
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - Visualization -> Render
+
+% Copyright (c) 2010 - 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position            |Title                                    |Tag                         |CallbackClReq
+        |pixels|off    |$  -1  -1  476  564 |NeuroElf GUI - configure render settings |Wnd_NeuroElf_render         |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|Enabled|Value|EGroups|Callback
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$   12  532  136   18 |Slicing object:                           |                       |    |left  ||||
+        |Edit       |$  144    0  308  -24 |  <untitled.vmr>                          |ED_render_slvarfile    |    |left  |off    |||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -144  -30  136  -18 |Background color:                         |                       |    |left  ||||
+        |Button     |$  144    4  -24    0 |]uint8(zeros(16, 22, 3))                  |BT_render_bgcol        |$ 9 |      ||||
+        |Label      |$   32   -4  -80    0 |Color range:                              |                       |    |left  ||||
+        |Button     |$   80    4  -24    0 |]uint8(zeros(16, 22, 3))                  |BT_render_locol        |$ 9 |      ||||
+        |Button     |$   32    0    0    0 |]uint8(255 .* ones(16, 22, 3))            |BT_render_hicol        |$ 9 |      ||||
+        |Dropdown   |$   32   -6  136  -24 |]{'RGB blending'; 'HSV blending'}         |DD_render_colblend     |$ 9 |left  ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -320  -28  136  -18 |Slicing alpha object:                     |                       |    |left  ||||
+        |Dropdown   |$  140   -2  208  -24 |]'<same>'                                 |DD_render_slavarfile   |$ 9 |left  |off    ||SlAlpha|
+        |Label      |$  216    2   44  -18 |factor:                                   |                       |    |center||||
+        |Edit       |$   48    0  -48  -24 |NaN                                       |ED_render_agalpha      |    |center|off    |||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -410   -6  464   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -32  136  -18 |Slicing distance from:                    |                       |    |left  ||||
+        |Edit       |$  144    0  -48  -24 |NaN                                       |ED_render_xfrom        |    |center|on     |||
+        |Label      |$   48    0  -24  -18 |to                                        |                       |    |center||||
+        |Edit       |$   24    0  -48  -24 |NaN                                       |ED_render_xto          |    |center|on     |||
+        |Label      |$   48    0   80  -18 |,  stepsize                               |                       |    |center||||
+        |Edit       |$   88    0  -56  -24 |NaN                                       |ED_render_xstep        |    |center|on     |||
+        |Label      |$   56    0  -44  -18 |mm                                        |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -408  -30 -104    0 |Per-slice range:                          |                       |    |left  ||||
+        |Edit       |$  144    0  -48  -24 |NaN                                       |ED_render_yzfrom       |    |center|on     |||
+        |Label      |$   48    0  -24  -18 |to                                        |                       |    |center||||
+        |Edit       |$   24    0  -48  -24 |NaN                                       |ED_render_yzto         |    |center|on     |||
+        |Label      |$   48    0  196  -18 |mm  (in both Y and Z directions)          |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -264  -30 -136    0 |Rotation angles:                          |                       |    |left  ||||
+        |Label      |$  144    0  -64    0 |zenith:                                   |                       |    |left  ||||
+        |Edit       |$   72    0  -48  -24 |NaN                                       |ED_render_yzenith      |    |center|on     |||
+        |Label      |$   48    0   88  -18 |deg., azimuth:                            |                       |    |center||||
+        |Edit       |$   96    0  -48  -24 |NaN                                       |ED_render_zazimuth     |    |center|on     |||
+        |Label      |$   48    0  -40  -18 |deg.                                      |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -408  -30 -136    0 |Distance from origin:                     |                       |    |left  ||||
+        |Edit       |$  144    0  -48  -24 |NaN                                       |ED_render_dist         |    |center|on     |||
+        |Label      |$   48    0  160  -18 |mm,    render resolution:                 |                       |    |center||||
+        |Edit       |$  168    0  -48  -24 |NaN                                       |ED_render_res          |    |center|on     |||
+        |Label      |$   48    0  -48  -18 |pixels                                    |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -414   -6  464   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -32  136  -18 |Statistics object:                        |                       |    |left  ||||
+        |Edit       |$  144    0  308  -24 |  <none>                                  |ED_render_stvarfile    |    |left  |off    ||StVar|
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -144  -30  136  -18 |Prepare statistics:                       |                       |    |left  ||||
+        |Button     |$  144    0 -140  -24 |Smooth map border                         |BT_render_smoothstat   |    |center|off    ||StVMP|
+        |Label      |$  148    0  -64  -18 |kernel size:                              |                       |    |center||||
+        |Edit       |$   68    0  -48  -24 |NaN                                       |ED_render_smstat       |    |center|off    ||StVMP|
+        |Label      |$   48    0  -36  -18 |mm                                        |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -408  -30 -136    0 |Store smoothed:                           |                       |    |left  ||||
+        |Checkbox   |$  144    0  -24  -24 |                                          |CB_render_smstatk      |$ 9 |right |off    |$0|StVMP|
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -150   -6  404   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -32  136  -18 |Anatomical alpha:                         |                       |    |left  ||||
+        |Edit       |$  144    0  -48  -24 |NaN                                       |ED_render_galpha       |    |center|on     |||
+        |Label      |$   48    0  112  -18 |Statistical alpha:                        |                       |    |right ||||
+        |Edit       |$  120    0  -48  -24 |NaN                                       |ED_render_stalp        |    |center|off    ||StVar|
+        |Label      |$   48    0   64  -18 |Join maps:                                |                       |    |right ||||
+        |Checkbox   |$   68    0  -24  -24 |                                          |CB_render_join         |$ 9 |right |off    |$0|StVar|
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -428  -30  136  -18 |Statistics visibility:                    |                       |    |left  ||||
+        |Label      |$  144    0    0    0 |multiply with anat. alpha                 |                       |    |left  ||||
+        |Checkbox   |$  136    0  -24  -24 |                                          |CB_render_stmulaalp    |$ 9 |right |off    |$0|StVar|
+        |Label      |$   30    0   96  -18 |min. anat. alpha                          |                       |    |left  ||||
+        |Edit       |$   96    0  -48  -24 |0.5                                       |ED_render_stminaalp    |    |center|off    ||StVar|
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$ -406  -30  136  -18 |Smooth statistics:                        |                       |    |left  ||||
+        |Edit       |$  144    0  -48  -24 |NaN                                       |ED_render_stsmooth     |    |center|on     |||
+        |Label      |$   48    0 -164  -18 |mm,    min. visibility (depth):           |                       |    |center||||
+        |Edit       |$  168    0  -48  -24 |NaN                                       |ED_render_actdepth     |    |center|on     |||
+        |Label      |$   48    0  -36  -18 |mm                                        |                       |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -414   -6  464   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -32  136  -18 |Interpolation method:                     |                       |    |left  ||||
+        |Dropdown   |$  144   -2   92  -24 |]{'linear';'cubic';'sinc3'}               |DD_render_avarinterp   |$ 9 |left  ||||
+        |Label      |$  100    2   56  -18 |(anat.)                                   |                       |    |left  ||||
+        |Dropdown   |$   56   -2   92  -24 |]{'linear';'cubic';'sinc3'}               |DD_render_stvarinterp  |$ 9 |left  |off    ||StVar|
+        |Label      |$  100    2   80  -18 |(statistics)                              |                       |    |left  ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Frame      |$ -406   -6  464   -1 |                                          |                       |    |      ||||
+        |           |                      |                                          |                       |    |      ||||
+        |Label      |$    6  -32  140  -18 |Show while rendering:                     |                       |    |left  ||||
+        |Checkbox   |$  144    0  -24  -24 |                                          |CB_render_showinfig    |$ 9 |left  |on     |$1||
+        |Label      |$   32    0   76  -18 |, write image:                            |                       |    |left  ||||
+        |Edit       |$   76    0  172  -24 |  render.jpg                              |ED_render_filename     |    |left  |on     |||
+        |Checkbox   |$  180    0  -24    0 |                                          |CB_render_filewrt      |$ 9 |left  |on     |$1||
+        |Label      |$ -288  -30  104  -18 |rendering movie:                          |                       |    |right ||||
+        |Edit       |$  108    0  172  -24 |  render.avi                              |ED_render_movfilename  |    |left  |on     |||
+        |Checkbox   |$  180    0  -24    0 |                                          |CB_render_movfilewrt   |$ 9 |left  |on     |$0||
+        |           |                      |                                          |                       |    |      ||||
+        |Button     |$   12    8   72   24 |Close                                     |BT_render_cancel       |    |center||||
+        |Button     |$  366    0  -92    0 |Render...                                 |BT_render_ex           |    |center||||
+        |           |                      |                                          |                       |    |      ||||
+---  END_UICONTROLS  ---

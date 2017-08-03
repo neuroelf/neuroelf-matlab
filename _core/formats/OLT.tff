@@ -1,0 +1,48 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.OLT files (Overlay Lookup Table)
+# OLT FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Colors
+Description:Overlay lookup table files
+Extensions:olt
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+
+# Field description
+ListOfFields:!
+type !cond               !field            !datatype!format !dim    !default !varname
+
+# reading/writing
+EXPRE!$TFFREAD      !!!!!!@NrOfColors = linecount; @Colors = zeros(@NrOfColors, 3);
+EXPRE!$TFFWRITE     !!!!!!@NrOfColors = size(@Colors, 1);
+
+# read OLT lines
+BLOOP!$TFFREAD           ! ! ! !@NrOfColors ! !RColNr
+EXPRE!!!!!!![t_ms, t_me, t_mt] = regexpi(deblank(linecont{linec}), '^color[^0-9]*(\d+)\s*\:?\s+(\d+)\s+(\d+)\s+(\d+).*$'); if isempty(t_ms), error('invalid file'); end
+EXPRE!!!!!!!@Colors($RColNr, 1) = str2double(linecont{linec}(t_mt{1}(2, 1):t_mt{1}(2, 2)));
+EXPRE!!!!!!!@Colors($RColNr, 2) = str2double(linecont{linec}(t_mt{1}(3, 1):t_mt{1}(3, 2)));
+EXPRE!!!!!!!@Colors($RColNr, 3) = str2double(linecont{linec}(t_mt{1}(4, 1):t_mt{1}(4, 2)));
+EXPRE!!!!!!!linec = linec + 1;
+ELOOP!                   ! ! ! !            ! !RColNr
+
+# write OLT lines
+BLOOP!$TFFWRITE          ! ! ! !@NrOfColors ! !WColNr
+EXPRE!!!!!!!linecont{end + 1} = sprintf('%-8s %d %d %d', sprintf('Color%d:', $WColNr), @Colors($WColNr, 1), @Colors($WColNr, 2), @Colors($WColNr, 3)); linecount = linecount + 1;
+ELOOP!                   ! ! ! !            ! !WColNr
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@NrOfColors = 20;
+@Colors = [[255 * ones(10, 1), (75:20:255)', zeros(10, 1)]; [zeros(10, 1), (75:20:255)', (255:-20:75)']];
+EndNewFileCode

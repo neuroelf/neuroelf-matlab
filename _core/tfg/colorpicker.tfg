@@ -1,0 +1,85 @@
+---  BEGIN_COMMENTS  ---
+
+colorpicker
+
+Version:  0.9d
+Build:    14062014
+Date:     Jun-20 2014, 2:43 PM EST
+Figure:   NeuroElf color-picker
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf - colorpicker.m
+
+% Copyright (c) 2010, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position           |Title                    |Tag                        |CallbackClReq
+        |pixels|off    |$  -1  -1  520  324|NeuroElf - color picker  |Wnd_NeuroElf_colorpicker   |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                  |Tag               |FontSize|HAlign|VAlign|Callback
+        |           |                      |                         |                      |    |      |      |
+labels, etc. |      |                      |                         |                      |    |      |      |
+        |Label      |$   12  298  256   18 |Saturation and Value:    |                      |$ 9 |left  |      |
+        |Label      |$  259    0  -28    0 |Hue                      |                      |$ 9 |center|      |
+        |Label      |$   40    0    0    0 |R                        |                      |$ 9 |center|      |
+        |Label      |$   36    0    0    0 |G                        |                      |$ 9 |center|      |
+        |Label      |$   36    0    0    0 |B                        |                      |$ 9 |center|      |
+        |Label      |$   40    0  -88    0 |Picked color             |TX_colorpicker_Pick   |$ 9 |center|      |
+        |           |                      |                         |                      |    |      |      |
+HSV 256 x 256 image||                      |                         |                      |    |      |      |
+        |XImage     |$    8   40  256  256 |]uint8(zeros(256,256,3)) |IM_colorpicker_SV     |    |      |      |
+        |XImage     |$  264    0  -28  256 |]uint8(zeros(256,1,3))   |IM_colorpicker_H      |    |      |      |
+        |           |                      |                         |                      |    |      |      |
+RGB "sliders" |     |                      |                         |                      |    |      |      |
+        |XImage     |$   40    0    0    0 |]uint8(zeros(256,1,3))   |IM_colorpicker_R      |    |      |      |
+        |XImage     |$   36    0    0    0 |]uint8(zeros(256,1,3))   |IM_colorpicker_G      |    |      |      |
+        |XImage     |$   36    0    0    0 |]uint8(zeros(256,1,3))   |IM_colorpicker_B      |    |      |      |
+        |           |                      |                         |                      |    |      |      |
+controls |          |                      |                         |                      |    |      |      |
+        |XImage     |$   40  168  -88  -88 |]uint8(zeros(1,1,3))     |IM_colorpicker_Pick   |    |      |      |
+        |Label      |$    8  -38  -20  -24 |R:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_R      |$ 9 |center|      |
+        |Label      |$  -30  -34  -20    0 |G:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_G      |$ 9 |center|      |
+        |Label      |$  -30  -34  -20    0 |B:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_B      |$ 9 |center|      |
+        |Label      |$  -30  -40  -20    0 |H:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_H      |$ 9 |center|      |
+        |Label      |$  -30  -34  -20    0 |S:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_S      |$ 9 |center|      |
+        |Label      |$  -30  -34  -20    0 |V:                       |                      |$ 9 |left  |      |
+        |Edit       |$   30    8  -50    0 |0                        |ED_colorpicker_V      |$ 9 |center|      |
+        |           |                      |                         |                      |    |      |      |
+        |Label      |$   12    8  240   16 |Pick a color:            |TX_colorpicker_Name   |$ 9 |left  |      |
+        |Button     |$  244    0   80  -24 |Reset                    |BT_colorpicker_reset  |$ 10|center|      |
+        |Button     |$   88    0    0    0 |Cancel                   |BT_colorpicker_cancel |$ 10|center|      |
+        |Button     |$   88    0    0    0 |Accept                   |BT_colorpicker_accept |$ 10|center|      |
+        |           |                      |                         |                      |    |      |      |
+---  END_UICONTROLS  ---

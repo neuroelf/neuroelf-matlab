@@ -1,0 +1,128 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# xff file format for *.PLP files (PLotting Points)
+# PLP FileVersions supported: 1
+#
+# Version:  v1.1
+# Build:    16012321
+# Date:     Jan-23 2016, 9:50 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Columbia University nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# FILE FORMAT
+DefaultProperty:{'@Points(:, %)', 'min(find(strcmpi(''%'', @ColumnNames)))'}
+Description:Plotting points files
+Extensions:plp
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+PLP_NrOfPLPs  |1, 64       |regexp  |\s+NrOfPlottingPoints\:?\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# initial checks for writing
+EXPRE!$TFFWRITE     !!!!!!...
+@NrOfPoints = size(@Points, 1); ...
+@NrOfColumns = size(@Points, 2); ...
+@ColumnNames = @ColumnNames(:)'; ...
+if numel(@ColumnNames) < @NrOfColumns, ...
+    for t_cc = numel(@ColumnNames)+1:@NrOfColumns, ...
+        @ColumnNames{t_cc} = sprintf('col%d', t_cc); ...
+    end, ...
+elseif numel(@ColumnNames) > @NrOfColumns, ...
+    @ColumnNames = @ColumnNames(1:@NrOfColumns); ...
+end, ...
+@NrOfColors = size(@Colors, 1); ...
+@NrOfLabels = numel(@Labels); ...
+@NrOfSymbols = max(numel(@SymbolSizes), numel(@Symbols)); ...
+@Labels = @Labels(:)'; ...
+@Symbols = @Symbols(:)'; ...
+@SymbolSizes = @SymbolSizes(:)'; ...
+if numel(@Symbols) < @NrOfSymbols, ...
+    @Symbols(end+1:@NrOfSymbols) = {'.'}; ...
+end, ...
+if numel(@SymbolSizes) < @NrOfSymbols, ...
+    @SymbolSizes(end+1:@NrOfSymbols) = 10; ...
+end
+
+# initialize on reading
+EXPRE!$TFFREAD      !!!!!!eval(tffspec.NewFileCode);
+
+# in/output
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfPlottingPoints  !double  !%d     !1      !0       !NrOfPoints
+FIELD!                   !NrOfPlottingGroups  !double  !%d     !1      !1       !NrOfGroups
+FIELD!                   !NrOfColumns         !double  !%d     !1      !7       !NrOfColumns
+FIELD!                   !NrOfColors          !double  !%d     !1      !1       !NrOfColors
+FIELD!                   !NrOfGroupIDs        !double  !%d     !1      !1       !NrOfGroupIDs
+FIELD!                   !NrOfLabels          !double  !%d     !1      !1       !NrOfLabels
+FIELD!                   !NrOfSymbols         !double  !%d     !1      !1       !NrOfSymbols
+WRTLN!!!!!!!!  # empty line
+ARRAY!                   !ColumnNames         !string  !"%s"   !1, @NrOfColumns!!ColumnNames
+WRTLN!!!!!!!!  # empty line
+ARRAY!                   !Points              !double  !%14.8g !@NrOfPoints, @NrOfColumns !!Points
+WRTLN!!!!!!!!  # empty line
+ARRAY!@NrOfColors > 0    !Colors              !double  !%d     !@NrOfColors, 3 !!Colors
+WRTLN!!!!!!!!  # empty line
+ARRAY!@NrOfGroupIDs > 0  !GroupIDs            !string  !"%s"   !1,@NrOfGroupIDs!!GroupIDs
+WRTLN!!!!!!!!  # empty line
+ARRAY!@NrOfLabels > 0    !Labels              !string  !"%s"   !1, @NrOfLabels !!Labels
+WRTLN!!!!!!!!  # empty line
+ARRAY!@NrOfSymbols > 0   !SymbolSizes         !double  !%d     !1, @NrOfSymbols!!SymbolSizes
+ARRAY!@NrOfSymbols > 0   !Symbols             !string  !"%s"   !1, @NrOfSymbols!!Symbols
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfPoints = 0;
+@NrOfGroups = 0;
+@NrOfColumns = 21;
+@NrOfColors = 0;
+@NrOfGroupIDs = 0;
+@NrOfLabels = 0;
+@NrOfSymbols = 0;
+@ColumnNames = { ...
+    'X', 'Y', 'Z', 'CoordSystem', 'UsePoint', 'Value', 'DF1', 'DF2', ...
+    'ClusterSize', 'VThresh', 'KThresh', 'Label', 'Software', 'RFX', ...
+    'Correction', 'Study', 'Group', 'GroupSize', 'Symbol', 'Size', 'Color'};
+@Points = zeros(0, 21);
+@Colors = zeros(0, 3);
+@GroupIDs = cell(1, 0);
+@Labels = cell(1, 0);
+@SymbolSizes = zeros(1, 0);
+@Symbols = cell(1, 0);
+EndNewFileCode

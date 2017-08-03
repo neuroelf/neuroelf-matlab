@@ -1,0 +1,111 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.SMP files (Surface MaP)
+# SMP FileVersions supported: 3, 4, 5
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Map
+Description:Surface map files
+EncodingSyntax:ieee-le
+Extensions:smp
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# make sure to use correct dimensions, no matter what fields say, and bail of if dims mismatch
+EXPRE !$BFFWRITE          !!!!!@NrOfMaps = prod(size(@Map)); @NrOfVertices = prod(size(@Map(1).SMPData));
+EXPRE !$BFFWRITE          !!!!!for tv_mc = 2:@NrOfMaps, if prod(size(@Map(tv_mc).SMPData)) ~= @NrOfVertices, error('MAPSIZE_MISMATCH'); end, end
+
+# common fields (shared between maps)
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfMaps
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfOriginalSRF
+
+# loop over maps
+EXPRE !$BFFREAD           !!!!! ...
+@Map = emptystruct({ ...
+    'Type', 'NrOfLags', 'MinLag', 'MaxLag', 'CCOverlay', 'ClusterSize', 'EnableClusterCheck', ...
+    'LowerThreshold', 'UpperThreshold', 'UseValuesAboveThresh', 'DF1', 'DF2', ...
+    'ShowPositiveNegativeFlag', 'BonferroniValue', ...
+    'RGBLowerThreshPos', 'RGBUpperThreshPos', 'RGBLowerThreshNeg', 'RGBUpperThreshNeg', ...
+    'UseRGBColor', 'LUTName', 'TransColorFactor', 'Name', 'SMPData', 'SMPDataCT', 'OverlayColors'}, [1, @NrOfMaps]);
+BLOOP !                       ! ! !@NrOfMaps ! !MapNo
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).Type
+
+# for cross correlation maps
+BLOOP !@Map($MapNo).Type == 3 ! ! !1 ! !MapIsCC
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).NrOfLags
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).MinLag
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).MaxLag
+FIELD !                       !int32   !double  !1, 1                     !        !Map($MapNo).CCOverlay
+ELOOP !                       ! ! !  ! !MapIsCC
+
+# continued loop over maps
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).ClusterSize
+FIELD !                       !uint8   !double  !1, 1                     !        !Map($MapNo).EnableClusterCheck
+FIELD !                       !single  !double  !1, 1                     !        !Map($MapNo).LowerThreshold
+FIELD !                       !single  !double  !1, 1                     !        !Map($MapNo).UpperThreshold
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !Map($MapNo).UseValuesAboveThresh
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).DF1
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).DF2
+FIELD !@FileVersion > 4       !uint32  !double  !1, 1                     !        !Map($MapNo).ShowPositiveNegativeFlag
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($MapNo).BonferroniValue
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($MapNo).RGBLowerThreshPos
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($MapNo).RGBUpperThreshPos
+FIELD !@FileVersion > 3       !uint8   !double  !1, 3                     !        !Map($MapNo).RGBLowerThreshNeg
+FIELD !@FileVersion > 3       !uint8   !double  !1, 3                     !        !Map($MapNo).RGBUpperThreshNeg
+FIELD !                       !uint8   !double  !1, 1                     !        !Map($MapNo).UseRGBColor
+FIELD !@FileVersion > 4       !cstring !cstring !1, 1                     !        !Map($MapNo).LUTName
+FIELD !                       !single  !double  !1, 1                     !        !Map($MapNo).TransColorFactor
+FIELD !                       !cstring !cstring !1, 1                     !        !Map($MapNo).Name
+FIELD !~$HEADERONLY           !single  !single  !@NrOfVertices, 1         !        !Map($MapNo).SMPData
+EXPRE ! $HEADERONLY       !!!!!fseek(fid, 4 * @NrOfVertices, 0);
+ELOOP !                       ! ! !  ! !MapNo
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0 && ~$HEADERONLY !uint8 !uint8 !1, $RemSize            !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 5;
+@NrOfVertices = 40962;
+@NrOfMaps = 1;
+@NameOfOriginalSRF = 'untitled.srf';
+@Map.Type = 1;
+@Map.NrOfLags = [];
+@Map.MinLag = [];
+@Map.MaxLag = [];
+@Map.CCOverlay = [];
+@Map.ClusterSize = 25;
+@Map.EnableClusterCheck = 0;
+@Map.LowerThreshold = 2.5;
+@Map.UpperThreshold = 8;
+@Map.UseValuesAboveThresh = 1;
+@Map.DF1 = 249;
+@Map.DF2 = 0;
+@Map.ShowPositiveNegativeFlag = 3;
+@Map.BonferroniValue = @NrOfVertices;
+@Map.RGBLowerThreshPos = [192,   0,   0];
+@Map.RGBUpperThreshPos = [255, 192,   0];
+@Map.RGBLowerThreshNeg = [  0,   0, 128];
+@Map.RGBUpperThreshNeg = [  0, 128, 255];
+@Map.UseRGBColor = 1;
+@Map.LUTName = '<default>';
+@Map.TransColorFactor = 1;
+@Map.Name = 'New Map';
+@Map.SMPData = zeros(@NrOfVertices, 1);
+@Map.SMPDataCT = [];
+@Map.OverlayColors = [];
+EndNewFileCode

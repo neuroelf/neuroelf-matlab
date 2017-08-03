@@ -1,0 +1,175 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.SDM files (Single-run Design Matrix)
+# SDM FileVersions supported: 1
+# and
+# BrainVoyager QX file format for *.RTC files (Reference Time Course)
+# RTC FileVersions supported: 2, POI/ROI/VOI
+#
+# Version:  v0.9a
+# Build:    10110211
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+CheckForNaNs:1
+DefaultProperty:SDMMatrix
+Description:Single-run design matrix files,Reference Time-Course files
+Extensions:sdm,rtc
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+SDM_firstcfd  |1, 192      |regexpi |includesconstant\:\s+\d\s+firstconfoundpredictor\:\s+\d+
+SDM_noprdp    |1, 1024     |regexpi |nrofpredictors\:\s*\d+.*nrofdatapoints\:\s*\d+\s*\"
+SDM_talznu    |1, 1024     |regexpi |talz\:\s*\d+\s*notused
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!$TFFREAD      !!!!!!@FileVersion = -1; @RTC = struct; @RTC.Type = 'DesignMatrix'; @RTC.FromFile = '<none>'; @RTC.ProjectType = -1; @RTC.FromElement = -1; @RTC.NrOfSources = 0; @RTC.SourceX1 = []; @RTC.SourceX2 = []; @RTC.SourceY1 = []; @RTC.SourceY2 = []; @RTC.SourceZ1 = []; @RTC.SourceZ2 = []; @NrOfPredictors = 0; @NrOfDataPoints = 0; @IncludesConstant = 0; @FirstConfoundPredictor = 1; @PredictorColors = zeros(1, 0); @PredictorNames = cell(1, 0); @SDMMatrix = []; @RTCMatrix = [];
+EXPRE!$TFFWRITE     !!!!!!@NrOfPredictors = size(@SDMMatrix, 2); @NrOfDataPoints = size(@SDMMatrix, 1); if numel(@PredictorNames) < @NrOfPredictors, for ipdc = (numel(@PredictorNames)+1):@NrOfPredictors, @PredictorNames{ipdc} = sprintf('Predictor_%d', ipdc); end, end, if size(@PredictorColors, 1) < @NrOfPredictors, @PredictorColors(end+1:@NrOfPredictors, :) = 255; end, @PredictorNames = @PredictorNames(1:@NrOfPredictors);
+
+# I/O support for RTC format
+BLOOP!strcmpi($FILENAME(end-3:end), '.rtc') !RTCIO !!!1 !!RTCIO
+
+# check what kind of content we have
+EXPRE!              !!!!!!if $TFFREAD, if ~isempty(strfind(linecont{linec}, 'FileVersion')), $HasFileVersion = 1; else $HasFileVersion = 0; end, else, $HasFileVersion = double(@FileVersion > 0); end
+
+# with FileVersion
+BLOOP!$HasFileVersion > 0!HasFVLoop           !!!1 !!HasFVLoop
+
+# header
+FIELD!                   !FileVersion         !double  !%d     !1      !2       !FileVersion
+FIELD!                   !Type                !string  !%s     !1 !DesignMatrix !RTC.Type
+EXPRE!              !!!!!!$AsRTC = 0; if $TFFREAD && ~isempty(strfind(linecont{linec}, 'OfRTC')), $AsRTC = 1; end
+FLIST!$AsRTC == 0        !NrOfPredictors      !double  !%d     !1      !        !NrOfPredictors
+FLIST!$AsRTC == 1        !NrOfRTCs            !double  !%d     !1      !        !NrOfPredictors
+FLIST!                   !NrOfDataPoints      !double  !%d     !1      !        !NrOfDataPoints
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFREAD      !!!!!!@PredictorNames = cell(1, @NrOfPredictors); @RTCMatrix = zeros(@NrOfDataPoints, @NrOfPredictors);
+ARRAY!                   !PredictorNames      !string  !"%s"   !1, @NrOfPredictors !!PredictorNames
+ARRAY!                   !SDMMatrix           !double  !%.6f   !@NrOfDataPoints, @NrOfPredictors !!SDMMatrix
+EXPRE!$TFFREAD      !!!!!!@PredictorColors = floor(255.999 * rand(@NrOfPredictors, 3));
+
+# end of (with FileVersion)
+ELOOP!                   !HasFVLoop           !!!  !!HasFVLoop
+
+# without FileVersion
+BLOOP!$HasFileVersion==0 !HasNoFVLoop         !!!1 !!HasNoFVLoop
+FLIST!                   !NrOfRTCs            !double  !%d     !1      !1       !NrOfPredictors
+FLIST!                   !NrOfValues          !double  !%d     !1      !        !NrOfDataPoints
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !FromFile            !string  !%s     !1      !        !RTC.FromFile
+
+# can be from an FMR, VTC, or MTC
+EXPRE!$TFFREAD           !!!!!!@RTC.ProjectType = -1;
+EXPRE!$TFFREAD           !!!!!!if ~isempty(strfind(linecont{linec}, 'FromSlice')), @RTC.ProjectType = 0; end
+EXPRE!$TFFREAD           !!!!!!if ~isempty(strfind(linecont{linec}, 'FromClust')), @RTC.ProjectType = 1; end
+EXPRE!$TFFREAD           !!!!!!if ~isempty(strfind(linecont{linec}, 'FromPatch')), @RTC.ProjectType = 2; end
+
+# FMR
+BLOOP!@RTC.ProjectType==0!RTCFromFMR          !!!1 !!RTCFromFMR
+FIELD!                   !FromSlice           !double  !%d     !1      !0       !RTC.FromElement
+FLIST!                   !NrOfPixels          !double  !%d     !1      !1       !RTC.NrOfSources
+
+# X1, Y1, X2, Y2 are more tricky!
+BLOOP!$TFFREAD           !RTCFromFMRRead      !!!1 !!RTCFromFMRRead
+FIELD!                   !X1                  !string  !%s     !1      !        !RTC.SourceX1
+EXPRE!              !!!!!!@RTC.SourceY1 = 0;
+FIELD!                   !X2                  !string  !%s     !1      !        !RTC.SourceX2
+EXPRE!              !!!!!!$X1Y1 = strrep(lower(@RTC.SourceX1), 'y1:', ''); $X2Y2 = strrep(lower(@RTC.SourceX2), 'y2:', '');
+EXPRE!              !!!!!!try, $X1Y1 = str2num($X1Y1); @RTC.SourceX1 = $X1Y1(1); @RTC.SourceY1 = $X1Y1(2); end
+EXPRE!              !!!!!!try, $X2Y2 = str2num($X2Y2); @RTC.SourceX2 = $X2Y2(1); @RTC.SourceY2 = $X2Y2(2); end
+ELOOP!                   !RTCFromFMRRead      !!!  !!RTCFromFMRRead
+BLOOP!$TFFWRITE          !RTCFromFMRWrite     !!!1 !!RTCFromFMRWrite
+EXPRE!              !!!!!!linecont{end + 1} = sprintf('X1: %3d   Y1: %3d', @RTC.SourceX1, @RTC.SourceY1); linecount = linecount + 1;
+EXPRE!              !!!!!!linecont{end + 1} = sprintf('X2: %3d   Y2: %3d', @RTC.SourceX2, @RTC.SourceY2); linecount = linecount + 1;
+ELOOP!                   !RTCFromFMRWrite     !!!  !!RTCFromFMRWrite
+ARRAY!                   !SDMMatrix           !double  !%6.3f  !@NrOfDataPoints, @NrOfPredictors !!SDMMatrix
+ELOOP!                   !RTCFromFMR          !!!  !!RTCFromFMR
+
+# VTC
+BLOOP!@RTC.ProjectType==1!RTCFromVTC          !!!1 !!RTCFromVTC
+FIELD!                   !FromCluster         !double  !%d     !1      !0       !RTC.FromElement
+FLIST!                   !NrOfVoxels          !double  !%d     !1      !1       !RTC.NrOfSources
+
+# TalX, TalY, TalZ, Unused are more tricky!
+BLOOP!$TFFREAD           !RTCFromVTCRead      !!!1 !!RTCFromVTCRead
+FIELD!                   !TalX                !string  !%s     !1      !        !RTC.SourceX1
+EXPRE!              !!!!!!@RTC.SourceY1 = 0;
+FIELD!                   !TalZ                !string  !%s     !1      !        !RTC.SourceZ1
+EXPRE!              !!!!!!$TalXY = strrep(lower(@RTC.SourceX1), 'taly:', ''); $TalZN = strrep(lower(@RTC.SourceZ1), 'notused:', '');
+EXPRE!              !!!!!!try, $TalXY = str2num($TalXY); @RTC.SourceX1 = $TalXY(1); @RTC.SourceY1 = $TalXY(2); end
+EXPRE!              !!!!!!try, $TalZN = str2num($TalZN); @RTC.SourceZ1 = $TalZN(1); @RTC.SourceZ2 = $TalZN(2); end
+ELOOP!                   !RTCFromVTCRead      !!!  !!RTCFromVTCRead
+BLOOP!$TFFWRITE          !RTCFromVTCWrite     !!!1 !!RTCFromVTCWrite
+EXPRE!              !!!!!!linecont{end + 1} = sprintf('TalX: %3d   TalY: %3d', @RTC.SourceX1, @RTC.SourceY1); linecount = linecount + 1;
+EXPRE!              !!!!!!linecont{end + 1} = sprintf('TalZ: %3d   NotUsed:   0', @RTC.SourceZ1); linecount = linecount + 1;
+ELOOP!                   !RTCFromVTCWrite     !!!  !!RTCFromVTCWrite
+ARRAY!                   !SDMMatrix           !double  !%6.3f  !@NrOfDataPoints, @NrOfPredictors !!SDMMatrix
+ELOOP!                   !RTCFromVTC          !!!  !!RTCFromVTC
+
+# MTC
+BLOOP!@RTC.ProjectType==2!RTCFromMTC          !!!1 !!RTCFromMTC
+FIELD!                   !FromPatch           !double  !%d     !1      !0       !RTC.FromElement
+FLIST!                   !NrOfVertices        !double  !%d     !1      !1       !RTC.NrOfSources
+WRTLN!!!!!!!NotUsed:   0   NotUsed:   0
+WRTLN!!!!!!!NotUsed:   0   NotUsed:   0
+ARRAY!                   !SDMMatrix           !double  !%6.3f  !@NrOfDataPoints, @NrOfPredictors !!SDMMatrix
+ELOOP!                   !RTCFromMTC          !!!  !!RTCFromMTC
+EXPRE!              !!!!!!@PredictorColors = floor(255.999 * rand(@NrOfPredictors, 3)); @PredictorNames = cell(1, @NrOfPredictors); for prdc = 1:@NrOfPredictors, @PredictorNames{prdc} = sprintf('Predictor_%d', prdc); end
+ELOOP!                   !HasNoFVLoop         !!!  !!HasNoFVLoop
+EXPRE!              !!!!!!@RTCMatrix = @SDMMatrix; @FirstConfoundPredictor = @NrOfPredictors + 1;
+ELOOP!                   !RTCIO               !!!  !!RTCIO
+
+# header
+BLOOP!~strcmpi($FILENAME(end-2:end), 'rtc')!SDMIO !!!1 !!SDMIO
+EXPRE!$TFFWRITE     !!!!!!if @FileVersion < 1, @FileVersion = 1; end
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfPredictors      !double  !%d     !1      !1       !NrOfPredictors
+FIELD!                   !NrOfDataPoints      !double  !%d     !1      !0       !NrOfDataPoints
+FIELD!                   !IncludesConstant    !double  !%d     !1      !1       !IncludesConstant
+FIELD!                   !FirstConfoundPredictor!double!%d     !1      !1       !FirstConfoundPredictor
+WRTLN!!!!!!!!  # empty line
+EXPRE!              !!!!!!$NrOfColorCodes = 3 * @NrOfPredictors;
+EXPRE!$TFFWRITE     !!!!!!@PredictorColors = reshape(@PredictorColors', [1, $NrOfColorCodes]);
+ARRAY!                   !PredictorColors     !double  !%d     !1, $NrOfColorCodes !!PredictorColors
+EXPRE!              !!!!!!@PredictorColors = reshape(@PredictorColors, [3, @NrOfPredictors])';
+ARRAY!                   !PredictorNames      !string  !"%s"   !1, @NrOfPredictors !!PredictorNames
+ARRAY!                   !SDMMatrix           !double  !%.6f   !@NrOfDataPoints, @NrOfPredictors !!SDMMatrix
+EXPRE!              !!!!!!if @FirstConfoundPredictor > 0 && @FirstConfoundPredictor <= @NrOfPredictors, @RTCMatrix = @SDMMatrix(:, 1:(@FirstConfoundPredictor - 1)); elseif @IncludesConstant > 0, @RTCMatrix = @SDMMatrix(:, 1:end-1); else @RTCMatrix = @SDMMatrix; end
+ELOOP!                   !SDMIO               !!!  !!SDMIO
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@RTC = struct;
+@RTC.Type = 'DesignMatrix';
+@RTC.FromFile = '<none>';
+@RTC.ProjectType = -1;
+@RTC.FromElement = -1;
+@RTC.NrOfSources = 0;
+@RTC.SourceX1 = [];
+@RTC.SourceX2 = [];
+@RTC.SourceY1 = [];
+@RTC.SourceY2 = [];
+@RTC.SourceZ1 = [];
+@RTC.SourceZ2 = [];
+@NrOfPredictors = 1;
+@NrOfDataPoints = 0;
+@IncludesConstant = 1;
+@FirstConfoundPredictor = 1;
+@PredictorColors = [255, 255, 255];
+@PredictorNames = {'Constant'};
+@SDMMatrix = zeros(@NrOfDataPoints, @NrOfPredictors);
+@RTCMatrix = zeros(@NrOfDataPoints, @FirstConfoundPredictor - 1);
+if @IncludesConstant > 0, @SDMMatrix(:, end) = 1; end
+EndNewFileCode

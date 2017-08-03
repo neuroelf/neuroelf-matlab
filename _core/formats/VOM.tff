@@ -1,0 +1,72 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.VOM files (Volume Of Map)
+# VOM FileVersions supported: 1
+#
+# VOM files contain coordinates of a group voxels of interest from a map.
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Volume of Map files
+Extensions:vom
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+VOM_NrVOMs    |1, 256      |regexpi |nrofvoms\:\s*\d+\s*nameofvom\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !1       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !BoundingBox         !double  !%d     !6      !        !BoundingBox
+FIELD!                   !ResolutionRelativeToVMR !double !%d  !1      !3       !ResolutionRelativeToVMR
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !LeftRightConvention !double  !%d     !1      !1       !LeftRightConvention
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !OriginalVMRFile     !string  !"%s"   !1      !        !OriginalVMRFile
+FIELD!                   !IncludeVMPValues    !double  !%d     !1      !0       !IncludeVMPValues
+EXPRE!!!!!!!$Vox2ndDim = 3 + @IncludeVMPValues;
+EXPRE!$TFFREAD      !!!!!!@FromVMPFile = '<none>'; @VMPIndex = -1; @MapType = 1;
+FIELD!@IncludeVMPValues > 0 !FromVMPFile      !string  !"%s"   !1      !        !FromVMPFile
+FIELD!@IncludeVMPValues > 0 !VMPIndex         !double  !%d     !1      !        !VMPIndex
+FIELD!@IncludeVMPValues > 0 !MapType          !double  !%d     !1      !1       !MapType
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfVOMs = prod(size(@VOM));
+FIELD!                   !NrOfVOMs            !double  !%d     !1      !1       !NrOfVOMs
+
+# loop over VOMs
+EXPRE!$TFFREAD      !!!!!!@VOM = emptystruct({'Name', 'Color', 'NrOfVoxels', 'Voxels', 'VMPValues'}, [1, @NrOfVOMs]);
+BLOOP!                   ! ! ! !@NrOfVOMs ! !VOMNo
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NameOfVOM           !string  !%s     !1      !1       !VOM($VOMNo).Name
+FIELD!                   !ColorOfVOM          !double  !%d     !3      !        !VOM($VOMNo).Color
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@VOM($VOMNo).NrOfVoxels = size(@VOM($VOMNo).Voxels, 1);
+FIELD!                   !NrOfVoxels          !double  !%d     !1      !        !VOM($VOMNo).NrOfVoxels
+ARRAY!                   !Voxels              !double  !%.0f   !@VOM($VOMNo).NrOfVoxels, $Vox2ndDim !!VOM($VOMNo).Voxels
+EXPRE!$TFFREAD      !!!!!!if @IncludeVMPValues > 0, @VOM($VOMNo).VMPValues = @VOM($VOMNo).Voxels(:, 4:end); @VOM($VOMNo).Voxels(:, 4:end) = []; end
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !VOMNo
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@BoundingBox = [57, 231, 52, 172, 59, 197];
+@ResolutionRelativeToVMR = 3;
+@LeftRightConvention = 1;
+@OriginalVMRFile = '<none>';
+@IncludeVMPValues = 0;
+@NrOfVOMs = 0;
+@VOM = emptystruct({'Name', 'Color', 'NrOfVoxels', 'Voxels', 'VMPValues'});
+EndNewFileCode

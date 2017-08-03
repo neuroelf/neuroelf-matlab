@@ -1,0 +1,84 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.MTC files (Mesh timecourse)
+# MTC FileVersions supported: 1
+#
+# Version:  v1.1
+# Build:    16032123
+# Date:     Mar-21 2016, 11:01 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:MTCData
+Description:Mesh time course files
+EncodingSyntax:ieee-le
+Extensions:mtc
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# ensure LinkedPRTFile is of correct type
+EXPRE !$BFFWRITE          !!!!! ...
+if ~ischar(@LinkedPRTFile), ...
+    @LinkedPRTFile = ''; ...
+end
+
+# header
+EXPRE !$BFFREAD           !!!!!eval(bffspec.NewFileCode);
+FIELD !                       !uint32  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTimePoints
+FIELD !                       !cstring !cstring !1, 1                     !        !SourceVTCFile
+FIELD !                       !cstring !cstring !1, 1                     !        !LinkedPRTFile
+FIELD !                       !uint32  !double  !1, 1                     !        !HemodynamicDelay
+FIELD !                       !single  !double  !1, 1                     !        !TR
+FIELD !                       !single  !double  !1, 1                     !        !HRFDelta
+FIELD !                       !single  !double  !1, 1                     !        !HRFTau
+FIELD !                       !uint32  !double  !1, 1                     !        !ProtocolSegmentSize
+FIELD !                       !uint32  !double  !1, 1                     !        !ProtocolSegmentOffset
+FIELD !                       !uint8   !double  !1, 1                     !        !MTCDataType
+
+# data
+FIELD !@MTCDataType == 1 && ~$HEADERONLY !single !single !@NrOfTimePoints, @NrOfVertices ! !MTCData
+EXPRE !@MTCDataType == 1 &&  $HEADERONLY !!!!!@MTCData = []; fseek(fid, 4 * @NrOfTimePoints * @NrOfVertices, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+# Create default RunTimeVars with discarded time points
+EXPRE !$BFFREAD           !!!!!@RunTimeVars = struct('Discard', []);
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NrOfVertices = 40962;
+@NrOfTimePoints = 0;
+@SourceVTCFile = '';
+@LinkedPRTFile = '';
+@HemodynamicDelay = 1;
+@TR = 2000;
+@HRFDelta = 2.5;
+@HRFTau = 1.25;
+@ProtocolSegmentSize = 10;
+@ProtocolSegmentOffset = 0;
+@MTCDataType = 1;
+@MTCData = single(zeros([@NrOfTimePoints, @NrOfVertices]));
+@RunTimeVars = struct('Discard', []);
+@RunTimeVars.Map = struct( ...
+    'Type', 84, 'LowerThreshold', 1, 'UpperThreshold', 3, 'Name', 'Time', ...
+    'RGBLowerThreshPos', [255, 0, 0], 'RGBUpperThreshPos', [255, 255, 0], ...
+    'RGBLowerThreshNeg', [255, 0, 255], 'RGBUpperThreshNeg', [0, 0, 255], ...
+    'UseRGBColor', 1, 'LUTName', '<default>', 'TransColorFactor', -1, ...
+    'NrOfLags', 0, 'MinLag', 0, 'MaxLag', 0, 'CCOverlay', 0, 'ClusterSize', 0, ...
+    'EnableClusterCheck', 0, 'UseValuesAboveThresh', 1, 'DF1', 248, 'DF2', 1, ...
+    'ShowPositiveNegativeFlag', 3, 'BonferroniValue', 40962, 'NrOfFDRThresholds', 0, ...
+    'FDRThresholds', zeros(0, 3), 'UnknownValue', 0, 'TimePointData', zeros(0, 1), ...
+    'OverlayColors', [], 'RunTimeVars', struct());
+@RunTimeVars.SubMapVol = 1;
+EndNewFileCode

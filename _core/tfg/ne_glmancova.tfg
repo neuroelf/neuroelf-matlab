@@ -1,0 +1,164 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - contrast manager GUI
+
+Version:  1.0
+Build:    14121115
+Date:     Dec-11 2014, 3:38 PM EST
+Figure:   NeuroElf GUI - GLM ANCOVA configuration
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - GLM ANCOVA configuration
+
+% Copyright (c) 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+layout1 |]{'1';'2';'3';'4';'5';'6';'7';'8';'9';'10';'FIR';'ST'}
+layouts |]{'(1 w-factor)';'...-by-2';'...-by-3';'...-by-2-by-2';'...-by-3-by-2'}
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                 |Tag                        |CallbackClReq
+        |pixels|off    |$   -1   -1  776  532  |NeuroElf GUI - ANCOVA configuration   |Wnd_NeuroElf_ancova        |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Value|MinMaxTop|ToolTip
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$   12  502   30   18 |GLM:                                      |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   36   -4  192  -26 |<no GLM loaded>                           |DD_NeuroElf_AC_GLMs    |$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$  -36  -24   56  -18 |Groups:                                   |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$   56    2  -18    0 |                                          |CB_NeuroElf_AC_groups  |    |center|      |off    |Groups |      |$ 0  |         |
+        |Listbox    |$  -56  -62  224  -58 |<no groups specified>                     |LB_NeuroElf_AC_groups  |$ 9 |left  |      |off    |Groups |      |     |$ 0 2 1  |
+        |Label      |$    0  -28  224  -18 |Subject selection:                        |TX_NeuroElf_AC_subjects|    |left  |      |       |NGroups|      |     |         |
+        |ListBox    |$    0 -208    0 -208 |empty                                     |LB_NeuroElf_AC_subjects|$ 9 |      |      |       |NGroups|      |     |$ 0 2 1  |
+        |Label      |$    0  -26   96  -18 |Covariates:                               |                       |    |left  |      |       |       |      |     |         |
+        |Label      |$  100    0    0    0 |]['+ interactions:']                      |                       |    |right |      |       |       |      |     |         |
+        |CheckBox   |$  104    4  -18    0 |                                          |CB_NeuroElf_AC_coviact |    |center|      |       |       |      |$ 1  |         |
+        |ListBox    |$ -204 -146  224 -142 |empty                                     |LB_NeuroElf_AC_covariates|$9|      |      |       |RFXGLM |      |     |$ 0 2 1  |
+        |Frame      |$  244    4    1  516 |                                          |                       |    |      |      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$    8  498   96  -18 |First factor levels:                      |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$  100   -4   72  -24 |]tfgtv.layout1                            |DD_NeuroElf_AC_layoutn |$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$   76    4   76  -18 |crossed with                              |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   76   -4  116  -24 |]tfgtv.layouts                            |DD_NeuroElf_AC_layout  |$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$  116    4   40  -18 |using                                     |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   40   -4  112  -24 |]{'Predictors';'Contrasts'}               |DD_NeuroElf_AC_celltype|$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$ -384  -26  160  -18 |Factor 2, Level 1                         |TX_NeuroElf_AC_FLx11   |    |left  |      |       |       |      |     |         |
+        |Label      |$  168    0    0    0 |Factor 2, Level 2                         |TX_NeuroElf_AC_FLx21   |    |left  |      |off    |       |      |     |         |
+        |Label      |$  168    0    0    0 |Factor 2, Level 3                         |TX_NeuroElf_AC_FLx31   |    |left  |      |off    |       |      |     |         |
+        |Label      |$  168    0    0    0 |Factor 2, L1; Factor 3, L2                |TX_NeuroElf_AC_FLx12   |    |left  |      |off    |       |      |     |         |
+        |Label      |$  168    0    0    0 |Factor 2, L2; Factor 3, L2                |TX_NeuroElf_AC_FLx22   |    |left  |      |off    |       |      |     |         |
+        |Label      |$  168    0    0    0 |Factor 2, L3; Factor 3, L2                |TX_NeuroElf_AC_FLx32   |    |left  |      |off    |       |      |     |         |
+        |DropDown   |$ -840  -34    0  -24 |<predictors>                              |DD_NeuroElf_AC_L01L1L1 |$ 9 |      |      |       |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L01L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L01L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L01L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L01L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L01L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L1L1 |$ 9 |      |      |       |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L02L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L03L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L04L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L05L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L06L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L07L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |XLabel     |$ -858  -20  -10  464 |y:First factor, levels 1 through N        |TX_NeuroElf_AC_F1      |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   10  -10  160  -24 |<predictors>                              |DD_NeuroElf_AC_L08L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L08L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L08L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L08L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L08L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L08L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L09L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$ -848  -30    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L1L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L2L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L3L1 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  176    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L1L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L2L2 |$ 9 |      |      |off    |       |      |     |         |
+        |DropDown   |$  168    0    0    0 |<predictors>                              |DD_NeuroElf_AC_L10L3L2 |$ 9 |      |      |off    |       |      |     |         |
+        |Frame      |$ -876   -2  524   -1 |                                          |FR_NeuroElf_AC_hdivide |    |      |      |       |       |      |     |         |
+        |Label      |$    4  -30  224  -18 |Add global mean (of map) as covariate     |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  228    2  -18    0 |                                          |CB_NeuroElf_AC_addGmean|    |center|      |       |       |      |$ 0  |         |
+        |Label      |$   34   -2  -50    0 |Store in:                                 |TX_NeuroElf_AC_storeVMP|    |left  |      |       |       |      |     |         |
+        |DropDown   |$   52   -4 -206  -26 |<new.vmp>                                 |DD_NeuroElf_AC_storeVMP|$ 9 |left  |      |       |       |      |$ 1  |         |
+        |Label      |$ -314  -26  176  -18 |Remove mean of covariates:                |                       |    |left  |      |       |       |      |     |         |
+        |RadioButton|$  180    1 -128    0 |not at all (SPSS)                         |RB_NeuroElf_AC_mrcnone |    |left  |      |       |       |MRCov |$ 0  |         |
+        |RadioButton|$  128    0 -128    0 |global mean (R)                           |RB_NeuroElf_AC_mrcglob |    |left  |      |       |       |MRCov |$ 1  |         |
+        |RadioButton|$  128    0 -100    0 |per-group                                 |RB_NeuroElf_AC_mrcgroup|    |left  |      |       |       |MRCov |$ 0  |         |
+        |Label      |$ -436  -31  224  -18 |Smooth maps prior to regression:          |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  228    2  -18    0 |                                          |CB_NeuroElf_AC_smdata  |    |center|      |       |       |      |$ 0  |         |
+        |Edit       |$   34   -2   44  -26 |]['6.0']                                  |ED_NeuroElf_AC_smdatak |$ 9 |center|      |off    |SMData |      |     |         |
+        |Label      |$   50    0   36  -18 |mm                                        |                       |$ 9 |left  |      |off    |SMData |      |     |         |
+        |Label      |$   46    0   76  -18 |interpolation:                            |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$   76   -4  -86  -26 |]{'linear';'cubic';'sinc3'}               |DD_NeuroElf_AC_imeth   |$ 9 |left  |      |       |       |      |$ 2  |         |
+        |Label      |$ -434  -26 -224  -18 |Limit individial betas between:           |                       |    |left  |      |off    |SMData |      |     |         |
+        |CheckBox   |$  228    4  -18    0 |                                          |CB_NeuroElf_AC_brange  |    |center|      |off    |SMData |      |$ 0  |         |
+        |Edit       |$   34   -4   96  -26 |]['-Inf']                                 |ED_NeuroElf_AC_brange1 |$ 9 |center|      |off    |SMData |      |     |         |
+        |Label      |$  106    0   40  -18 |and                                       |                       |    |center|      |off    |SMData |      |     |         |
+        |Edit       |$   50    0   96  -26 |]['Inf']                                  |ED_NeuroElf_AC_brange2 |$ 9 |center|      |off    |SMData |      |     |         |
+        |Button     |$ -422  -36  112  -26 |Load config ...                           |BT_NeuroElf_AC_loadcfg |    |center|      |       |       |      |     |         |
+        |Button     |$  124    0    0    0 |Save config ...                           |BT_NeuroElf_AC_savecfg |    |center|      |       |       |      |     |         |
+        |Button     |$  284    0    0    0 |Compute ...                               |BT_NeuroElf_AC_compute |    |center|      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+---  END_UICONTROLS  ---

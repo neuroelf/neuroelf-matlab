@@ -1,0 +1,612 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf GUI
+
+Version:  1.1
+Build:    16060916
+Date:     Jun-09 2016, 4:45 PM EST
+Figure:   NeuroElf main GUI window
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf (main UI)
+
+% Copyright (c) 2010 - 2016, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+rgbbt   |]permute(uint8(cat(2, repmat([255; 0; 0], [1, 6, 12]), repmat([0; 255; 0], [1, 6, 12]), repmat([0; 0; 255], [1, 6, 12]))), [3, 2, 1])
+talsg   |]load(neuroelf_file('t', 'talairach_seg_sn.mat'))
+talsi   |]load(neuroelf_file('t', 'talairach_seg_inv_sn.mat'))
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position              |Title                                      |Tag                     |Page|CallbackClReq
+        |pixels|off    |$  -1   -1  1000  696 |NeuroElf GUI                               |NeuroElf_MainFig        |$ 1 |neuroelf_gui('close');
+---    END_FIGURE    ---
+
+---    BEGIN_MENU    ---
+Comment |Level |Enabled |Checked |Separator |EGroups|VGroups|Caption         |Accelerator |Tag                          |Callback
+
+  File -> LEV   ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |&File                                    | |UIM_NeuroElf_FILE            |]{tfgne.ne_selectfile}
+        |$ 2   |    |    |    |       |       |Open...                                  |o|UIM_NeuroElf_openfile        |]{tfgne.ne_openfile}
+        |$ 2   |    |    |    |       |       |Open file as stats...                    | |UIM_NeuroElf_openstatsfile   |]{tfgne.ne_openstatsfile}
+        |$ 2   |    |    |on  |       |       |Select current object                    | |UIM_NeuroElf_selectfile      |
+        |$ 2   |    |    |on  |       |       |Recently loaded slicing objects          | |UIM_NeuroElf_recentslice     |]{tfgne.ne_recentfiles, 'slc', 'SliceVar'}
+        |$ 2   |    |    |    |       |       |Recently loaded slicing stats objects    | |UIM_NeuroElf_recentstats     |]{tfgne.ne_recentfiles, 'stat', 'StatsVar'}
+        |$ 2   |    |    |    |       |       |Recently loaded surface objects          | |UIM_NeuroElf_recentsrf       |]{tfgne.ne_recentfiles, 'srf', 'SurfVar'}
+        |$ 2   |    |    |    |       |       |Recently loaded surface stats objects    | |UIM_NeuroElf_recentsrfst     |]{tfgne.ne_recentfiles, 'srfst', 'SurfStatsVar'}
+        |$ 2   |    |    |on  |       |       |Colin-27 dataset                         | |UIM_NeuroElf_opencolin       |
+        |$ 2   |    |    |on  |       |       |NeuroSynth maps                          | |UIM_NeuroElf_neurosynth      |
+        |$ 2   |off |    |on  |VarIsLoaded  | |Clone slicing object                     | |UIM_NeuroElf_clonefile       |]{tfgne.ne_clonefile, 'SliceVar'}
+        |$ 2   |off |    |    |VarIsLoaded  | |Close slicing object                     | |UIM_NeuroElf_closefile       |]{tfgne.ne_closefile, 'SliceVar'}
+        |$ 2   |    |    |    |       |       |New slicing object (empty VMR)           | |UIM_NeuroElf_newvmr          |]{tfgne.ne_newfile, 'vmr'}
+        |$ 2   |off |    |    |VarIsLoaded  | |Reload slicing object                    | |UIM_NeuroElf_reloadfile      |]{tfgne.ne_reloadfile, 'ana'}
+        |$ 2   |off |    |    |VarIsLoaded  | |Set underlay object                      | |UIM_NeuroElf_setunderlay     |]{tfgne.ne_setunderlay}
+        |$ 2   |off |    |on  |SLoaded      | |Clone stats object                       | |UIM_NeuroElf_clonestats      |]{tfgne.ne_clonefile, 'StatsVar'}
+        |$ 2   |off |    |    |SLoaded|       |Reload stats object                      | |UIM_NeuroElf_reloadstats     |]{tfgne.ne_reloadfile, 'stats'}
+        |$ 2   |off |    |on  |VarIsLoaded  | |Save                                     |s|UIM_NeuroElf_savefile        |]{tfgne.ne_savefile, 'SliceVar', 0}
+        |$ 2   |off |    |    |VarIsLoaded  | |Save as...                               | |UIM_NeuroElf_savefileas      |]{tfgne.ne_savefile, 'SliceVar', 1}
+        |$ 2   |off |    |on  |SLoaded|       |Save stats                               | |UIM_NeuroElf_savestat        |]{tfgne.ne_savefile, 'StatsVar', 0}
+        |$ 2   |off |    |    |SLoaded|       |Save stats as...                         | |UIM_NeuroElf_savestatas      |]{tfgne.ne_savefile, 'StatsVar', 1}
+        |$ 2   |    |    |on  |       |       |Save text output (table/betas)...        | |UIM_NeuroElf_savetextas      |]{tfgne.ne_savetextoutput}
+        |$ 2   |off |    |    |TCPlot |       |Save time course (SDM)...                | |UIM_NeuroElf_savetcsdm       |]{tfgne.ne_savetcsdm}
+        |$ 2   |    |    |on  |       |       |Reload scenery file                      |y|UIM_NeuroElf_reloadscene     |]{tfgne.ne_srf_tools, 'loadscenery'}
+        |$ 2   |    |    |on  |       |       |Import Analyze to VMR...                 | |UIM_NeuroElf_importvmr       |]{tfgne.ne_importvmr}
+        |$ 2   |    |    |    |       |       |Import SPM maps to VMP...                | |UIM_NeuroElf_importvmp       |]{tfgne.ne_importvmp}
+        |$ 2   |    |    |    |       |       |Import RFX-GLM from SPM.mat files...     | |UIM_NeuroElf_importrfxglm    |]{tfgne.ne_importrfxglm}
+        |$ 2   |    |    |on  |       |       |Close all files                          | |UIM_NeuroElf_closeallfiles   |]{tfgne.ne_unloadobjects}
+
+    File -> Options -> C  SEP  EGRP    VGRP    CAPT
+        |$ 2   |    |    |on  |       |       |Options                                  | |UIM_NeuroElf_OPTIONS         |
+        |$  3  |    |    |    |       |       |ClusterTable                             | |UIM_NeuroElf_CTable          |
+        |$   4 |    |    |    |       |       |generate new VOI                         | |UIM_NeuroElf_CTableNewVOI    |]{tfgne.ne_setoption, 'ctableadd', false}
+        |$   4 |    |    |    |       |       |add to existing VOI                      | |UIM_NeuroElf_CTableAddToVOI  |]{tfgne.ne_setoption, 'ctableadd', true}
+        |$   4 |    |    |on  |       |       |extract only manually                    | |UIM_NeuroElf_CTableExtManual |]{tfgne.ne_setoption, 'extonselect', 'manual'}
+        |$   4 |    |    |    |       |       |extract on single select                 | |UIM_NeuroElf_CTableExtSingle |]{tfgne.ne_setoption, 'extonselect', 'single'}
+        |$   4 |    |    |    |       |       |extract on multi-selection               | |UIM_NeuroElf_CTableExtMulti  |]{tfgne.ne_setoption, 'extonselect', 'multi'}
+        |$   4 |    |    |on  |       |       |extract transio-based                    | |UIM_NeuroElf_CTableExtTransIO|]{tfgne.ne_setoption, 'exttransio'}
+        |$   4 |    |    |    |       |       |extract with subject IDs                 | |UIM_NeuroElf_CTableExtWithSID|]{tfgne.ne_setoption, 'extwithsids'}
+        |$   4 |    |    |on  |       |       |separate value by spaces                 | |UIM_NeuroElf_CTableExtSepSpc |]{tfgne.ne_setoption, 'extsepchars', [32, 32]}
+        |$   4 |    |    |    |       |       |separate value by tabs                   | |UIM_NeuroElf_CTableExtSepTab |]{tfgne.ne_setoption, 'extsepchars', 9}
+        |$   4 |    |    |    |       |       |separate value by commas                 | |UIM_NeuroElf_CTableExtSepCom |]{tfgne.ne_setoption, 'extsepchars', 44}
+        |$   4 |    |    |    |       |       |separate value by semicolons             | |UIM_NeuroElf_CTableExtSepSmc |]{tfgne.ne_setoption, 'extsepchars', 59}
+        |$   4 |    |    |on  |       |       |peak coordinate                          | |UIM_NeuroElf_CTablePeak      |]{tfgne.ne_setoption, 'ctablelupcrd', 'peak'}
+        |$   4 |    |    |    |       |       |center coordinate                        | |UIM_NeuroElf_CTableCenter    |]{tfgne.ne_setoption, 'ctablelupcrd', 'center'}
+        |$   4 |    |    |    |       |       |center-of-gravity                        | |UIM_NeuroElf_CTableCOG       |]{tfgne.ne_setoption, 'ctablelupcrd', 'cog'}
+        |$   4 |    |    |on  |       |       |print sub-cluster sizes                  | |UIM_NeuroElf_CTableSCSizes   |]{tfgne.ne_setoption, 'ctablescsizes'}
+        |$   4 |    |    |on  |       |       |sort table by stats                      | |UIM_NeuroElf_CTableSortMax   |]{tfgne.ne_setoption, 'ctablesort', 'maxstat'}
+        |$   4 |    |    |    |       |       |sort table by signed stats               | |UIM_NeuroElf_CTableSortMaxS  |]{tfgne.ne_setoption, 'ctablesort', 'maxstats'}
+        |$   4 |    |    |    |       |       |sort table by cluster size               | |UIM_NeuroElf_CTableSortSize  |]{tfgne.ne_setoption, 'ctablesort', 'size'}
+        |$   4 |    |    |    |       |       |sort table by X coordinate               | |UIM_NeuroElf_CTableSortX     |]{tfgne.ne_setoption, 'ctablesort', 'x'}
+        |$   4 |    |    |    |       |       |sort table by Y coordinate               | |UIM_NeuroElf_CTableSortY     |]{tfgne.ne_setoption, 'ctablesort', 'y'}
+        |$   4 |    |    |    |       |       |sort table by Z coordinate               | |UIM_NeuroElf_CTableSortZ     |]{tfgne.ne_setoption, 'ctablesort', 'z'}
+
+        |$  3  |    |    |    |       |       |Draw on event                            | |UIM_NeuroElf_DOn             |
+        |$   4 |    |    |    |       |       |Mouse click or movement                  | |UIM_NeuroElf_DOnMouse        |]{tfgne.ne_setoption, 'drawon', 'Mouse'}
+        |$   4 |    |    |    |       |       |Set position by cursor                   | |UIM_NeuroElf_DOnCursor       |]{tfgne.ne_setoption, 'drawon', 'Cursor'}
+        |$   4 |    |    |    |       |       |Set position by coordinate               | |UIM_NeuroElf_DOnPosition     |]{tfgne.ne_setoption, 'drawon', 'Position'}
+        |$   4 |    |    |on  |       |       |Satellite browsing                       | |UIM_NeuroElf_DOnSatellite    |]{tfgne.ne_setoption, 'drawon', 'Satellite'}
+        |$   4 |    |    |on  |       |       |Linked position update                   | |UIM_NeuroElf_DOnLinked       |]{tfgne.ne_setoption, 'drawon', 'Linked'}
+
+        |$  3  |    |    |    |       |       |NeuroElf listener                        | |UIM_NeuroElf_Listener        |
+        |$   4 |    |    |    |       |       |Start listener                           | |UIM_NeuroElf_ListenerStart   |]{tfgne.ne_remote, 'listen'}
+        |$   4 |off |    |    |       |       |Stop listener                            | |UIM_NeuroElf_ListenerStop    |]{tfgne.ne_remote, 'unlisten'}
+        |$   4 |    |    |on  |       |       |Set listener folder                      | |UIM_NeuroElf_ListenerFolder  |
+
+        |$  3  |    |    |    |       |       |Orientation                              | |UIM_NeuroElf_Orient          |
+        |$   4 |    |    |    |       |       |neurological                             | |UIM_NeuroElf_OrientNeuro     |]{tfgne.ne_setoption, 'orientation', 'n'}
+        |$   4 |    |    |    |       |       |radiological                             | |UIM_NeuroElf_OrientRadio     |]{tfgne.ne_setoption, 'orientation', 'r'}
+
+        |$  3  |    |    |    |       |       |PLP-Lookup                               | |UIM_NeuroElf_PLPLookup       |
+        |$   4 |    |    |    |       |       |On cursor position change                | |UIM_NeuroElf_PLPLUCursor     |]{tfgne.ne_setoption, 'mkda', 'lookuponcursor'}
+        |$   4 |    |    |    |       |       |On cluster selection                     | |UIM_NeuroElf_PLPLUCluster    |]{tfgne.ne_setoption, 'mkda', 'lookuponcluster'}
+
+        |$  3  |    |    |    |       |       |Renderer                                 | |UIM_NeuroElf_Renderer        |
+        |$   4 |    |    |    |       |       |OpenGL                                   | |UIM_NeuroElf_RendOpenGL      |]{tfgne.ne_setoption, 'renderer', 'OpenGL'}
+        |$   4 |    |    |    |       |       |zbuffer                                  | |UIM_NeuroElf_Rendzbuffer     |]{tfgne.ne_setoption, 'renderer', 'zbuffer'}
+
+        |$  3  |    |    |    |       |       |Spatial normalization                    | |UIM_NeuroElf_SPMsn           |
+        |$   4 |    |    |    |       |       |Load *_sn.mat for slicing object         | |UIM_NeuroElf_SPMsnloadslv    |]{tfgne.ne_setoption, 'spmsn', 'SliceVar'}
+        |$   4 |    |    |    |       |       |Set ICBM -> TAL for slicing object       | |UIM_NeuroElf_SPMsnli2tslv    |]{tfgne.ne_setoption, 'spmsn', 'SliceVar', tfgtv.talsi}
+        |$   4 |    |    |    |       |       |Set TAL -> ICBM for slicing object       | |UIM_NeuroElf_SPMsnlt2islv    |]{tfgne.ne_setoption, 'spmsn', 'SliceVar', tfgtv.talsg}
+        |$   4 |    |    |    |       |       |Unload *_sn.mat for slicing object       | |UIM_NeuroElf_SPMsnunldslv    |]{tfgne.ne_setoption, 'spmsn', 'SliceVar', 'null'}
+        |$   4 |    |    |on  |       |       |Load *_sn.mat for stats object           | |UIM_NeuroElf_SPMsnloadstv    |]{tfgne.ne_setoption, 'spmsn', 'StatsVar'}
+        |$   4 |    |    |    |       |       |Set ICBM -> TAL for stats object         | |UIM_NeuroElf_SPMsnli2tstv    |]{tfgne.ne_setoption, 'spmsn', 'StatsVar', tfgtv.talsi}
+        |$   4 |    |    |    |       |       |Set TAL -> ICBM for stats object         | |UIM_NeuroElf_SPMsnlt2istv    |]{tfgne.ne_setoption, 'spmsn', 'StatsVar', tfgtv.talsg}
+        |$   4 |    |    |    |       |       |Unload *_sn.mat for stats object         | |UIM_NeuroElf_SPMsnunldstv    |]{tfgne.ne_setoption, 'spmsn', 'StatsVar', 'null'}
+
+        |$  3  |    |    |    |       |       |Surface view options                     | |UIM_NeuroElf_SurfOpt         |
+        |$   4 |    |    |    |       |       |Set background color...                  | |UIM_NeuroElf_SOBackColor     |]{tfgne.ne_setoption, 'surfbgcol'}
+        |$   4 |    |    |    |       |       |Set reconstruction colors...             | |UIM_NeuroElf_SORecoColors    |]{tfgne.ne_setoption, 'surfrecocol'}
+        |$   4 |    |    |on  |       |       |Reconstruct largest cluster only         | |UIM_NeuroElf_SORecoOneSurf   |]{tfgne.ne_setoption, 'surfrecoonesurf'}
+        |$   4 |    |    |    |       |       |Use 4 triangles per surface              | |UIM_NeuroElf_SOReco4TPS      |]{tfgne.ne_setoption, 'surfreco4tps'}
+        |$   4 |    |    |on  |       |       |Reuse existing SSM/TSM mapping files     | |UIM_NeuroElf_SOReuseXSMMap   |]{tfgne.ne_setoption, 'surfreusexsm'}
+
+        |$  3  |    |    |on  |       |       |Grayscale colors (LUT)                   | |UIM_NeuroElf_GLUTList        |
+        |$   4 |    |    |    |       |       |Default (black to white)                 | |UIM_NeuroElf_GLUT_bw         |]{tfgne.ne_setoption, 'graylut', 'bw'}
+        |$   4 |    |    |    |       |       |Inverse (white to black)                 | |UIM_NeuroElf_GLUT_wb         |]{tfgne.ne_setoption, 'graylut', 'wb'}
+        |$   4 |    |    |on  |       |       |Black-white-black                        | |UIM_NeuroElf_GLUT_bwb        |]{tfgne.ne_setoption, 'graylut', 'bwb'}
+        |$   4 |    |    |    |       |       |Two black-white-black bands              | |UIM_NeuroElf_GLUT_bwbwb      |]{tfgne.ne_setoption, 'graylut', 'bwbwb'}
+        |$   4 |    |    |    |       |       |White-black-white                        | |UIM_NeuroElf_GLUT_wbw        |]{tfgne.ne_setoption, 'graylut', 'wbw'}
+        |$   4 |    |    |    |       |       |Color wheel                              | |UIM_NeuroElf_GLUT_color      |]{tfgne.ne_setoption, 'graylut', 'color'}
+
+        |$  3  |    |    |    |       |       |Stats Colors (LUT)                       | |UIM_NeuroElf_LUTList         |
+        |$  3  |    |    |    |       |       |Edit LUT palette                         | |UIM_NeuroElf_LUTEdit         |]{tfgne.ne_lut_edit}
+
+        |$  3  |    |    |on  |       |       |Underlay blending mode                   | |UIM_NeuroElf_ULayBlend       |
+        |$   4 |    |    |    |       |       |Overlay wins                             | |UIM_NeuroElf_ULayBlendOLay   |]{tfgne.ne_setoption, 'joinulay', 6}
+        |$   4 |    |on  |    |       |       |Overlay favored                          | |UIM_NeuroElf_ULayBlendOLayF  |]{tfgne.ne_setoption, 'joinulay', 5}
+        |$   4 |    |    |    |       |       |Overlay weighted                         | |UIM_NeuroElf_ULayBlendOLayW  |]{tfgne.ne_setoption, 'joinulay', 4}
+        |$   4 |    |    |    |       |       |Equal mixing                             | |UIM_NeuroElf_ULayBlendMix    |]{tfgne.ne_setoption, 'joinulay', 3}
+        |$   4 |    |    |    |       |       |Underlay weighted                        | |UIM_NeuroElf_ULayBlendULayW  |]{tfgne.ne_setoption, 'joinulay', 2}
+        |$   4 |    |    |    |       |       |Underlay favored                         | |UIM_NeuroElf_ULayBlendULayF  |]{tfgne.ne_setoption, 'joinulay', 1}
+        |$   4 |    |    |    |       |       |Underlay wins                            | |UIM_NeuroElf_ULayBlendULay   |]{tfgne.ne_setoption, 'joinulay', 0}
+
+        |$  3  |    |off |on  |       |       |Compute instantaneous seed-correlations  | |UIM_NeuroElf_InstantSeed     |]{tfgne.ne_setoption, 'instseedcorr'}
+        |$  3  |    |off |    |       |       |Create new VMR in 0.5mm resolution       | |UIM_NeuroElf_VMRRes05        |]{tfgne.ne_setoption, 'newvmrres', 'res05'}
+        |$  3  |    |off |    |       |       |Extended map names in list               | |UIM_NeuroElf_ExtMapNames     |]{tfgne.ne_setoption, 'extmapnames'}
+        |$  3  |    |off |    |       |       |Linked browsing with satellites          | |UIM_NeuroElf_LinkedBrowse    |]{tfgne.ne_togglelinked}
+        |$  3  |    |off |    |       |       |Max-distant colors for joined stats maps | |UIM_NeuroElf_StatsJoinMaxDist|
+        |$  3  |    |off |    |       |       |Show stats thresh bars                   | |UIM_NeuroElf_ShowThreshBars  |]{tfgne.ne_setoption, 'showthreshbars'}
+        |$  3  |    |off |    |       |       |Show stats thresh bar stats limits       | |UIM_NeuroElf_ShowThreshText  |]{tfgne.ne_setoption, 'showthreshtext'}
+        |$  3  |    |off |    |       |       |Echo function call/methods               | |UIM_NeuroElf_EchoCalls       |]{tfgne.ne_setoption, 'echocalls'}
+
+  File -> (... continued) SEP  EGRP    VGRP    CAPT
+        |$ 2   |    |    |on  |       |       |Exit                                     |x|UIM_NeuroElf_CloseUI         |]{tfgne.ne_closewindow}
+
+  Study ->LEV   ENA  CHK  SEP  EGRP    VGRP    CAPT
+c       |$1    |    |    |    |       |       |&Study                                   | |UIM_NeuroElf_STUDY           |
+c       |$ 2   |    |    |    |       |       |Open study...                            | |UIM_NeuroElf_openstudy       |
+c       |$ 2   |    |    |    |       |       |Create study...                          | |UIM_NeuroElf_createstudy     |
+c       |$ 2   |    |    |    |       |       |Study configuration...                   | |UIM_NeuroElf_configstudy     |
+c       |$ 2   |    |    |on  |       |       |Import subject(s)...                     | |UIM_NeuroElf_studyimport     |
+c       |$ 2   |    |    |    |       |       |Preprocess subjects...                   | |UIM_NeuroElf_studyprepro     |
+
+  FMR -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |FMRMenu|FMR                                      | |UIM_NeuroElf_FMR             |
+c       |$ 2   |    |    |    |       |       |Create AMR                               | |UIM_NeuroElf_FMRCreateAMR    |
+        |$ 2   |    |    |    |       |       |Create time-course movie...              | |UIM_NeuroElf_FMRTCMovie      |]{tfgne.ne_tcmovie}
+        |$ 2   |    |    |    |       |       |Export to Nifti                          | |UIM_NeuroElf_FMRExportNII    |]{tfgne.ne_exportnii, 'SliceVar'}
+c       |$ 2   |    |    |    |       |       |Preprocess...                            | |UIM_NeuroElf_FMRPreprocess   |
+
+  VMR -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |VMRMenu|VMR                                      | |UIM_NeuroElf_VMR             |
+        |$ 2   |    |    |    |       |       |Border reconstruction                    | |UIM_NeuroElf_VMRDBReco       |]{tfgne.ne_vmr_dbreco}
+        |$ 2   |    |    |    |       |       |Border-to-Sphere-SRF                     | |UIM_NeuroElf_VMRDBRecoSPH    |]{tfgne.ne_srf_tools, 'recosmsph'}
+        |$ 2   |    |    |    |       |       |Clean VMR                                | |UIM_NeuroElf_VMRCleanVMR     |]{tfgne.ne_vmr_clean}
+        |$ 2   |    |    |    |       |       |Correct inhomogeneity                    | |UIM_NeuroElf_VMRInhomogen    |]{tfgne.ne_vmr_ihc}
+c       |$ 2   |    |    |    |       |       |Peel brain                               | |UIM_NeuroElf_VMRPeelBrain    |]{tfgne.ne_vmr_peelbrain}
+        |$ 2   |off |    |    |       |       |Recompute 8bit from 16bit                | |UIM_NeuroElf_VMRLimitVMR     |]{tfgne.ne_vmr_limitvmr}
+c       |$ 2   |    |    |    |       |       |Rescale to 0.5mm                         | |UIM_NeuroElf_VMRHiResResc    |tfgne.ne_vmr_hiresrescale
+        |$ 2   |    |    |    |       |       |Smooth VMR                               | |UIM_NeuroElf_VMRSmoothData   |]{tfgne.ne_setdrawmode, [], -6}
+        |$ 2   |    |    |on  |       |       |Export to Nifti                          | |UIM_NeuroElf_VMRExportNII    |]{tfgne.ne_exportnii, 'SliceVar'}
+        |$ 2   |    |    |    |       |       |Export as RGB Nifti                      | |UIM_NeuroElf_VMRExportRGB    |]{tfgne.ne_vmr_exportrgb}
+
+  VTC -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |VTCMenu|VTC                                      | |UIM_NeuroElf_VTC             |
+        |$ 2   |    |    |    |       |       |Create time-course movie...              | |UIM_NeuroElf_VTCTCMovie      |]{tfgne.ne_tcmovie}
+        |$ 2   |    |    |    |       |       |Mask with VMR                            | |UIM_NeuroElf_VTCMaskWithVMR  |]{tfgne.ne_maskstatswithvmr, 'vtc'}
+        |$ 2   |    |    |    |       |       |Mean/Standard dev. maps                  | |UIM_NeuroElf_VTCMeanStd      |]{tfgne.ne_vtc_meanstdvmp}
+        |$ 2   |    |    |    |       |       |Temporally filter data                   | |UIM_NeuroElf_VTCTFilter      |]{tfgne.ne_vtc_filter, 'temp'}
+        |$ 2   |    |    |on  |       |       |Export to Nifti                          | |UIM_NeuroElf_VTCExportNII    |]{tfgne.ne_exportnii, 'SliceVar'}
+
+  GLM -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |GLMMenu|GLM                                      | |UIM_NeuroElf_GLM             |
+        |$ 2   |    |    |    |       |       |Beta/scatter plot                        | |UIM_NeuroElf_GLMBetaPlot     |]{tfgne.ne_glmplotbetas}
+        |$ 2   |    |    |    |       |       |Generate MDM...                          | |UIM_NeuroElf_GLMGenerateMDM  |]{tfgne.ne_glmgeneratemdm}
+c       |$ 2   |    |    |    |       |       |Join RFX GLMs...                         | |UIM_NeuroElf_GLMJoinRFX      |
+        |$ 2   |    |    |    |       |       |Mask with VMR                            | |UIM_NeuroElf_GLMMaskWithVMR  |]{tfgne.ne_maskstatswithvmr}
+        |$ 2   |    |    |    |       |       |Threshold multiple maps                  | |UIM_NeuroElf_GLMThreshMaps   |]{tfgne.ne_vmp_threshmaps}
+        |$ 2   |    |    |on  |       |       |Export GLM to Nifti                      | |UIM_NeuroElf_GLMExportNII    |]{tfgne.ne_exportnii, 'StatsVar'}
+        |$ 2   |    |    |    |       |       |Load data into memory                    | |UIM_NeuroElf_GLMLoadTransIOs |]{tfgne.ne_loadtransio, 'StatsVar'}
+        |$ 2   |    |    |on  |       |       |Select conditions for export             | |UIM_NeuroElf_GLMSelXConds    |]{tfgne.ne_setoption, 'GLMXConds'}
+
+  VMP -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |VMPMenu|VMP                                      | |UIM_NeuroElf_VMP             |
+        |$ 2   |    |    |    |       |       |Apply FDR...                             | |UIM_NeuroElf_VMPApplyFDR     |]{tfgne.ne_vmp_applyfdr}
+        |$ 2   |    |    |    |       |       |Thresholding                             | |UIM_NeuroElf_VMPOPTThresh    |
+        |$  3  |    |    |    |       |       |Use raw thresholds                       | |UIM_NeuroElf_VMPOPTRawThresh |]{tfgne.ne_setoption, 'vmpusefdr', 'raw'}
+        |$  3  |    |    |    |       |       |Use plain FDR thresholds                 | |UIM_NeuroElf_VMPOPTFDRIndPos |]{tfgne.ne_setoption, 'vmpusefdr', 'indpos'}
+        |$  3  |    |    |    |       |       |Use non-parametric FDR thresholds        | |UIM_NeuroElf_VMPOPTFDRNonPar |]{tfgne.ne_setoption, 'vmpusefdr', 'nonpar'}
+        |$  3  |off |    |on  |       |       |Apply SVC ... (requires smoothness estimate) ||UIM_NeuroElf_VMPSVCItems  |
+        |$  3  |off |    |    |       |       |  selected clusters                      | |UIM_NeuroElf_VMPSVCVOI       |]{tfgne.ne_vmp_applysvc, 'voi'}
+        |$  3  |off |    |    |       |       |  mask object                            | |UIM_NeuroElf_VMPSVCMask      |]{tfgne.ne_vmp_applysvc}
+        |$  3  |off |    |    |       |       |  current slicing object                 | |UIM_NeuroElf_VMPSVCVMR       |]{tfgne.ne_vmp_applysvc, 'vmr'}
+        |$  3  |off |    |    |       |       |  Colin brain                            | |UIM_NeuroElf_VMPSVCColin     |]{tfgne.ne_vmp_applysvc, [neuroelf_path('colin') '/colin_brain_ICBMnorm.vmr']}
+        |$ 2   |    |    |on  |       |       |Combine VMPs...                          | |UIM_NeuroElf_VMPCombine      |]{tfgne.ne_vmp_combine}
+        |$ 2   |    |    |    |       |       |Compute formula...                       | |UIM_NeuroElf_VMPCompFormula  |]{tfgne.ne_setcstatmapformula}
+        |$ 2   |    |    |    |       |       |Create MSK...                            | |UIM_NeuroElf_VMPCreateMSK    |]{tfgne.ne_vmp_createmsk}
+        |$ 2   |    |    |    |       |       |Create SMP...                            | |UIM_NeuroElf_VMPCreateSMP    |]{tfgne.ne_vmp_createsmp}
+        |$ 2   |    |    |    |       |       |Export maps to Analyze                   | |UIM_NeuroElf_VMPWriteAna     |]{tfgne.ne_vmp_writeana}
+        |$ 2   |    |    |    |       |       |Mask with VMR                            | |UIM_NeuroElf_VMPMaskWithVMR  |]{tfgne.ne_maskstatswithvmr}
+        |$ 2   |    |    |    |       |       |Mask with VOI clusters                   | |UIM_NeuroElf_VMPMaskWithCls  |]{tfgne.ne_maskstatswithcls}
+        |$ 2   |    |    |    |       |       |Smooth selected maps                     | |UIM_NeuroElf_VMPSmoothMaps   |]{tfgne.ne_smoothstats}
+        |$ 2   |    |    |    |       |       |Threshold multiple maps                  | |UIM_NeuroElf_VMPThreshMaps   |]{tfgne.ne_vmp_threshmaps}
+        |$ 2   |    |    |on  |       |       |Export VMP to Nifti                      | |UIM_NeuroElf_VMPExportNII    |]{tfgne.ne_exportnii, 'StatsVar'}
+        |$ 2   |    |    |on  |SngVMP |       |Invoke GLM beta plotter                  | |UIM_NeuroElf_VMPBetaPlot     |]{tfgne.ne_vmpplotbetas}
+
+  SRF -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |SRFMenu|SRF                                      | |UIM_NeuroElf_SRF             |
+        |$ 2   |    |    |    |       |       |Save current surface                     | |UIM_NeuroElf_SRFSave         |]{tfgne.ne_srf_save}
+        |$ 2   |    |    |    |       |       |Save current surface as...               | |UIM_NeuroElf_SRFSaveAs       |]{tfgne.ne_srf_save, 'saveas'}
+        |$ 2   |    |    |on  |       |       |Clone surface                            | |UIM_NeuroElf_SRFClone        |]{tfgne.ne_srf_tools, 'clone'}
+        |$ 2   |    |    |    |       |       |Create surface from cluster table        | |UIM_NeuroElf_SRFClusterSRF   |]{tfgne.ne_srf_tools, 'clustersrf'}
+        |$ 2   |    |    |    |       |       |New surface (sphere)                     | |UIM_NeuroElf_SRFNewSphere    |]{tfgne.ne_srf_tools, 'createsphere'}
+        |$ 2   |    |    |    |       |       |Reload from disk                         | |UIM_NeuroElf_SRFReload       |]{tfgne.ne_srf_reload}
+c       |$ 2   |    |    |    |       |       |Combine surfaces...                      | |UIM_NeuroElf_SRFCombine      |]{tfgne.ne_srf_tools, 'combine'}
+        |$ 2   |    |    |on  |       |       |Morph sphere to current slicing object... ||UIM_NeuroElf_SRFMorphToS     |]{tfgne.ne_srf_tools, 'findintensity'}
+        |$ 2   |    |    |    |       |       |Find intensity in current slicing object...||UIM_NeuroElf_SRFMorphTo     |]{tfgne.ne_srf_tools, 'findintensity', [], 'nospherecheck'}
+        |$ 2   |    |    |on  |       |       |General morph...                         | |UIM_NeuroElf_SRFGMorph       |]{tfgne.ne_srf_tools, 'morph'}
+        |$ 2   |    |    |    |       |       |Smooth...                                | |UIM_NeuroElf_SRFSmooth       |]{tfgne.ne_srf_tools, 'smooth'}
+        |$ 2   |    |    |    |       |       |Inflate...                               | |UIM_NeuroElf_SRFInflate      |]{tfgne.ne_srf_tools, 'inflate'}
+        |$ 2   |    |    |    |       |       |Morph to sphere...                       | |UIM_NeuroElf_SRFSphere       |]{tfgne.ne_srf_tools, 'tosphere'}
+        |$ 2   |    |    |    |       |       |Map to Icosahedron...                    | |UIM_NeuroElf_SRFMapToIco     |]{tfgne.ne_srf_tools, 'maptoico'}
+        |$ 2   |    |    |on  |       |       |Create curvature SMP...                  | |UIM_NeuroElf_SRFCurvSMP      |]{tfgne.ne_srf_tools, 'curvsmp'}
+        |$ 2   |    |    |    |       |       |Create density SMP...                    | |UIM_NeuroElf_SRFDensSMP      |]{tfgne.ne_srf_tools, 'denssmp'}
+        |$ 2   |    |    |on  |       |       |Set colors...                            | |UIM_NeuroElf_SRFSetColors    |]{tfgne.ne_srf_tools, 'setcolors'}
+        |$ 2   |    |    |    |       |       |Set morph target...                      | |UIM_NeuroElf_SRFSetMorphT    |]{tfgne.ne_srf_tools, 'setmorphtarget'}
+        |$ 2   |    |    |on  |       |       |Apply TSM...                             | |UIM_NeuroElf_SRFApplyTSM     |]{tfgne.ne_srf_tools, 'applytsm'}
+        |$ 2   |    |    |    |       |       |Print surface info                       | |UIM_NeuroElf_SRFPrintInfo    |]{tfgne.ne_srf_tools, 'srfinfo'}
+        |$ 2   |    |    |    |       |       |Project SRF into new VMR                 | |UIM_NeuroElf_SRFBackToVMR    |]{tfgne.ne_srf_tools, 'backtovmr'}
+
+    SRF Viewpoint ->
+        |$ 2   |    |    |on  |       |       |Viewpoint                                | |UIM_NeuroElf_SRFVIEW         |
+        |$  3  |    |    |    |       |       |Left lateral                             | |UIM_NeuroElf_SRFLeftView     |]{tfgne.ne_setsurfpos, '', {180, 0, [0, 0]}}
+        |$  3  |    |    |    |       |       |Right lateral                            | |UIM_NeuroElf_SRFRightView    |]{tfgne.ne_setsurfpos, '', {0, 0, [0, 0]}}
+        |$  3  |    |    |on  |       |       |Frontal                                  | |UIM_NeuroElf_SRFFrontView    |]{tfgne.ne_setsurfpos, '', {90, 0, [0, 0]}}
+        |$  3  |    |    |    |       |       |Occipital                                | |UIM_NeuroElf_SRFOcciView     |]{tfgne.ne_setsurfpos, '', {270, 0, [0, 0]}}
+        |$  3  |    |    |on  |       |       |Superior                                 | |UIM_NeuroElf_SRFSuperView    |]{tfgne.ne_setsurfpos, '', {270, 90, [0, 0]}}
+        |$  3  |    |    |    |       |       |Inferior                                 | |UIM_NeuroElf_SRFInferView    |]{tfgne.ne_setsurfpos, '', {90, -90, [0, 0]}}
+
+  SMP -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |SMPMenu|SMP                                      | |UIM_NeuroElf_SMP             |
+        |$ 2   |    |    |    |       |       |Save SMP                                 | |UIM_NeuroElf_SMPSave         |]{tfgne.ne_smp_save}
+        |$ 2   |    |    |    |       |       |Save SMP as...                           | |UIM_NeuroElf_SMPSaveAs       |]{tfgne.ne_smp_save, 'saveas'}
+        |$ 2   |    |    |on  |       |       |Clone SMP                                | |UIM_NeuroElf_SMPClone        |]{tfgne.ne_srf_tools, 'smpclone'}
+        |$ 2   |    |    |    |       |       |Reload SMP from disk                     | |UIM_NeuroElf_SMPReload       |
+        |$ 2   |    |    |on  |       |       |Combine SMPs...                          | |UIM_NeuroElf_SMPCombine      |]{tfgne.ne_smp_combine}
+        |$ 2   |    |    |    |       |       |Compute formula...                       | |UIM_NeuroElf_SMPCompFormula  |]{tfgne.ne_srf_tools, 'smpformula'}
+        |$ 2   |    |    |    |       |       |Smooth selected maps                     | |UIM_NeuroElf_SMPSmooth       |]{tfgne.ne_srf_tools, 'smoothsmp'}
+        |$ 2   |    |    |on  |       |       |Project SMP back to VMP                  | |UIM_NeuroElf_SMPBackToVMP    |]{tfgne.ne_srf_tools, 'backtovmp'}
+
+  HDR -> LEV    ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |HDRMenu|HDR                                      | |UIM_NeuroElf_HDR             |
+        |$ 2   |off |    |    |VIsTemp|       |Create time-course movie...              | |UIM_NeuroElf_HDRTCMovie      |]{tfgne.ne_tcmovie}
+        |$ 2   |    |    |    |       |       |Segment head using SPM                   | |UIM_NeuroElf_HDRSegmentHead  |]{tfgne.ne_hdr_segment}
+        |$ 2   |    |    |    |       |       |Toggle oblique slicing                   | |UIM_NeuroElf_HDRObliqueSlc   |]{tfgne.ne_hdr_obliqueslices}
+        |$ 2   |off |    |on  |VHasBVs|       |DTI                                      | |UIM_NeuroElf_HDRDTISubMenu   |
+        |$  3  |    |    |    |       |       |Perform 3-parameter, 2-pass motion correction||UIM_NeuroElf_HDRDTI3p2pMC |]{tfgne.ne_hdr_dti, 'motcorr'}
+        |$  3  |    |    |on  |       |       |Compute DTI tensor+eigenvectors from DWI data||UIM_NeuroElf_HDRDTIDTCalc |]{tfgne.ne_hdr_dti, 'dtcalc'}
+        |$  3  |    |    |    |       |       |Flip BVecs in X-direction                | |UIM_NeuroElf_HDRDTIFlipBVX   |]{tfgne.ne_hdr_dti, 'flipbvecs', 'x'}
+        |$  3  |    |    |    |       |       |Flip BVecs in Y-direction                | |UIM_NeuroElf_HDRDTIFlipBVY   |]{tfgne.ne_hdr_dti, 'flipbvecs', 'y'}
+        |$  3  |    |    |    |       |       |Flip BVecs in Z-direction                | |UIM_NeuroElf_HDRDTIFlipBVZ   |]{tfgne.ne_hdr_dti, 'flipbvecs', 'z'}
+        |$  3  |off |    |on  |       |       |Track fibers using first eigenvectors    | |UIM_NeuroElf_HDRDTIFibTrack  |]{tfgne.ne_hdr_dti, 'trackfibers'}
+
+  Stats -> LEV  ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |Statistics                               | |UIM_NeuroElf_STATS           |]{tfgne.ne_statsmenu}
+
+  Analysis -> L ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |&Analysis                                | |UIM_NeuroElf_ANALYSIS        |
+        |$ 2   |    |    |    |       |       |Compute multi-study GLM                  |g|UIM_NeuroElf_runmdm          |]{tfgne.ne_mdm_open}
+        |$ 2   |    |    |    |       |       |Contrast manager                         |c|UIM_NeuroElf_contrasts       |]{tfgne.ne_cm_open}
+        |$ 2   |    |    |    |       |       |RFX-AN(C)OVA                             | |UIM_NeuroElf_rfxancova       |]{tfgne.ne_ancova_open}
+        |$ 2   |    |    |    |       |       |Preprocess VTCs for functional connectivity ||UIM_NeuroElf_fcprepro      |]{tfgne.ne_fcprepro}
+        |$ 2   |    |    |    |       |       |Single-level RFX mediation               |d|UIM_NeuroElf_rfxmediation    |]{tfgne.ne_rm_open}
+        |$ 2   |    |    |on  |       |       |Multi-image display                      | |UIM_NeuroElf_multiimage      |]{tfgne.ne_multiimage}
+        |$ 2   |    |    |    |       |       |ECG Heart-rate data analysis             |e|UIM_NeuroElf_hrv             |]{tfgne.ne_physio, 'ecg'}
+c       |$ 2   |    |    |    |       |       |GSR peak-to-peak analysis                | |UIM_NeuroElf_gsrp2p          |]{tfgne.ne_physio, 'gsr'}
+        |$ 2   |    |    |on  |       |       |Meta Analysis                            | |UIM_NeuroElf_MKDA            |]{tfgne.ne_mkda}
+        |$ 2   |    |    |    |       |       |PINES expression analysis                | |UIM_NeuroElf_PinesExp        |]{tfgne.ne_pinesexp}
+        |$ 2   |    |    |    |       |       |Load Shen et al. Atlas VOI clusters      | |UIM_NeuroElf_LoadShenVOIs    |]{tfgne.ne_loadcluster, [neuroelf_path('files') '/shenparcel/shen_parcels.voi']}
+
+  Drawing tools -> E CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |on  |       |DrawMenu|Drawing                                 | |UIM_NeuroElf_DRAWING         |
+        |$ 2   |    |    |    |       |       |Histogram of marked voxels               | |UIM_NeuroElf_DrawHistMark    |]{tfgne.ne_draw_histmarked}
+        |$ 2   |    |    |    |       |       |Load Undo-Buffer...                      | |UIM_NeuroElf_DrawLoadUBuff   |]{tfgne.ne_draw_loadubuff}
+        |$ 2   |    |    |    |       |       |Sample Undo-Buffer from Underlay...      | |UIM_NeuroElf_DrawSmpULay     |]{tfgne.ne_setdrawmode, [], -2.5}
+
+  Visualization -> E CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |&Visualization                           | |UIM_NeuroElf_VISUAL          |
+        |$2    |    |    |    |       |       |Create montage images                    |i|UIM_NeuroElf_VisMontage      |]{tfgne.ne_vismontage}
+        |$2    |    |    |    |       |       |Create rendered images                   |r|UIM_NeuroElf_Render          |]{tfgne.ne_render}
+        |$2    |    |    |    |       |       |Create surface images                    |f|UIM_NeuroElf_SurfMontage     |]{tfgne.ne_surfmontage}
+        |$2    |    |    |on  |SngVMP |       |Create SPM-style MIP image               | |UIM_NeuroElf_SPMMIP          |]{tfgne.ne_spmmip}
+        |$2    |    |    |    |SngVMP |       |Create SPM-style MIP image (- tail)      | |UIM_NeuroElf_SPMMIPnegtail   |]{tfgne.ne_spmmip, '-'}
+        |$2    |    |    |on  |       |       |Create VOI condition plots               | |UIM_NeuroElf_VOICondAvg      |]{tfgne.ne_mdmvoicondavg}
+        |$2    |    |    |    |       |       |Reload VOI condition plots               | |UIM_NeuroElf_VOICondAvgLoad  |]{tfgne.ne_mdmvoicondavg, 'reload'}
+        |$2    |off |    |on  |       |       |Create whole-brain average TC movie      | |UIM_NeuroElf_VTCCondAvgMovie |]{tfgne.ne_avgvtcmovie}
+        |$2    |off |    |on  |       |       |Show fibers from selected VOI            | |UIM_NeuroElf_DTIPlotFib      |]{tfgne.ne_hdr_dti, 'plotfibers'}
+
+  Cluster/VOI tools ->CHK SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |VOI                                      | |UIM_NeuroElf_VOI             |]{tfgne.ne_voimenu}
+
+  External tools ->  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |&Tools                                   | |UIM_NeuroElf_TOOLS           |
+
+    External tools -> Quality assessment
+        |$2    |    |    |    |       |       |Quality assessment                       | |UIM_NeuroElf_TOOLS_QA        |
+        |$3    |    |    |    |       |       |Assess fMRI quality...                   | |UIM_NeuroElf_fmriquality     |]{tfgne.ne_fmriquality}
+        |$3    |    |    |    |       |       |Create averaged-volumes VTC...           | |UIM_NeuroElf_QCVTC           |]{tfgne.ne_mdmqcvtc}
+        |$3    |    |    |    |       |       |Create global MDM-based timecourse...    | |UIM_NeuroElf_QCglobtc        |]{tfgne.ne_mdmqcglobtc}
+        |$3    |    |    |    |       |       |Visualize SPM motion params...           | |UIM_NeuroElf_visspmrp        |]{tfgne.ne_visspmrp}
+
+    External tools -> SPM-to-BV conversion
+        |$2    |    |    |    |       |       |SPM -> BV conversion...                  | |UIM_NeuroElf_TOOLS_SPM2BV    |
+        |$3    |    |    |    |       |       |SPM.mat -> PRT(s)...                     | |UIM_NeuroElf_SPM2PRT         |]{tfgne.ne_spmmat2prt}
+        |$3    |    |    |    |       |       |SPM.mat -> SDM(s)...                     | |UIM_NeuroElf_SPM2SDM         |]{tfgne.ne_spmmat2sdm}
+
+  External tools -> (... continued)
+        |$2    |    |    |on  |       |       |alphasim...                              | |UIM_NeuroElf_alphasim        |]{tfgne.ne_alphasim}
+        |$2    |    |    |    |       |       |Average anatomicals...                   | |UIM_NeuroElf_averagenii      |]{tfgne.ne_averagenii}
+        |$2    |    |    |    |       |       |Rename DICOM files...                    | |UIM_NeuroElf_renamedicom     |]{tfgne.ne_renamedicom}
+        |$2    |    |    |    |       |       |SPM preprocessing...                     |p|UIM_NeuroElf_spmx_prepro     |]{tfgne.ne_spmxprepro}
+        |$2    |    |    |    |       |       |tdclient...                              |t|UIM_NeuroElf_tdclient        |]{tfgne.ne_tdclient}
+        |$2    |    |    |on  |       |       |NeuroElf console...                      | |UIM_NeuroElf_console         |]{tfgne.ne_console, 'open'}
+
+  Help menu ->  ENA  CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |Help                                     | |UIM_NeuroElf_HELP            |
+        |$2    |    |    |    |       |       |About NeuroElf GUI...                    | |UIM_NeuroElf_about           |]{tfgne.ne_about}
+
+  Tooltop menu -> EN CHK  SEP  EGRP    VGRP    CAPT
+        |$1    |    |    |    |       |       |Tooltip                                  | |UIM_NeuroElf_TTIP            |
+
+---     END_MENU     ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                 |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|Page|RGroup|ColorFG      |ColorBG|ToolTip                                           |Callback
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+file/map selection| |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |Label      |$   12  672  116   16 |Loaded objects:                         |                       ||    |           ||     |left  |      |       |       |       |       |    |      |             |       ||
+        |DropDown   |$  118    0  240  -20 |empty                                   |DD_NeuroElf_varlist    ||$ 9 |           ||     |left  |      |       |       |       |       |$1 2 4|    |             |       |Set current anatomical (or functional) dataset    |]{tfgne.ne_setcvar}
+        |DropDown   |$    0    0    0    0 |empty                                   |DD_NeuroElf_varlistsrf ||$ 9 |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       |Set current surface object                        |]{tfgne.ne_setcsrf}
+        |XImage     |$  248    0  -20    0 |]neuroelf_file('i', 'trans')            |BT_NeuroElf_slvartrf   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Set orientation for slice-based object            |]{tfgne.ne_setvartrf, 'SliceVar'}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'trans')            |BT_NeuroElf_surfvartrf ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set orientation for surface object                |]{tfgne.ne_setvartrf, 'SurfVar'}
+        |XImage     |$   24    0    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_varclose   ||$ 8 |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Unload slicing object                             |]{tfgne.ne_closefile, 'SliceVar'}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_varclosesrf||$ 8 |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Unload surface object                             |]{tfgne.ne_closefile, 'SurfVar'}
+        |Label      |$ -390  -30  116  -16 |Available statistics:                   |                       ||    |           ||     |left  |      |       |       |       |       |    |      |             |       || 
+        |Label      |$    0  -30    0    0 |Available maps:                         |                       ||    |           ||     |left  |      |       |       |       |       |    |      |             |       ||
+        |DropDown   |$  118   30  240  -20 |empty                                   |DD_NeuroElf_statlist   ||$ 9 |           ||     |left  |      |off    |SLoaded|       |       |$1 2 4|    |             |       |Set current (voxel-based) statistical dataset     |]{tfgne.ne_setcstats}
+        |DropDown   |$    0    0    0    0 |empty                                   |DD_NeuroElf_statlistsrf||$ 9 |           ||     |left  |      |off    |SLoadSR|       |       |$ 3 |      |             |       |Set current surface-based statistical dataset     |]{tfgne.ne_setcsrfstats}
+        |DropDown   |$    0  -24    0    0 |Inspect VTC file...                     |DD_NeuroElf_statsref   ||$ 9 |           ||     |left  |      |off    |SLoaded|       |       |$1 2 4|    |             |       |Load referenced voxel-based time-course object    |]{tfgne.ne_openreffile, 'StatsVarRefs', 'SliceVar'}
+        |DropDown   |$    0    0    0    0 |Inspect MTC file...                     |DD_NeuroElf_statsrefsrf||$ 9 |           ||     |left  |      |off    |SLoadSR|       |       |$ 3 |      |             |       |Load referenced MTC-based time-course object      |]{tfgne.ne_openreffile, 'SurfStatsVarRefs', 'SurfVar'}
+        |XImage     |$  248   24  -20    0 |]neuroelf_file('i', 'trans')            |BT_NeuroElf_stvartrf   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Set orientation for voxel-based statistics object |]{tfgne.ne_setvartrf, 'StatsVar'}
+        |XImage     |$   24    0    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_statclose  ||$ 8 |           ||     |      |      |off    |SLoaded|       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Unload (voxel-based) statistical map object       |]{tfgne.ne_closefile, 'StatsVar'}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_statclossrf||$ 8 |           ||     |      |      |off    |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Unload surface-based statistical map object       |]{tfgne.ne_closefile, 'SurfStatsVar'}
+        |Toggle     |$  -24  -24    0    0 |]neuroelf_file('i', 'plot')             |BT_NeuroElf_statsrefreg||    |           ||$1   |      |      |       |       |       |       |    |      |             |       |Show regressors of referenced study               |]{tfgne.ne_setslicepos}
+        |Toggle     |$   24    0    0    0 |]neuroelf_file('i', 'ixx')              |BT_NeuroElf_statsrefixx||    |           ||     |      |      |       |       |       |       |    |      |             |       |Regress out effects of no interest (nuisance)     |]{tfgne.ne_setslicepos}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |ListBox    |$ -390 -200  386 -190 |none                                    |LB_NeuroElf_statmaps   ||$ 9 |$[1, 3, 1] ||     |left  |      |off    |SSelect|       |       |$1 2 4|    |             |       |Select (voxel-based) stats maps to overlay        |]{tfgne.ne_setcstatmap}
+        |ListBox    |$    0    0    0    0 |none (fitting the current surface)      |LB_NeuroElf_statmapssrf||$ 9 |$[1, 3, 1] ||     |left  |      |off    |SSeleSR|       |       |$ 3 |      |             |       |Select (surface-based) stats maps to overlay      |]{tfgne.ne_setcsrfstatmap}
+        |XImage     |$  390  170   20  -20 |]neuroelf_file('i', 'up')               |BT_NeuroElf_statmup    ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Move selected maps up in list                     |]{tfgne.ne_movestatmap, -1}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'up')               |BT_NeuroElf_srfsmup    ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Move selected maps up in list                     |]{tfgne.ne_movestatmap, -1, 'SurfStatsVar'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'down')             |BT_NeuroElf_statmdown  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Move selected maps down in list                   |]{tfgne.ne_movestatmap, 1}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'down')             |BT_NeuroElf_srfsmdown  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Move selected maps down in list                   |]{tfgne.ne_movestatmap, 1, 'SurfStatsVar'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'props')            |BT_NeuroElf_statprops  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Set map properties (name, type, DF1/2, etc.)      |]{tfgne.ne_setcstatmapprops}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'props')            |BT_NeuroElf_srfsprops  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set map properties (name, type, DF1/2, etc.)      |]{tfgne.ne_setcstatmapprops, 'SurfStatsVar'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_statmdel   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Delete currently selected maps from object        |]{tfgne.ne_movestatmap, 0}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_srfsmdel   ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Delete currently selected maps from object        |]{tfgne.ne_movestatmap, 0, 'SurfStatsVar'}
+        |XImage     |$    0  -38    0    0 |]neuroelf_file('i', 'f')                |BT_NeuroElf_statmcfrm  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Compute formula for current voxel-based object    |]{tfgne.ne_setcstatmapformula}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'f')                |BT_NeuroElf_srfmcfrm   ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Compute formula for current surface-based object  |]{tfgne.ne_srf_tools, 'smpformula'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'smp')              |BT_NeuroElf_statmcsmp  ||    |           ||     |      |      |       |       |       |       |$1 2 3 4|  |$ 0.6 0.6 0.6|       |Create SMP from selected stats maps               |]{tfgne.ne_vmp_createsmp, 'StatsVar', 'cursel'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'bars')             |BT_NeuroElf_statbars   ||    |           ||     |      |      |       |SLdNVMP|       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Invoke GLM beta plotter with current map settings |]{tfgne.ne_vmpplotbetas}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'smoost')           |BT_NeuroElf_smoothsmp  ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Smooth currently select SMP maps                  |]{tfgne.ne_srf_tools, 'smoothsmp'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'ellipse')          |BT_NeuroElf_statmproj  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Set selected maps for all subjects                |]{tfgne.ne_setcstatmapproj}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'ellipse')          |BT_NeuroElf_srfsmproj  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set selected maps for all subjects                |]{tfgne.ne_setcstatmapproj, 'SurfStatsVar'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |Label      |$ -390  -24  116  -16 |Clusters/VOIs:                          |                       ||    |           ||     |left  |      |       |       |       |       |$1 2 4|    |             |       ||
+        |Label      |$    0    0    0    0 |Clusters/POIs:                          |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |ListBox    |$    0 -222  386 -218 |                                        |LB_NeuroElf_clusters   ||$ 9 |$[1, 3, 1] ||     |left  |      |       |       |       |       |$1 2 4|    |             |       |Select VOI clusters for extraction, marking, etc. |]{tfgne.ne_setcluster, 'set'}
+        |ListBox    |$    0    0    0    0 |                                        |LB_NeuroElf_Srfclust   ||$ 9 |$[1, 3, 1] ||     |left  |      |       |       |       |       |$ 3 |      |             |       |Select POI clusters for extraction, marking, etc. |]{tfgne.ne_setsrfcluster, 'set'}
+        |XImage     |$  390  199   20  -20 |]neuroelf_file('i', 'mroi')             |BT_NeuroElf_clustmark  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Mark voxels in selected VOI(s) in current VMR     |]{tfgne.ne_markclusters}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'sphere')           |BT_NeuroElf_clustsph   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Restrict clusters to sphere around peak (first) voxel|]{tfgne.ne_limitclusters}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'atl')              |BT_NeuroElf_clustatl   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Add cluster from (Talairach) atlas to list        |]{tfgne.ne_addatlascluster}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'gotor')            |BT_NeuroElf_clustgoto  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Goto location of nearest cluster peak/center      |]{tfgne.ne_setcluster, 'nearest'}
+        |Toggle     |$    0  -22    0    0 |]neuroelf_file('i', 'zoom')             |BT_NeuroElf_clustzoom  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |             |       |Zoom to current cluster                           |]{tfgne.ne_setcluster, 'set'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_clustmdel  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Delete currently selected regions from VOI object |]{tfgne.ne_delcluster}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'folder')           |BT_NeuroElf_clustload  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Load clusters/VOI definitions VOI file            |]{tfgne.ne_loadcluster}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'disk')             |BT_NeuroElf_clustsave  ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Save current clusters/VOI definitions as VOI file |]{tfgne.ne_savecluster}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'mdisk')            |BT_NeuroElf_clustsmask ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Save (selected) clusters as MSK...                |]{tfgne.ne_savecluster, 'asmask'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'table')            |BT_NeuroElf_clustbet   ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Extract betas from selected clusters              |]{tfgne.ne_extcluster}
+        |XImage     |$    0  132    0    0 |]neuroelf_file('i', 'gotor')            |BT_NeuroElf_Srfclgoto  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Select POI cluster peak/center                    |]{tfgne.ne_setsrfcluster, 'nearest'}
+        |XImage     |$    0  -44    0    0 |]neuroelf_file('i', 'props')            |BT_NeuroElf_Srfclprop  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |POI properties...                                 |
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_Srfclmdel  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Delete currently selected patches from POI object |
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'folder')           |BT_NeuroElf_Srfclload  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Load clusters/POI definitions POI file            |
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'disk')             |BT_NeuroElf_Srfclsave  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Save current clusters/POI definitions as POI file |
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'table')            |BT_NeuroElf_Srfclbet   ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Extract betas from selected POI clusters          |
+        |MultiEdit  |$ -390 -133  408 -126 |Cluster table/beta extracts...          |ED_NeuroElf_clusters   |FixedWidth |$ 9 |||     |left  |      |       |SSelect|       |       |    |      |             |       |Output of cluster table and beta extractions      |
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XProgress  |$    0  -28    0  -20 |x: NeuroElf GUI progress                |PB_NeuroElf_mainpbar   ||$ 10| |$[1, 20]  |     |left  |      |off    |       |       |       |    |      |$ 0.9 0.3 0.2|$ 0.6 0.1 0.1|Progress indicator                          |
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |Frame      |$  426    4    1  688 |                                        |FR_NeuroElf_vertdivide ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XImage     |$    6  668   20  -20 |]neuroelf_file('i', 'chair')            |BT_NeuroElf_draw0      ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Cursor mode only (no drawing)                     |]{tfgne.ne_setdrawmode, 1}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'paint')            |BT_NeuroElf_draw2d     ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |2-D drawing mode (circle or square)               |]{tfgne.ne_setdrawmode, 2}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'paint3')           |BT_NeuroElf_draw3d     ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |3-D drawing mode (sphere or cube)                 |]{tfgne.ne_setdrawmode, 3}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'flood')            |BT_NeuroElf_flood3     ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Fill color range with other color/code            |]{tfgne.ne_setdrawmode, [], -3}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'xpand')            |BT_NeuroElf_expand3    ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Expand marking into range                         |]{tfgne.ne_setdrawmode, [], -4}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'smooa')            |BT_NeuroElf_smoothana  ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Smooth volume                                     |]{tfgne.ne_setdrawmode, [], -6}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'smoos')            |BT_NeuroElf_smoothseg  ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Smooth marking                                    |]{tfgne.ne_setdrawmode, [], -5}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'smoob')            |BT_NeuroElf_smoothwbrd ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Smooth within borders                             |
+        |Toggle     |$    0  -22    0    0 |]neuroelf_file('i', 'paintu')           |BT_NeuroElf_drawu      ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |             |       |Undo painter (gets data back from original buffer)|]{tfgne.ne_setdrawmode, -1}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$1 2|      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'tick')             |BT_NeuroElf_drawok     ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Copy current data into backup buffer (accept changes) |]{tfgne.ne_setdrawmode, [], 1}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'back')             |BT_NeuroElf_drawback   ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Copy backup buffer back to data (revert changes)  |]{tfgne.ne_setdrawmode, [], -1}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'reload')           |BT_NeuroElf_drawreld   ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Reload VMR from disk (revert all changes)         |]{tfgne.ne_setdrawmode, [], -2}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'mskvmr')           |BT_NeuroElf_drawmask   ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Reload voxels marked in current color code (mask) |]{tfgne.ne_setdrawmode, [], 0}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'invmsk')           |BT_NeuroElf_drawimask  ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Reload all voxel not marked in current color code (inverse mask)  |]{tfgne.ne_setdrawmode, [], 0.5}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'roi')              |BT_NeuroElf_mark2roi   ||    |           ||     |      |      |off    |SVIsVMR|       |       |$1 2|      |$ 0.6 0.6 0.6|       |Create ROI with from marked voxels                |]{tfgne.ne_addcluster, 'ana'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'ulay')             |BT_NeuroElf_setulay    ||    |           ||     |      |      |off    |VarIsLoaded |  |       |$1 2|      |$ 0.6 0.6 0.6|       |Set underlay object                               |]{tfgne.ne_setunderlay}
+        |Toggle     |$    0  -22    0    0 |]neuroelf_file('i', 'v16')              |BT_NeuroElf_showv16    ||    |           ||     |      |      |off    |       |       |       |$1 2|      |             |       |Show VMRData16 data for VMRs (if available)       |]{tfgne.ne_setoption, 'showv16'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XImage     |$    0  355    0  -20 |]neuroelf_file('i', 'nsph')             |BT_NeuroElf_newsphere  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Create new sphere                                 |]{tfgne.ne_srf_tools, 'createsphere'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'hmesh')            |BT_NeuroElf_headmesh   ||    |           ||     |      |      |       |VarIsLoaded|   |       |$ 3 |      |$ 0.6 0.6 0.6|       |Create head mesh                                  |]{tfgne.ne_srf_tools, 'findintensity'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'bordq')            |BT_NeuroElf_morphto    ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Find intensity in selected slicing object         |]{tfgne.ne_srf_tools, 'findintensity', [], 'nospherecheck'}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'smoob')            |BT_NeuroElf_smoothsrf  ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Smooth surface                                    |]{tfgne.ne_srf_tools, 'smooth'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'isrf')             |BT_NeuroElf_inflatesrf ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Inflate surface                                   |]{tfgne.ne_srf_tools, 'inflate'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'ssrf')             |BT_NeuroElf_tospheresrf||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Morph surface to sphere                           |]{tfgne.ne_srf_tools, 'tosphere'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'ico')              |BT_NeuroElf_maptoico   ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Map spherically morphed mesh to icosahedron mesh  |]{tfgne.ne_srf_tools, 'maptoico'}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'stop')             |BT_NeuroElf_stopmorph  ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Stop morphing                                     |]{tfgne.ne_srf_tools, 'cancelmorph'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'back')             |BT_NeuroElf_srfundomrp ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Undo last morphing operation                      |]{tfgne.ne_srf_tools, 'undomorph'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'reload')           |BT_NeuroElf_srfreload  ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Reload surface from disk (revert all changes)     |]{tfgne.ne_srf_reload}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'disk')             |BT_NeuroElf_srfsave    ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Save surface (as...)                              |]{tfgne.ne_srf_save}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'msrf')             |BT_NeuroElf_backprojsrf||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Backproject selected SRF into current VMR         |]{tfgne.ne_srf_tools, 'backproject'}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]tfgtv.rgbbt                            |BT_NeuroElf_srfcolors  ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set pair of SRF basic colors                      |]{tfgne.ne_srf_tools, 'setcolors'}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'info')             |BT_NeuroElf_srfinfo    ||    |           ||     |      |      |       |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Print information about current mesh into console |]{tfgne.ne_srf_tools, 'srfinfo'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XImage     |$  544  299    0  -20 |]neuroelf_file('i', 'undock')           |BT_NeuroElf_undock     ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Copy current view configuration to satellite window|]{tfgne.ne_undock}
+        |Toggle     |$    0  -22    0    0 |]neuroelf_file('i', 'link')             |BT_NeuroElf_togglelink ||    |           ||     |      |      |       |       |       |       |    |      |             |       |Toggle linked/unlinked browsing                   |]{tfgne.ne_togglelinked}
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'mini')             |BT_NeuroElf_minimize   ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Remove controls and only show axes view           |]{tfgne.ne_swapfullsize, 'swap'}
+        |XImage     |$    0    0    0    0 |]neuroelf_file('i', 'maxi')             |BT_NeuroElf_maximize   ||    |           ||     |      |      |       |       |off    |       |    |      |$ 0.6 0.6 0.6|       |Show the full dialog with controls                |]{tfgne.ne_swapfullsize, 'swap'}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'sct')              |BT_NeuroElf_viewsct    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Show three slices (SAG, COR, TRA) in one view     |]{tfgne.ne_setview, 1, 0}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'sag')              |BT_NeuroElf_viewsag    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Show only the SAG (sagittal) slicing              |]{tfgne.ne_setview, 2, 1}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'cor')              |BT_NeuroElf_viewcor    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Show only the COR (coronal) slicing               |]{tfgne.ne_setview, 2, 2}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'tra')              |BT_NeuroElf_viewtra    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Show only the TRA (transversal / axial) slicing   |]{tfgne.ne_setview, 2, 3}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'trans')            |BT_NeuroElf_viewtrf    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Set (display-only) free-form transformation values|]{tfgne.ne_setview, 0, 0}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'surf')             |BT_NeuroElf_viewsrf    ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Show the surface/scenery display                  |]{tfgne.ne_setview, 3, 0}
+        |Frame      |$    0   -3    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -22    0  -20 |]neuroelf_file('i', 'rend')             |BT_NeuroElf_render     ||    |           ||     |      |      |       |       |       |       |    |      |$ 0.6 0.6 0.6|       |Render anatomical and stats dataset in 3D         |]{tfgne.ne_render}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+3 oblique slicing | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XImage     |$  456  432  256  256 |]zeros(256,256)                         |IM_NeuroElf_Slice_SAG  ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Saggital slice view (Y/Z plane)                   |
+        |XAxes      |$    0    0 -256    0 |                                        |AX_NeuroElf_Slice_SAG  ||    |           ||     |      |      |       |       |off    |       |    |      |             |       |Saggital slice view (Y/Z plane)                   |
+        |XImage     |$  260    0    0    0 |]zeros(256,256)                         |IM_NeuroElf_Slice_COR  ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Coronal slice view (X/Z plane)                    |
+        |XAxes      |$    0    0 -256    0 |                                        |AX_NeuroElf_Slice_COR  ||    |           ||     |      |      |       |       |off    |       |    |      |             |       |Coronal slice view (X/Z plane)                    |
+        |XImage     |$    0 -260    0    0 |]zeros(256,256)                         |IM_NeuroElf_Slice_TRA  ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Axial slice view (X/Y plane)                      |
+        |XAxes      |$    0    0 -256    0 |                                        |AX_NeuroElf_Slice_TRA  ||    |           ||     |      |      |       |       |off    |       |    |      |             |       |Axial slice view (X/Y plane)                      |
+        |XImage     |$  262    0  -16    0 |]zeros(256,16)                          |IM_NeuroElf_Slice_Hist ||    |           ||     |      |      |       |       |       |       |$1 2 4|    |             |       |Control Brightness/Contrast using the sliders     |
+        |XAxes      |$   -2    0  -20    0 |                                        |AX_NeuroElf_Slice_Hist ||    |           ||     |      |      |       |       |off    |       |    |      |             |       |Control Brightness/Contrast using the sliders     |
+        |XImage     |$    0  260    0  -20 |]neuroelf_file('i', 'cb')               |BT_NeuroElf_setscalewin||    |           ||     |      |      |       |       |       |       |$1 2 4|    |$ 0.6 0.6 0.6|       |Manually set scaling window                       |]{tfgne.ne_setoption, 'scalingwindow'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+coordinate boxes  | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |Label      |$ -516  -28   56  -18 |X (mm):                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |0                                       |ED_NeuroElf_TALX       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |TAL/MNI (real-world mm) X coordinate              |]{tfgne.ne_setwindowpos}
+        |Label      |$  -56  -28   56  -18 |Y (mm):                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |0                                       |ED_NeuroElf_TALY       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |TAL/MNI (real-world mm) Y coordinate              |]{tfgne.ne_setwindowpos}
+        |Label      |$  -56  -28   56  -18 |Z (mm):                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |0                                       |ED_NeuroElf_TALZ       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |TAL/MNI (real-world mm) Z coordinate              |]{tfgne.ne_setwindowpos}
+        |Label      |$   64   56   56  -18 |X (vox):                                |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |128                                     |ED_NeuroElf_BVSX       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Voxel-space (one-based) X coordinate (dim-1)      |]{tfgne.ne_setwindowpos}
+        |Label      |$  -56  -28   56  -18 |Y (vox):                                |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |128                                     |ED_NeuroElf_BVSY       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Voxel-space (one-based) Y coordinate (dim-2)      |]{tfgne.ne_setwindowpos}
+        |Label      |$  -56  -28   56  -18 |Z (vox):                                |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |128                                     |ED_NeuroElf_BVSZ       ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       |Voxel-space (one-based) Z coordinate (dim-3)      |]{tfgne.ne_setwindowpos}
+        |Label      |$ -176  -30   56  -18 |Volume:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   56    0   48  -24 |1                                       |ED_NeuroElf_TempPos    ||    |           ||     |      |      |off    |VIsTemp|       |       |$ 1 |      |             |       |Volume-index                                      |
+        |Slider     |$   56    0  136  -18 |                                        |SL_NeuroElf_TempPos    ||    |$[1,120, 1]|$[1, 10] | | |      |off    |VIsTemp|       |       |$ 1 |      |             |       |Volume-selector                                   |]{tfgne.ne_setslicepos}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+stats config    |   |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |Frame      |$ -140   -3  280   -1 |0                                       |FR_NeuroElf_statdivide ||    |           ||     |      |      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$    4  -27  -60  -24 |0                                       |ED_NeuroElf_LowerThresh||    |           ||     |      |      |       |SLoaded,SngVMP||       |$ 1 |      |             |       |Lower statistics threshold (only show values above)|]{tfgne.ne_setstatthr}
+        |Label      |$   60    0  -44  -18 |<=V<=                                   |                       ||    |           ||     |center|      |       |       |       |       |$ 1 |      |             |       ||
+        |Edit       |$   46    0  -60  -24 |0                                       |ED_NeuroElf_UpperThresh||    |           ||     |      |      |       |SLoaded,SngVMP||       |$ 1 |      |             |       |Upper statistics threshold (value above same color)|]{tfgne.ne_setstatthr}
+        |Label      |$   60    0   -6  -18 |,                                       |                       ||    |           ||     |center|      |       |       |       |       |$ 1 |      |             |       ||
+        |DropDown   |$    6    0 -100  -22 |.05                                     |DD_NeuroElf_StatSetP   ||    |           ||$1   |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Set statistical thresholds by p-value             |]{tfgne.ne_setstatthrpval}
+        |Label      |$ -172  -30  -36  -18 |+ tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_NeuroElf_PositivStat||    |           ||$1   |      |      |       |SLoaded,SngVMP||       |$ 1 |      |             |       |Show positive tail of statistical map             |]{tfgne.ne_setstatthrtails}
+        |Label      |$   28   -4  -36    0 |- tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_NeuroElf_NegativStat||    |           ||$1   |      |      |       |SLoaded,SngVMP||       |$ 1 |      |             |       |Show negative tail of statistical map             |]{tfgne.ne_setstatthrtails}
+        |Label      |$   28   -4  -56    0 |k-thresh:                               |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   56    4  -18    0 |                                        |CB_NeuroElf_kExtThresh ||    |           ||$1   |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Restrict map to clusters of at least K voxels size|]{tfgne.ne_setstatthrccheck}
+        |Edit       |$   28   -2  -56  -24 |0                                       |ED_NeuroElf_kExtThresh ||    |           ||     |      |      |       |SLoaded,SngVMP||       |$ 1 |      |             |       |                                                  |]{tfgne.ne_setstatthrccheck}
+        |Button     |$ -216  -30  108  -24 |alphasim                                |BT_NeuroElf_alphasim   ||    |           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Estimate minimal cluster size under empirical NULL|]{tfgne.ne_alphasim}
+        |Button     |$  116    0  -92    0 |Clustertable                            |BT_NeuroElf_ClusterTable||   |           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Tabulate clusters (and generate VOI object)       |]{tfgne.ne_clustertable}
+        |Label      |$  100   -2  -40  -18 |split:                                  |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   40    4  -18    0 |                                        |CB_NeuroElf_SplitMaxima||    |           ||$1   |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Split large clusters using watershed algorithm    |]{tfgne.ne_setstatsplitc}
+        |Label      |$ -254  -32  -56    0 |icbm2tal                                |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   60    4  -18    0 |                                        |CB_NeuroElf_ICBM2TAL   ||    |           ||$1   |      |      |       |       |       |       |$ 1 |      |             |       |Dis-/enable icbm2tal conversion of coordinates    |
+        |Label      |$   28   -4  -56    0 |TDclient                                |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   60    4  -18    0 |                                        |CB_NeuroElf_TDClient   ||    |           ||$1   |      |      |       |       |       |       |$ 1 |      |             |       |Dis-/enable Talairach Daemon database lookups     |
+        |Label      |$   38   -4  -64    0 |Interpolate                             |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |Checkbox   |$   68    4  -18    0 |                                        |CB_NeuroElf_Interpolate||    |           ||$1   |      |      |       |       |       |       |$ 1 |      |             |       |Dis-/enable interpolation of voxel-based files    |]{tfgne.ne_setslicepos}
+        |Label      |$ -254  -32  -30  -18 |LUT                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_NeuroElf_LUTColor   ||    |           ||$1   |      |      |       |SLdNVMP,SngVMP||       |$ 1 |VMPCol|             |       |Set color-mapping to Look-Up-Table (LUT) mode     |]{tfgne.ne_setstatthrcolor, 'LUT'}
+        |Label      |$   24   -2  -30    0 |RGB                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 1 |      |             |       ||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_NeuroElf_RGBColor   ||    |           ||$0   |      |      |       |SLdNVMP,SngVMP||       |$ 1 |VMPCol|             |       |Set color-mapping to RGB mode                     |]{tfgne.ne_setstatthrcolor, 'RGB'}
+        |Button     |$   40   -2  -28  -24 |]'+'                                    |BT_NeuroElf_RGBLowPos  ||$ 12|           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Set color for values at lower threshold (positive)|]{tfgne.ne_setrgbcolor, '+'}
+        |Button     |$   36    0    0    0 |]'++'                                   |BT_NeuroElf_RGBUppPos  ||$ 12|           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Set color for values at upper threshold (positive)|]{tfgne.ne_setrgbcolor, '++'}
+        |Button     |$   36    0    0    0 |]'-'                                    |BT_NeuroElf_RGBLowNeg  ||$ 12|           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Set color for values at lower threshold (negative)|]{tfgne.ne_setrgbcolor, '-'}
+        |Button     |$   36    0    0    0 |]'- -'                                  |BT_NeuroElf_RGBUppNeg  ||$ 12|           ||     |      |      |       |SLdNVMP,SngVMP||       |$ 1 |      |             |       |Set color for values at upper threshold (negative)|]{tfgne.ne_setrgbcolor, '--'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+zoomed/render image||                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XImage     |$  458  174  512  512 |]zeros(512,512)                         |IM_NeuroElf_Slice_Zoom ||    |           ||     |      |      |       |       |off    |       |$ 2 |      |             |       |Single-slice display (either SAG, COR, or TRA)    |
+        |XAxes      |$    0    0    0    0 |                                        |AX_NeuroElf_Slice_Zoom ||    |           ||     |      |      |       |       |off    |       |$ 2 |      |             |       |Single-slice display (either SAG, COR, or TRA)    |
+        |XImage     |$    0    0    0    0 |]zeros(512,512)                         |IM_NeuroElf_Slice_Rend ||    |           ||     |      |      |       |       |off    |       |$ 4 |      |             |       |Rendered visualization of voxel-based objects     |
+        |XAxes      |$    0    0    0    0 |                                        |AX_NeuroElf_Slice_Rend ||    |           ||     |      |      |       |       |off    |       |$ 4 |      |             |       |Rendered visualization of voxel-based objects     |
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+surface view   |    |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XAxes      |$    0    0    0    0 |                                        |AX_NeuroElf_Surface    ||    |           ||     |      |      |       |       |off    |       |$ 3 |      |             |       |Surface view                                      |
+        |Edit       |$    2  -30  -60  -24 |0                                       |ED_NeuroElf_SrfLowerThr||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Lower statistics threshold (only show values above)|]{tfgne.ne_updatesmpprops}
+        |Label      |$   64    0    0  -18 |<= stat <=                              |                       ||    |           ||     |center|      |       |       |       |       |$ 3 |      |             |       ||
+        |Edit       |$   64    0    0  -24 |0                                       |ED_NeuroElf_SrfUpperThr||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Upper statistics threshold (value above same color)|]{tfgne.ne_updatesmpprops}
+        |Label      |$   64    0  -36  -18 |, k >=                                  |                       ||    |           ||     |center|      |       |       |       |       |$ 3 |      |             |       ||
+        |Edit       |$   42    0  -72  -24 |0.0mm                                   |ED_NeuroElf_SrfkExtThr ||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Cluster-size extent threshold in mm               |]{tfgne.ne_updatesmpprops}
+        |Label      |$   80    0  -56  -18 |k-thresh:                               |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |Checkbox   |$   56    4  -18    0 |                                        |CB_NeuroElf_SrfkExtThr ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Enforce cluster-size threshold                    |]{tfgne.ne_updatesmpprops}
+        |Label      |$   26   -4  -36  -18 |+ tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_NeuroElf_SrfPosStat ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Show positive tail of statistical map             |]{tfgne.ne_updatesmpprops}
+        |Label      |$   24   -4  -36    0 |- tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_NeuroElf_SrfNegStat ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Show negative tail of statistical map             |]{tfgne.ne_updatesmpprops}
+        |Label      |$ -492  -32  -50    0 |Set p <                                 |TX_NeuroElf_SrfSetP    ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |DropDown   |$   52    0 -100  -22 |.05                                     |DD_NeuroElf_SrfStatSetP||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |             |       |Set statistical thresholds by p-value             |]{tfgne.ne_updatesmpprops, 'pval'}
+        |Button     |$  106    0   96  -24 |Clustertable                            |BT_NeuroElf_SrfClusterT||    |           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |             |       |Tabulate clusters (and generate POI object)       |]{tfgne.ne_clustertable, 'smp'}
+        |Label      |$  102    0  -30  -18 |LUT                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_NeuroElf_SrfLUTColor||    |           ||$1   |      |      |       |SLdNSMP,SngSMP||       |$ 3 |SMPCol|             |       |Set color-mapping to Look-Up-Table (LUT) mode     |]{tfgne.ne_setstatthrcolor, 'LUT', 'smp'}
+        |Label      |$   24   -2  -30    0 |RGB                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_NeuroElf_SrfRGBColor||    |           ||$0   |      |      |       |SLdNSMP,SngSMP||       |$ 3 |SMPCol|             |       |Set color-mapping to RGB mode                     |]{tfgne.ne_setstatthrcolor, 'RGB', 'smp'}
+        |Button     |$   24   -2  -28  -24 |]'+'                                    |BT_NeuroElf_SrfRGBLPos ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |             |       |Set color for values at lower threshold (positive)|]{tfgne.ne_setrgbcolor, '+', 'smp'}
+        |Button     |$   34    0    0    0 |]'++'                                   |BT_NeuroElf_SrfRGBUPos ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |             |       |Set color for values at upper threshold (positive)|]{tfgne.ne_setrgbcolor, '++', 'smp'}
+        |Button     |$   34    0    0    0 |]'-'                                    |BT_NeuroElf_SrfRGBLNeg ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |             |       |Set color for values at lower threshold (negative)|]{tfgne.ne_setrgbcolor, '-', 'smp'}
+        |Button     |$   34    0    0    0 |]'- -'                                  |BT_NeuroElf_SrfRGBUNeg ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |             |       |Set color for values at upper threshold (negative)|]{tfgne.ne_setrgbcolor, '--', 'smp'}
+        |XImage     |$   34  101   20  -20 |]neuroelf_file('i', 'ortho')            |BT_NeuroElf_SceneOrtho ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set scenery display to orthographic projection    |]{tfgne.ne_setsceneproj, 'orthographic'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'persp')            |BT_NeuroElf_ScenePersp ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set scenery display to perspective projection     |]{tfgne.ne_setsceneproj, 'perspective'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'props')            |BT_NeuroElf_SceneProps ||    |           ||     |      |      |off    |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Set surface properties (transform, transparency)  |]{tfgne.ne_setsceneprops}
+        |ListBox    |$ -540 -133  536  -72 |Scene compilation (empty)               |LB_NeuroElf_Scenery    ||$ 9 |$[1, 3, 1] ||     |left  |      |off    |SLoadSR|       |       |$ 3 |      |             |       |Show selected objects only                        |]{tfgne.ne_sceneryselect}
+        |Label      |$    0  -30   80  -18 |Viewpoint:                              |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |             |       ||
+        |Edit       |$   80    0  456  -24 |0 (0)                                   |ED_NeuroElf_SrfViewPnt ||    |           ||     |      |      |       |       |       |       |$ 3 |      |             |       |Surface view / current vertex information         |
+        |Toggle     |$  460    2   20  -20 |]neuroelf_file('i', 'remote')           |BT_NeuroElf_RListener  ||    |           ||     |      |      |       |       |       |       |    |      |             |       |En- or disable remote (folder) listening mode     |]{tfgne.ne_remote, 'listen'}
+        |XImage     |$    0   78    0    0 |]neuroelf_file('i', 'trash')            |BT_NeuroElf_SceneRemove||    |           ||     |      |      |off    |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Unload selected surfaces and their maps           |]{tfgne.ne_srf_tools, 'closefiles'}
+        |Frame      |$    0   -4    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.5 0.5 0.5|       ||
+        |XImage     |$    0  -23    0  -20 |]neuroelf_file('i', 'folder')           |BT_NeuroElf_SceneLoad  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Reload objects from previously saved scenery      |]{tfgne.ne_srf_tools, 'loadscenery'}
+        |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'disk')             |BT_NeuroElf_SceneSave  ||    |           ||     |      |      |off    |SLoadSR|       |       |$ 3 |      |$ 0.6 0.6 0.6|       |Save all objects from current scenery             |]{tfgne.ne_srf_tools, 'savescenery'}
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+values under cursor||                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |MultiEdit  |$  436  130  536   36 |Values at cursor:                       |TX_NeuroElf_SValues    ||$ 9 |           ||     |left  |      |       |       |       |       |$1 2 4|    |             |       |Sampled values at cursor position                 |
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+time course plot  | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |             |       ||
+        |XAxes      |$  468   24  500  104 |                                        |AX_NeuroElf_TC_Plot    ||    |           ||     |      |      |       |       |       |TCPlot |    |      |             |       |Time-course plot (and discarded volume indicators)|
+        |XImage     |$  506   84   20  -20 |]neuroelf_file('i', 'undock')           |BT_NeuroElf_tcundock   ||    |           ||     |      |      |       |       |       |TCPlot |    |      |$ 0.6 0.6 0.6|       |Copy time course plot into satellite window       |]{tfgne.ne_tcundock}
+        |XAxes      |$  458  174  512  104 |                                        |AX_NeuroElf_STC_Plot   ||    |           ||     |      |      |       |       |       |STCPlot|    |      |             |       |Surface-based time course plot                    |
+---  END_UICONTROLS  ---

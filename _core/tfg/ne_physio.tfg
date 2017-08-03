@@ -1,0 +1,119 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - physio data analysis
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:28 PM EST
+Figure:   NeuroElf - Physio data analysis
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf (physio data analysis UI)
+
+% Copyright (c) 2010, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+ecgtrans|]{'<none>', 'ztrans(ECG) .^ 2', 'abs(ztrans(ECG)) .^ 3', 'ztrans(ECG) .^ 4', 'abs(diff(ECG))', 'diff(ECG) .^ 2', 'auto (try all)'}
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position           |Title                                     |Tag                      |CallbackClReq
+        |pixels|off    |$ -1  -1  520  592 |NeuroElf - Physio Data Analysis           |Wnd_NeuroElf_physio      |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|Enabled|EGroups|Value|Callback|ToolTip
+        |           |                      |                                          |                       |    |      |||||
+        |Label      |$   12  560  496   24 |Select a data file, then configure the required settings (kind, resampling, filtering, outputs, etc.): ||$ 9 |left |||||
+        |Label      |$    0  -24  112  -18 |Source data file:                         |                       |$ 9 |left  |||||
+        |Edit       |$  116    0  232  -24 | <either enter or browse...>              |ED_physio_sf           |    |left  |on     ||||Enter or correct the filename of the physio data file to load
+        |Button     |$  240    0  -68    0 |Browse...                                 |BT_physio_sf_browse    |    |center|||||Browse for a physio data file to load
+        |Button     |$   76    0  -68    0 |Load                                      |BT_physio_sf_load      |    |center|off    ||||Load the selected file
+        |           |                      |||||||||
+        |Frame      |$ -436   -4  508   -1 |||||||||
+        |Label      |$    4  -30  112  -18 |Kind of data:                             |                       |$ 9 |left  |||||
+        |Dropdown   |$  116   -2   80  -24 |]{'ECG', 'GSR'}                           |DD_physio_datakind     |$ 9 |left  |off    |DLoaded_OFF|||Choose what kind of data (and analysis) you want to use (perform)
+        |           |                      |||||||||
+        |Frame      |$ -120   -2  508   -1 |||||||||
+        |Label      |$    4  -30  112  -18 |Source frequency:                         |                       |$ 9 |left  |||||
+        |Edit       |$  116    0   80  -24 | <from file>                              |ED_physio_sfreq        |    |center|off    |DLoaded,Resampled|||Adapt the source frequency if necessary
+        |Label      |$   88    0  128  -18 |Resampling Frequency:                     |                       |$ 9 |left  |||||
+        |Edit       |$  132    0   80  -24 | 100                                      |ED_physio_rfreq        |    |center|off    |DLoaded,Resampled|||Set the resampling frequency
+        |Label      |$   88    0   48  -18 |Hz                                        |                       |$ 9 |left  |||||
+        |Label      |$ -424  -26  112  -18 |Channels of interest:                     |                       |$ 9 |left  |||||
+        |Edit       |$  116    0  212  -24 | all                                      |ED_physio_coi          |    |left  |off    |DLoaded,Resampled|||Which channels should be kept (for further analysis)
+        |Button     |$  220    0  -80    0 |Resample                                  |BT_physio_resample     |    |center|off    |DLoaded,Resampled|||Resamples the data (keeping only the configured channels)
+        |           |                      |||||||||
+        |Frame      |$ -340   -4  508   -1 |||||||||
+        |Label      |$    4  -30  112  -18 |ECG channel number:                       |                       |$ 9 |left  |off    |DECG|||
+        |Edit       |$  116    0   64  -24 | 1                                        |ED_physio_ecgschan     |    |center|off    |DECG|||Configure the number of the channel containing the ECG data
+        |Label      |$   68    0   72  -18 |use RW-code:                              |                       |$ 9 |left  |off    |DECG|||
+        |CheckBox   |$   76    2  -18    0 |                                          |CB_physio_ecgrwchan    |$ 9 |left  |off    |DECG|||Check this box if your data contains an R-wave marker/code
+        |Label      |$   24   -2  -44    0 |channel:                                  |                       |$ 9 |left  |off    |DECG,DECGRWC|||
+        |Edit       |$   52    0   56  -24 | 2                                        |ED_physio_ecgrwchan    |    |center|off    |DECG,DECGRWC|||Configure the number of the channel containing the R-wave marker/code
+        |Label      |$   64    0   32  -18 |code:                                     |                       |$ 9 |left  |off    |DECG,DECGRWC|||
+        |Edit       |$   40    0   56  -24 | 1                                        |ED_physio_ecgrwcode    |    |center|off    |DECG,DECGRWC|||Configure the value which is used to code the R-wave marker
+        |Label      |$ -440  -26  112  -18 |Limit signal range:                       |                       |$ 9 |left  |off    |DECG|||
+        |Label      |$  128    0  -48    0 |from                                      |                       |$ 9 |left  |off    |DECG|||
+        |Edit       |$   56    0   72  -24 | -Inf                                     |ED_physio_ecglrmin     |    |center|off    |DECG|||Configure the minimal value for the signal
+        |Label      |$   80    0   48  -18 |to                                        |                       |$ 9 |left  |off    |DECG|||
+        |Edit       |$   24    0   72  -24 | Inf                                      |ED_physio_ecglrmax     |    |center|off    |DECG|||Configure the maximal value for the signal
+        |Label      |$ -288  -26  112  -18 |First-pass transform:                     |                       |$ 9 |left  |off    |DECG|||
+        |Dropdown   |$  116   -2  168  -24 |]tfgtv.ecgtrans                           |DD_physio_ecgptrans    |$ 9 |left  |off    |DECG|||Which transformation to apply to the data (first pass of beat detection only)
+        |Label      |$  172    2  224  -18 |(only applied during first detection pass)|                       |$ 9 |left  |off    |DECG|||
+        |Label      |$ -288  -26  112  -18 |Pre-filtering passes:                     |                       |$ 9 |left  |off    |DECG|||
+        |Dropdown   |$  116   -2   64  -24 |]{'0','1','2','3','4'}                    |DD_physio_ecgpfiltp    |$ 9 |left  |off    |DECG|]3||Number of pre-filtering passes (set to 0 for none)
+        |Label      |$   68    2  148  -18 |Pre-filtering kernel (seconds):           |                       |$ 9 |left  |off    |DECG|||
+        |Edit       |$  152    0   80  -24 | 0.025                                    |ED_physio_ecgpfiltk    |    |center|off    |DECG|||Apply Gaussian pre-filter (default: 0.025 seconds)
+        |Label      |$ -336  -26  112  -18 |Manual cleanup pass:                      |                       |$ 9 |left  |off    |DECG|||
+        |CheckBox   |$  116    2  -18    0 |                                          |CB_physio_ecgmcleaup   |    |center|off    |DECG|]1||Use manual cleanup on preliminary detection result (highly suggested)
+        |Label      |$   48   -2  -80    0 |Positioning help:                         |                       |$ 9 |left  |off    |DECG|||
+        |Dropdown   |$   88   -2   80  -24 |]{'max', 'min', 'off'}                    |DD_physio_ecgmposhlp   |$ 9 |left  |off    |DECG|]1||Helper to position new beats at the maximum/minimum within a small range
+        |Label      |$   88    2  104  -18 |Also compute HRV:                         |                       |$ 9 |left  |off    |DECG|||
+        |CheckBox   |$  108    2  -18    0 |                                          |CB_physio_ecghrv       |    |center|off    |DECG|]1||Also compute HRV (computehrv) and set 'hrv' in base workspace
+        |Label      |$ -448  -26  304  -18 |Save / re-load results in/from auxiliary (RunTimeVars) file: |  |$ 9 |left  |||||
+        |CheckBox   |$  312    2  -18    0 |                                          |CB_physio_ecgsavertv   |    |center|||]1||
+        |CheckBox   |$   24    0    0    0 |                                          |CB_physio_ecgusertv    |    |center|||]1||
+        |Label      |$   24   -2 -160    0 |RTV:                                      |TX_physio_ecgrtvinfo   |$ 9 |left  |off    ||||
+        |           |                      |||||||||
+        |Frame      |$ -364   -4  508   -1 |||||||||
+        |Label      |$    4  -30  112  -18 |GSR channel number:                       |                       |$ 9 |left  |off    |DGSR|||
+        |Edit       |$  116    0   80  -24 | 1                                        |ED_physio_filtschan    |    |center|off    |DGSR|||
+        |Label      |$   88    0  128  -18 |To (destination channel):                 |                       |$ 9 |left  |off    |DGSR|||
+        |Edit       |$  132    0   80  -24 | in-place                                 |ED_physio_filttchan    |    |center|off    |DGSR|||
+        |CheckBox   |$   88    2   18  -18 |                                          |CB_physio_filtchan     |    |center|off    |DGSR|||
+        |           |                      |||||||||
+        |Frame      |$ -428   -6  508   -1 |||||||||
+        |Label      |$    4  -30  112  -18 |Stim channel numbers:                     |                       |$ 9 |left  |off    |DLoaded|||
+        |Edit       |$  116    0   80  -24 | none                                     |ED_physio_filtschan    |    |center|off    |DLoaded|||Enter the channel number of stimulus/condition onsets (if any -> these will be resampled without cubic/gaussian interpolation)
+        |           |                      |||||||||
+        |Button     |$   12    8   88   24 |Cancel                                    |BT_physio_cancel       |    |center|||||
+        |Button     |$  408    0    0    0 |Process                                   |BT_physio_process      |    |center|off    |DLoaded|     ||
+        |           |                      |||||||||
+---  END_UICONTROLS  ---

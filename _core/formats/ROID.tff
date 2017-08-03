@@ -1,0 +1,84 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for [ROI_Details].TXT files (ROI DETAILS)
+# ROI_Details FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+ArrayFormat: %-4s
+Description:ROI details files (*.txt)
+Extensions:roid # dummy extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+ROID_ROIDETAILS|1, 64      |regexp  |^\s+ROI\sDETAILS\s+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!                ROI DETAILS
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !RandomEffectsAnalysis!string !%s     !1      !        !RandomEffectsAnalysis
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !TypeOfStatistic     !string  !%s     !1      !        !TypeOfStatistic
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NrOfVoxels          !double  !%d     !1      !        !NrOfVoxels
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !StatMinValue        !double  !%.6f   !1      !        !StatMinValue
+FLIST!                   !StatMaxValue        !double  !%.6f   !1      !        !StatMaxValue
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !AvgStatValue        !double  !%.6f   !1      !        !AvgStatValue
+FLIST!                   !AvgPValue           !double  !%.6f   !1      !        !AvgPValue
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !StatWeightedMass    !double  !%.6f   !1      !        !StatWeightedMass
+FLIST!                   !PWeightedMass       !double  !%.6f   !1      !        !PWeightedMass
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!ListOfVOIVoxels:
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!! x   y   z   subROI   StatValue     p
+WRTLN!!!!!!!----------------------------------------------
+
+# loop over Voxels
+ARRAY!                   !VoxelData           !double  !%3g    !@NrOfVoxels, 6 !!VoxelData
+
+# split data
+BLOOP! ! ! ! !1 ! !ROISplit
+EXPRE!!!!!!!@VoxelCoords = @VoxelData(:, 1:3);
+EXPRE!!!!!!!@VoxelStats = @VoxelData(:, 5);
+EXPRE!!!!!!!@NrOfSubROIs = max(@VoxelData(:, 4));
+BLOOP! ! ! ! !@NrOfSubROIs ! !ROINr
+EXPRE!!!!!!!t_s = find(@VoxelData(:, 4) == $ROINr);
+EXPRE!!!!!!!@ROI($ROINr).NrOfVoxels = length(t_s);
+EXPRE!!!!!!!@ROI($ROINr).VoxelCoords = @VoxelData(t_s, 1:3);
+EXPRE!!!!!!!@ROI($ROINr).VoxelStats = @VoxelData(t_s, 5);
+ELOOP! ! ! ! !  ! !ROINr
+ELOOP! ! ! ! !  ! !ROISplit
+
+EndListOfFields
+
+NewFileCode:!
+@RandomEffectsAnalysis = 'no';
+@TypeOfStatistic = 't';
+@NrOfVoxels = 0;
+@StatMinValue = 0;
+@StatMaxValue = 999999;
+@AvgStatValue = 0;
+@AvgPValue = 1;
+@StatWeightedMass = 0;
+@PWeightedMass = 1;
+@VoxelData = zeros(0, 6);
+@VoxelCoords = zeros(0, 3);
+@VoxelStats = zeros(0, 1);
+@NrOfSubROIs = 0;
+@ROI = emptystruct({'NrOfVoxels', 'VoxelCoords', 'VoxelStats'});
+EndNewFileCode

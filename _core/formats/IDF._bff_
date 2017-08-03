@@ -1,0 +1,72 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# SMI file format for *.IDF (iView Data File)
+# IDF FileVersions supported: 8
+#
+# Version:  v0.9c
+# Build:    11083012
+# Date:     Aug-30 2011, 12:18 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:IDFData
+Description:iView Data Files
+EncodingSyntax:ieee-le
+Extensions:idf
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# parse header
+FIELD !                       !uint32  !double  !1, 1                     !8       !FileVersion
+FIELD !                       !single  !double  !1, 1                     !        !FIELD02
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD03
+FIELD !                       !uint16  !double  !1, 1                     !        !FIELD04
+FIELD !                       !single  !double  !1, 1                     !        !FIELD05
+FIELD !                       !uint16  !double  !1, 1                     !        !FIELD06
+FIELD !                       !uint16  !double  !1, 1                     !        !PointsLength
+FIELD !                       !char    !char    !1, @PointsLength         !        !Points
+FIELD !                       !double  !double  !1, 1                     !        !InfMarker
+FIELD !                       !double  !double  !1, 1                     !        !FIELD10
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD11
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD12
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD13
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD14
+FIELD !                       !uint8   !double  !1, 1                     !        !FIELD15
+FIELD !                       !uint8   !double  !1, 1                     !        !FieldsLength
+FIELD !                       !char    !char    !1, @FieldsLength         !        !Fields
+FIELD !                       !double  !double  !1, 1                     !        !FIELD18
+FIELD !                       !double  !double  !1, 1                     !        !FIELD19
+FIELD !                       !double  !double  !1, 1                     !        !FIELD20
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD21
+FIELD !                       !uint32  !double  !1, 1                     !        !FIELD22
+FIELD !                       !double  !double  !1, 1                     !        !FIELD23
+FIELD !                       !uint8   !double  !1, 5                     !        !FIELD24
+FIELD !                       !double  !double  !42, 1                    !        !FIELD25
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@CompressionType = 0;
+@NrOfCompressionParams = 0;
+@CompressionParams = zeros(1, 0);
+@DataType = 1;
+@SampleOrdering = 1;
+@NrOfChannels = 1;
+@NrOfSamples = 40000;
+@SamplingFrequency = 20000;
+@ValueOffset = 0;
+@ValueSlope = 1;
+@NrOfConditions = 0;
+@Condition = emptystruct({'NrOfOnsets', 'NrOfPreTriggerSamples', 'NrOfPostTriggerSamples', 'CTCData'});
+@CTCData = single(zeros(@NrOfSamples, 1));
+EndNewFileCode

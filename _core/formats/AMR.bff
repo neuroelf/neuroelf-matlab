@@ -1,0 +1,127 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.AMR files (Anatomical MR image)
+# AMR FileVersions supported: (no versioning information)
+#
+# AMR files contain anatomical 2D data. The actual data are
+# stored as *.bmp images. Each data point is one byte.
+#
+# Version:  v0.9b
+# Build:    11050315
+# Date:     Jun-15 2010, 12:37 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Slice
+Description:Anatomical coplanar MRI files
+EncodingSyntax:ieee-le
+Extensions:amr
+Magic:|
+name             |range       |type    |magic
+AMR_BITMAPbmType |3, 4        |hex     |42,4d
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+EXPRE !$BFFWRITE          !!!!!@NrOfSlices = numel(@Slice);
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfSlices
+
+# looping over NrOfSlices
+EXPRE !$BFFREAD           !!!!!...
+@Slice = emptystruct({ ...
+    'BITMAPFILEHEADER', 'BITMAPINFOHEADER', 'BITMAPRGBQUAD', 'AMRData'}); ...
+@Slice(@NrOfSlices).AMRData = [];
+BLOOP !                       ! ! !@NrOfSlices ! !SliceNo
+
+# BITMAPFILEHEADER (see Win32 API reference)
+FIELD !                       !uint16  !uint16  !1, 1                     !        !Slice($SliceNo).BITMAPFILEHEADER.bfType     # = 'BM' :: 19778
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPFILEHEADER.bfSize
+FIELD !                       !uint16  !uint16  !1, 1                     !        !Slice($SliceNo).BITMAPFILEHEADER.bfReserved1
+FIELD !                       !uint16  !uint16  !1, 1                     !        !Slice($SliceNo).BITMAPFILEHEADER.bfReserved2
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPFILEHEADER.bfOffBits
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biSize
+
+# either just a BITMAPCOREHEADER or full BITMAPFILEHEADER
+EXPRE !                   !!!!!...
+if @Slice($SliceNo).BITMAPINFOHEADER.biSize == 40, ...
+    $IsInfoHeader = true; ...
+else, ...
+    $IsInfoHeader = false; ...
+end
+
+# BITMAPCOREHEADER
+BLOOP !~$IsInfoHeader         ! ! !1 ! !BMPCoreHeader
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biWidth
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biHeight
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biPlanes
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biBitCount
+EXPRE !                   !!!!!$ColorsUsed = 2 .^ @Slice($SliceNo).BITMAPINFOHEADER.biBitCount;
+ELOOP !                       ! ! !  ! !BMPCoreHeader
+
+# BITMAPINFOHEADER
+BLOOP !$IsInfoHeader          ! ! !1 ! !BMPInfoHeader
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biWidth
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biHeight
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biPlanes
+FIELD !                       !uint16  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biBitCount
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biCompression
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biImageSize
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biXPixelsPerMeter
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biYPixelsPerMeter
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biClrUsed
+FIELD !                       !uint32  !double  !1, 1                     !        !Slice($SliceNo).BITMAPINFOHEADER.biClrImportant
+EXPRE !                   !!!!!$ColorsUsed = @Slice($SliceNo).BITMAPINFOHEADER.biClrUsed;
+ELOOP !                       ! ! !  ! !BMPInfoHeader
+
+# Colortable
+FIELD !                       !uint8   !double  !4, $ColorsUsed           !        !Slice($SliceNo).BITMAPRGBQUAD
+
+# BITMAP pixel data
+EXPRE !                   !!!!!...
+$biHeight = @Slice($SliceNo).BITMAPINFOHEADER.biHeight; ...
+$biWidth  = @Slice($SliceNo).BITMAPINFOHEADER.biWidth;
+
+FIELD !~$HEADERONLY           !uint8   !uint8   !$biHeight, $biWidth      !        !Slice($SliceNo).AMRData
+
+EXPRE ! $HEADERONLY       !!!!!...
+@Slice($SliceNo).AMRData = []; ...
+fseek(fid, $biHeight * $biWidth, 0);
+
+# end of loop over NrOfSlices
+ELOOP !                       ! ! !  ! !SliceNo
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@NrOfSlices = 30;
+@Slice.BITMAPFILEHEADER.bfType = uint16(19778);
+@Slice.BITMAPFILEHEADER.bfSize = 66614;
+@Slice.BITMAPFILEHEADER.bfReserved1 = uint16(0);
+@Slice.BITMAPFILEHEADER.bfReserved2 = uint16(0);
+@Slice.BITMAPFILEHEADER.bfOffBits = 1078;
+@Slice.BITMAPINFOHEADER.biSize = 40;
+@Slice.BITMAPINFOHEADER.biWidth = 256;
+@Slice.BITMAPINFOHEADER.biHeight = 256;
+@Slice.BITMAPINFOHEADER.biPlanes = 1;
+@Slice.BITMAPINFOHEADER.biBitCount = 8;
+@Slice.BITMAPINFOHEADER.biCompression = 0;
+@Slice.BITMAPINFOHEADER.biImageSize = 65536;
+@Slice.BITMAPINFOHEADER.biXPixelsPerMeter = 2834;
+@Slice.BITMAPINFOHEADER.biYPixelsPerMeter = 2834;
+@Slice.BITMAPINFOHEADER.biClrUsed = 256;
+@Slice.BITMAPINFOHEADER.biClrImportant = 256;
+@Slice.BITMAPRGBQUAD = [[repmat(round([0:255/225:255]), [3, 1]), [zeros(1, 10);75:20:255; 255 * ones(1, 10)], [255:-20:75; 75:20:255; zeros(1, 10)], 255 * ones(3, 10)]; zeros(1, 256)];
+tbiHeight = @Slice.BITMAPINFOHEADER.biHeight;
+tbiWidth  = @Slice.BITMAPINFOHEADER.biWidth;
+@Slice.AMRData = uint8(0); @Slice.AMRData(tbiHeight, tbiWidth) = @Slice.AMRData(1);
+@Slice(2:@NrOfSlices) = @Slice;
+EndNewFileCode

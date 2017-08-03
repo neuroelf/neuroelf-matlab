@@ -1,0 +1,134 @@
+---  BEGIN_COMMENTS  ---
+
+imageedit
+
+Version:  0.9c
+Build:    11092016
+Date:     Sep-20 2011, 12:08 PM EST
+Figure:   image edit
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf (image editor)
+
+% Copyright (c) 2011, Jochen Weber
+% All rights reserved.
+%  
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%  
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                               |Tag                            |CallbackClReq
+        |pixels|off    |$   -1   -1   720  600 |image editor                        |imgedit_MainUI                 |imageedit('close');
+---    END_FIGURE    ---
+
+---    BEGIN_MENU    ---
+Comment |Level |Enabled |Checked |Separator |EGroups|VGroups|Caption     |Accelerator |Tag                          |Callback
+        |      |        |        |          |       |       |                       | |                             |
+Main menu ->
+
+  File ->
+        |$1    |        |        |          |       |       |&File                  | |UIM_imgedit_FILE             |
+        |$2    |        |        |          |       |       |New (empty) image      | |UIM_imgedit_new              |
+        |$2    |        |        |on        |       |       |Open...                |o|UIM_imgedit_open             |
+        |$2    |off     |        |          |ImgIsLoaded  | |Reload image           | |UIM_imgedit_reload           |
+        |$2    |off     |        |on        |ImgIsLoaded  | |Save                   |s|UIM_imgedit_save             |
+        |$2    |off     |        |          |ImgIsLoaded  | |Save as...             | |UIM_imgedit_saveas           |
+        |$2    |        |        |on        |       |       |Exit                   |x|UIM_imgedit_CloseUI          |
+
+  ROIs ->
+        |$1    |        |        |          |ImgIsLoaded  | |ROIs                   | |UIM_imgedit_ROI              |
+---     END_MENU     ---
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                 |Tag|FontName|FontSize|MinMaxTop|SliderStep|Value|HAlign|VAlign|Enabled|EGroups|Visible|VGroups|RGroup|SGroups|ColorFG|ColorBG|ToolTip|Callback
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |      |||||
+file/map selection| |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |      |||||
+        |Button     |$   12  572   20   20 |]neuroelf_file('i', 'chair')            |BT_imgedit_draw0       ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Cursor mode only (no drawing)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'paint')            |BT_imgedit_draw2d      ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||2-D drawing mode (circle or square)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'paint3')           |BT_imgedit_draw3d      ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||3-D drawing mode (sphere or cube)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'flood')            |BT_imgedit_flood3      ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Fill color range with other color/code|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'xpand')            |BT_imgedit_expand3     ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Expand marking into range|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'smooa')            |BT_imgedit_smoothana   ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Smooth volume|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'smoos')            |BT_imgedit_smoothseg   ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Smooth marking|
+        |Toggle     |$    0  -22    0    0 |]neuroelf_file('i', 'paintu')           |BT_imgedit_drawu       ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Undo painter (gets data back from original buffer)|
+        |Frame      |$    0   -4    0   -1 |                                        |                       ||    |           ||     |      |      |       |       |       |       |      |Resize |$ 0.5 0.5 0.5|||
+        |Button     |$    0  -23    0  -20 |]neuroelf_file('i', 'tick')             |BT_imgedit_drawok      ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Copy current buffer into original buffer (accept changes)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'back')             |BT_imgedit_drawback    ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Copy original buffer back to current buffer (revert changes)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'reload')           |BT_imgedit_drawreld    ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Reload VMR from disk (revert all changes)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'mskvmr')           |BT_imgedit_drawmask    ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Reload voxels marked in current color code (mask)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'invmsk')           |BT_imgedit_drawimask   ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Reload all voxel not marked in current color code (inverse mask)|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'roi')              |BT_imgedit_mark2roi    ||    |           ||     |      |      |off    |SVIsVMR|       |       |      |Resize |||Create ROI with from marked voxels|
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'ulay')             |BT_imgedit_setulay     ||    |           ||     |      |      |off    |VarIsLoaded |  |       |      |Resize |||Set underlay object|
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |      |||||
+3 oblique slicing | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+        |XImage     |$  456  432  256  256 |]zeros(256,256)                         |IM_imgedit_Slice_SAG   ||    |           ||     |      |      |       |       |       |       |$ 1 |      |Resize ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_imgedit_Slice_SAG   ||    |           ||     |      |      |       |       |off    |       |    |      |Resize ||||
+        |XImage     |$  260    0    0    0 |]zeros(256,256)                         |IM_imgedit_Slice_COR   ||    |           ||     |      |      |       |       |       |       |$ 1 |      |Resize ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_imgedit_Slice_COR   ||    |           ||     |      |      |       |       |off    |       |    |      |Resize ||||
+        |XImage     |$    0 -260    0    0 |]zeros(256,256)                         |IM_imgedit_Slice_TRA   ||    |           ||     |      |      |       |       |       |       |$ 1 |      |Resize ||||
+        |XAxes      |$    0    0 -256    0 |                                        |AX_imgedit_Slice_TRA   ||    |           ||     |      |      |       |       |off    |       |    |      |Resize ||||
+        |XImage     |$  262    0  -16    0 |]zeros(256,16)                          |IM_imgedit_Slice_Hist  ||    |           ||     |      |      |       |       |       |       |$ 1 |      |Resize ||||
+        |XAxes      |$   -2    0  -20    0 |                                        |AX_imgedit_Slice_Hist  ||    |           ||     |      |      |       |       |off    |       |    |      |Resize ||||
+        |Button     |$    0  260    0  -20 |]neuroelf_file('i', 'cb')               |BT_imgedit_setscalewin ||    |           ||     |      |      |       |       |       |       |      |Resize |||Manually set scaling window|
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+zoomed image   |    |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+        |XImage     |$  458  174  512  512 |]zeros(512,512)                         |IM_imgedit_Slice_Zoom  ||    |           ||     |      |      |       |       |off    |       |$ 2 |      |Resize ||||
+        |XAxes      |$    0    0    0    0 |                                        |AX_imgedit_Slice_Zoom  ||    |           ||     |      |      |       |       |off    |       |$ 2 |      |Resize ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+surface view   |    |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+        |XAxes      |$    0    0    0    0 |                                        |AX_imgedit_Surface     ||    |           ||     |      |      |       |       |off    |       |$ 3 |      |Resize ||||
+        |Edit       |$    2  -33  -60  -24 |0                                       |ED_imgedit_SrfLowerThr ||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$   64    0    0  -18 |<= stat <=                              |                       ||    |           ||     |center|      |       |       |       |       |$ 3 |      |Resize ||||
+        |Edit       |$   64    0    0  -24 |0                                       |ED_imgedit_SrfUpperThr ||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$   64    0  -36  -18 |, k >=                                  |                       ||    |           ||     |center|      |       |       |       |       |$ 3 |      |Resize ||||
+        |Edit       |$   42    0  -72  -24 |0.0mm                                   |ED_imgedit_SrfkExtThr  ||    |           ||     |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$   80    0  -56  -18 |k-thresh:                               |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |Checkbox   |$   56    4  -18    0 |                                        |CB_imgedit_SrfkExtThr  ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$   26   -4  -36  -18 |+ tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_imgedit_SrfPosStat  ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$   24   -4  -36    0 |- tail:                                 |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |Checkbox   |$   36    4  -18    0 |                                        |CB_imgedit_SrfNegStat  ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Label      |$ -492  -34  -50    0 |Set p <                                 |TX_imgedit_SrfSetP     ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |DropDown   |$   52    0 -100  -22 |.05                                     |DD_imgedit_SrfStatSetP ||    |           ||$1   |      |      |       |SngSMP |       |       |$ 3 |      |Resize ||||
+        |Button     |$  106    0   96  -24 |Clustertable                            |BT_imgedit_SrfClusterT ||    |           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |Resize ||||
+        |Label      |$  102    0  -30  -18 |LUT                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_imgedit_SrfLUTColor ||    |           ||$1   |      |      |       |SLdNSMP,SngSMP||       |$ 3 |SMPCol|Resize ||||neuroelf_gui('setsrfstatthrcolor');
+        |Label      |$   24   -2  -30    0 |RGB                                     |                       ||    |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |RadioButton|$   36    2  -18    0 |                                        |RB_imgedit_SrfRGBColor ||    |           ||$0   |      |      |       |SLdNSMP,SngSMP||       |$ 3 |SMPCol|Resize ||||neuroelf_gui('setsrfstatthrcolor');
+        |Button     |$   24   -2  -28  -24 |+                                       |BT_imgedit_SrfRGBLPos  ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |Resize ||||
+        |Button     |$   34    0    0    0 |++                                      |BT_imgedit_SrfRGBUPos  ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |Resize ||||
+        |Button     |$   34    0    0    0 |-                                       |BT_imgedit_SrfRGBLNeg  ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |Resize ||||
+        |Button     |$   34    0    0    0 |- -                                     |BT_imgedit_SrfRGBUNeg  ||$ 12|           ||     |      |      |       |SLdNSMP,SngSMP||       |$ 3 |      |Resize ||||
+        |Button     |$   34   86   20  -20 |]neuroelf_file('i', 'ortho')            |BT_imgedit_SceneOrtho  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |Resize |||Set scenery display to orthographic projection|
+        |Button     |$    0  -24    0    0 |]neuroelf_file('i', 'persp')            |BT_imgedit_ScenePersp  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |Resize |||Set scenery display to perspective projection|
+        |ListBox    |$ -540 -131  536  -60 |Scene compilation (empty)               |LB_imgedit_Scenery     ||$ 9 |$[1, 3, 1] ||     |left  |      |off    |SLoadSR|       |       |$ 3 |      |Resize ||||
+        |Label      |$    0  -30   80  -18 |Viewpoint:                              |                       ||$ 9 |           ||     |left  |      |       |       |       |       |$ 3 |      |Resize ||||
+        |Edit       |$   80    0  456  -24 |0 (0)                                   |ED_imgedit_SrfViewPnt  ||    |           ||     |      |      |       |       |       |       |$ 3 |      |Resize ||||
+        |Button     |$  460   70   20  -20 |]neuroelf_file('i', 'props')            |BT_imgedit_SceneProps  ||    |           ||     |      |      |off    |SLoadSR|       |       |$ 3 |      |Resize |||Set surface properties (transformation, transparency)|
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+values under cursor||                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+        |MultiEdit  |$  436  130  536   36 |Values at cursor:                       |TX_imgedit_SValues     ||$ 9 |           ||     |left  |      |       |       |       |       |      |Resize ||||
+        |           |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+time course plot  | |                      |                                        |                       ||    |           ||     |      |      |       |       |       |       |    |      |||||
+        |XAxes      |$  468   24  500  104 |                                        |AX_imgedit_TC_Plot     ||    |           ||     |      |      |       |       |       |TCPlot |    |      |Resize ||||
+---  END_UICONTROLS  ---

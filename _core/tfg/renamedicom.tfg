@@ -1,0 +1,79 @@
+---  BEGIN_COMMENTS  ---
+
+renamedicom
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:42 PM EST
+Figure:   NeuroElf - rename DICOM files
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf - renamedicom.m
+
+% Copyright (c) 2010 - 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position           |Title                          |Tag                        |CallbackClReq
+        |pixels|off    |$  -1  -1  520  540|NeuroElf - rename DICOM files  |Wnd_NeuroElf_renamedicom   |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|Enabled|Value|Callback
+        |           |                      |                                          |                       |    |      |||
+        |Label      |$   12  488  496   44 |Select a folder to search DICOM files in, choose whether or not to look only for *.dcm files and whether or not to include sub-directories. Then search the folder for files and configure the renaming pattern.||$ 9 |left |||
+        |Label      |$    0  -28  108  -18 |Searchfolder:                             |                       |$ 9 |left  |||
+        |Edit       |$  116    0  312  -24 | <either enter the name or browse...>     |ED_renamedicom_folder  |    |left  |on     ||
+        |Button     |$  320    0  -68    0 |Browse...                                 |BT_renamedicom_folder  |    |center|||
+        |Label      |$ -436  -28  108  -18 |Only get *.dcm files                      |                       |$ 9 |left  |||
+        |CheckBox   |$  116    4  -18    0 |                                          |CB_renamedicom_dcmonly |    |center|       |$ 1  |
+        |Label      |$   48   -4 -236    0 |Extend search to also include sub-directories |                   |$ 9 |left  |||
+        |CheckBox   |$  244    4  -18    0 |                                          |CB_renamedicom_subdirs |    |center|       |$ 1  |
+        |Button     |$   28   -4  -68  -24 |Search...                                 |BT_renamedicom_search  |    |center|off    ||
+        |           |                      |                                          |                       |    |      |||
+        |Label      |$ -436  -28  480  -18 |Files found:                              |TX_renamedicom_files   |$ 9 |left  |||
+        |ListBox    |$    0 -164    0 -164 |empty                                     |LB_renamedicom_files   |$ 9 |left  |||
+        |Button     |$  484  145  -18   18 |]imread([neuroelf_path('icons') '/minus.tif'])|BT_renamedicom_fminus | |center|||
+        |Button     |$    0 -144  -18   18 |]imread([neuroelf_path('icons') '/info.tif']) |BT_renamedicom_getinfo| |center|off    ||
+        |           |                      |                                          |                       |    |      |||
+        |Label      |$ -484  -33  248  -18 |Available fields:                         |                       |$ 9 |left  |||
+        |Label      |$  252    0  248  -18 |Field content:                            |                       |$ 9 |left  |||
+        |ListBox    |$ -252 -112  248 -112 |empty                                     |LB_renamedicom_fields  |$ 9 |left  |||
+        |ListBox    |$  252    0    0 -112 |empty                                     |LB_renamedicom_fieldc  |$ 9 |left  |||
+        |           |                      |                                          |                       |    |      |||
+        |Label      |$ -252  -32   88  -18 |Rename pattern:                           |                       |$ 9 |left  |||
+        |Edit       |$   96    0  328  -24 |                                          |ED_renamedicom_pattern |$ 9 |left  |||
+        |Button     |$  336    0  -68    0 |Test                                      |BT_renamedicom_testpat |    |center|off    ||
+        |Label      |$ -432  -28   88  -18 |Example output:                           |                       |$ 9 |left  |||
+        |Label      |$   96   -6 -420  -24 |example                                   |LB_renamedicom_pattest |$ 9 |left  |||
+        |           |                      |                                          |                       |    |      |||
+        |Button     |$   12    8   68   24 |Cancel                                    |BT_renamedicom_cancel  |    |center|||
+        |Button     |$  280    0    0    0 |Copy...                                   |BT_renamedicom_copy    |    |center|off    ||
+        |Button     |$   76    0    0    0 |Pack...                                   |BT_renamedicom_pack    |    |center|off    ||
+        |Button     |$   76    0    0    0 |Rename...                                 |BT_renamedicom_rename  |    |center|off    ||
+        |           |                      |                                          |                       |    |      |||
+---  END_UICONTROLS  ---

@@ -1,0 +1,130 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.CTC & *.ACT files (Channel Time Course, Average Channel Time course)
+# CTC/ACT FileVersions supported: 1
+#
+# Version:  v0.9c
+# Build:    11050617
+# Date:     May-06 2011, 5:30 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:CTCData
+Description:Channel time course files,Average channel time course files
+EncodingSyntax:ieee-le
+Extensions:ctc,act
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# parse header
+FIELD !                       !uint32  !double  !1, 1                     !1       !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !0       !CompressionType         # 0: none, 1...C to be implemented
+EXPRE !@CompressionType == 0  !!!!!@NrOfCompressionParams = 0; @CompressionParams = zeros(1, 0);
+FIELD !@CompressionType > 0   !uint32  !double  !1, 1                     !0       !NrOfCompressionParams   # number of parameters used for compression
+FIELD !@CompressionType > 0   !single  !double  !1, @NrOfCompressionParams!        !CompressionParams       # compression parameters
+FIELD !                       !uint32  !double  !1, 1                     !        !DataType                # 1: float32, 2: float64, 3: int16, 4: int8, 5: float32+offset+slope
+FIELD !                       !uint32  !double  !1, 1                     !        !SampleOrdering          # 1: TxC, 2: CxT, 3: TxCxO, 4: CxTxO, 5: OxTxC, 6: OxCxT
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfChannels
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSamples
+FIELD !                       !single  !double  !1, 1                     !        !SamplingFrequency
+FIELD !@DataType > 2          !single  !double  !1, @NrOfChannels         !        !ValueOffset             # used only required data types
+FIELD !@DataType > 2          !single  !double  !1, @NrOfChannels         !        !ValueSlope              # used only required data types
+EXPRE !$BFFREAD && @DataType < 3 !!!!!@ValueOffset = zeros(1, @NrOfChannels); @ValueSlope = ones(1, @NrOfChannels);
+
+# file requires basic knowledge about NrOfConditions / NrOfOnsets...
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfConditions          # number of experimental conditions
+EXPRE !$HEADERONLY        !!!!!@Condition = emptystruct({ ...
+    'NrOfOnsets', 'NrOfPreTriggerSamples', 'NrOfPostTriggerSamples', 'CTCData'}); ...
+@CTCData = single(zeros(@NrOfSamples, 1)); ...
+fseek(fid, 0, 1); ...
+rulec = 999;
+
+# data
+BLOOP !@NrOfConditions > 0    ! ! !1 ! !HasConditions
+EXPRE !$BFFREAD           !!!!!@Condition = emptystruct({ ...
+    'NrOfOnsets', 'NrOfPreTriggerSamples', 'NrOfPostTriggerSamples', 'CTCData'});
+BLOOP !                       ! ! !@NrOfConditions ! !CondNo1
+FIELD !                       !uint32  !double  !1, 1                     !        !Condition($CondNo1).NrOfOnsets             # number of onsets per condition (0 for average)
+ELOOP !                       ! ! !  ! !CondNo1
+BLOOP !                       ! ! !@NrOfConditions ! !CondNo2
+FIELD !                       !uint32  !double  !1, 1                     !        !Condition($CondNo2).NrOfPreTriggerSamples  # samples before onsets per condition
+ELOOP !                       ! ! !  ! !CondNo2
+BLOOP !                       ! ! !@NrOfConditions ! !CondNo3
+FIELD !                       !uint32  !double  !1, 1                     !        !Condition($CondNo3).NrOfPostTriggerSamples # samples after onsets per condition
+ELOOP !                       ! ! !  ! !CondNo3
+ELOOP !                       ! ! !  ! !HasConditions
+
+# plain channel data
+BLOOP !@SampleOrdering < 3    ! ! !1 ! !PlainMatrix 
+
+# get data dimensions
+EXPRE !!!!!!...
+switch (@SampleOrdering), ...
+    case {1}, ...
+        $DataDims = [@NrOfSamples, @NrOfChannels]; ...
+    case {2}, ...
+        $DataDims = [@NrOfChannels, @NrOfSamples]; ...
+end
+
+# read data
+FIELD !any([1,5] == @DataType)!single  !single  !$DataDims                !        !CTCData
+FIELD !@DataType == 2         !double  !double  !$DataDims                !        !CTCData
+FIELD !@DataType == 3         !int16   !int16   !$DataDims                !        !CTCData
+FIELD !@DataType == 4         !int8    !int8    !$DataDims                !        !CTCData
+ELOOP !                       ! ! !  ! !PlainMatrix
+
+# complex channel data
+BLOOP !@SampleOrdering > 2    ! ! !@NrOfConditions ! !CondNoCM
+
+# get data dimensions
+EXPRE !!!!!!...
+$noon = @Condition($CondNoCM).NrOfOnsets; ...
+if $noon == 0, ...
+    $noon = 1; ...
+end, ...
+$nosamp = @Condition($CondNoCM).NrOfPreTriggerSamples + @Condition($CondNoCM).NrOfPostTriggerSamples; ...
+switch (@SampleOrdering), ...
+    case {3}, ...
+        $DataDims = [$nosamp, @NrOfChannels, $noon]; ...
+    case {4}, ...
+        $DataDims = [@NrOfChannels, $nosamp, $noon]; ...
+    case {5}, ...
+        $DataDims = [$noon, $nosamp, @NrOfChannels]; ...
+    case {6}, ...
+        $DataDims = [$noon, @NrOfChannels, $nosamp]; ...
+end
+
+# read data
+FIELD !any([1,5] == @DataType)!single  !single  !$DataDims                !        !Condition($CondNoCM).CTCData
+FIELD !@DataType == 2         !double  !double  !$DataDims                !        !Condition($CondNoCM).CTCData
+FIELD !@DataType == 3         !int16   !int16   !$DataDims                !        !Condition($CondNoCM).CTCData
+FIELD !@DataType == 4         !int8    !int8    !$DataDims                !        !Condition($CondNoCM).CTCData
+ELOOP !                       ! ! !  ! !CondNoCM
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD   !  !  !  !  !$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE  !  !  !  !  !$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@CompressionType = 0;
+@NrOfCompressionParams = 0;
+@CompressionParams = zeros(1, 0);
+@DataType = 1;
+@SampleOrdering = 1;
+@NrOfChannels = 1;
+@NrOfSamples = 40000;
+@SamplingFrequency = 20000;
+@ValueOffset = 0;
+@ValueSlope = 1;
+@NrOfConditions = 0;
+@Condition = emptystruct({'NrOfOnsets', 'NrOfPreTriggerSamples', 'NrOfPostTriggerSamples', 'CTCData'});
+@CTCData = single(zeros(@NrOfSamples, 1));
+EndNewFileCode

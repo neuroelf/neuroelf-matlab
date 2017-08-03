@@ -1,0 +1,67 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# NeuroMag file format for *.FIF files (Functional Image File, binary)
+# FIF FileVersions supported:
+#
+# Version:  v1.1
+# Build:    16012320
+# Date:     Jan-23 2016, 8:32 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Functional Image Files
+EncodingSyntax:ieee-be# !!! Big Endian byte order !!!
+Extensions:fif
+Magic:|
+name             |range       |type    |magic
+FIF_FormatHead   |1, 16       |hex     |0, 0, 0, 64, 0, 0, 0, 31, 0, 0, 0, 20, 0, 0, 0, 0
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# no write support yet
+EXPRE !$BFFWRITE          !!!!!error('Not yet implemented');
+
+# use external reader (fifio.m)
+EXPRE !$BFFREAD           !!!!!eval(bffspec.NewFileCode); try, fif_str = fifio($FILENAME); @FIFStructure = fif_str; catch ne_eo; neuroelf_lasterr(ne_eo); error('error reading file'); end
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FIFStructure = struct;
+@FIFStructure.IOPos = 0;
+@FIFStructure.Datakind = 'FileID';
+@FIFStructure.Datatype = 'id';
+@FIFStructure.RawSize = 20;
+@FIFStructure.Value = struct;
+@FIFStructure.IOPosOffset = 0;
+@FIFStructure.Children = emptystruct({ ...
+    'IOPos', 'Datakind', 'Datatype', 'Rawsize', 'Value', 'IOPosOffset', 'Children', 'BlockID', 'Meta'});
+@FIFStructure.BlockID = 0;
+@FIFStructure.Meta = struct;
+@FIFStructure.Filename = '';
+@FIFStructure.Directory = emptystruct({'IOPos', 'Datakind', 'Datatype', 'Rawsize'});
+@FIFStructure.Tree = @FIFStructure.Children;
+@FIFStructure.Lookup = 100;
+@FIFStructure.BlockLookup = [-1; 1];
+@FIFStructure.ReadFlag = false;
+@Measurement = struct;
+@MetaInformation = struct;
+@RawData = struct;
+@CookedData = struct;
+@EvokedData = struct;
+@AspectData = struct;
+@SubjectInformation = struct;
+@ISOTrak = struct;
+@HPIResult = struct;
+@ContinuousData = struct;
+@Comments = struct;
+@MRIInformation = struct;
+@MRISetData = struct;
+@MRISliceData = struct;
+@ProjectInformation = struct;
+@ProjectItem = struct;
+EndNewFileCode

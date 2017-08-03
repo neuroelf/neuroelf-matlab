@@ -1,0 +1,63 @@
+---  BEGIN_COMMENTS  ---
+
+tdclient
+
+Version:  0.9d
+Build:    14091111
+Date:     Sep-11 2014, 11:48 AM EST
+Figure:   NeuroElf tdclient GUI window
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf - tdclient.m
+
+% Copyright (c) 2010, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title               |Tag              |CallbackClReq
+        |pixels|on     |$   -1   -1  800  360  |tdclient            |Wnd_tdclient     |tdneobj = neuroelf; tdneobj.tdclient('visual', 'close'); clear tdneobj;
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|EGroups|RGroup|Callback
+        |           |                      |                                          |                       |    |      |      |       |      |
+        |Label      |$   12  334  784   18 |tdclient input (coordinates or variable): |                       |$ 9 |left  |      |       |      |
+        |Edit       |$    0  -28  532  -24 |                                          |ED_tdclient_input      |    |left  |      |       |      |
+        |Button     |$  540    0 -112    0 |send request                              |                       |$ 9 |center|      |       |      |tdneobj = neuroelf; tdneobj.tdclient('visual', 'send'); clear tdneobj;
+        |Button     |$  120    0    0    0 |clear fields                              |                       |$ 9 |center|      |       |      |tdneobj = neuroelf; tdneobj.tdclient('visual', 'clear'); clear tdneobj;
+        |RadioButton|$ -660  -30  -96  -18 |TAL Label                                 |RB_tdclient_TALLabel   |$ 9 |left  |      |       |SType |xfigure(gcf, 'SetGroupEnabled', 'NoLabel', false); xfigure(gcf, 'SetGroupEnabled', 'NGMSrc', false);
+        |RadioButton|$  104    0    0    0 |Cube search                               |RB_tdclient_CubeSearch |$ 9 |left  |      |       |SType |xfigure(gcf, 'SetGroupEnabled', 'NoLabel', true);  xfigure(gcf, 'SetGroupEnabled', 'NGMSrc', false);
+        |RadioButton|$  104    0    0    0 |NGM search                                |RB_tdclient_NGMSearch  |$ 9 |left  |      |       |SType |xfigure(gcf, 'SetGroupEnabled', 'NoLabel', true);  xfigure(gcf, 'SetGroupEnabled', 'NGMSrc', true);
+        |Label      |$  104    0  -76  -18 |Search range                              |                       |$ 9 |center|      |       |      |
+        |Edit       |$   84    0  -24  -20 |7                                         |ED_tdclient_SrcRange   |$ 9 |center|      |NoLabel|      |
+        |Label      |$   32    0  -64  -18 |# of hits                                 |                       |$ 9 |center|      |       |      |
+        |Edit       |$   72    0  -32  -20 |5                                         |ED_tdclient_NGMoccur   |$ 9 |center|      |NGMSrc |      |
+        |           |                      |                                          |                       |    |      |      |       |      |
+        |Label      |$   12  250  784   18 |tdclient output:                          |                       |$ 9 |left  |      |       |      |
+        |MultiEdit  |$    0 -238    0 -232 |                                          |ED_tdclient_result     |$ 9 |left  |      |       |      |
+        |           |                      |                                          |                       |    |      |      |       |      |
+---  END_UICONTROLS  ---

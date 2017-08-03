@@ -1,0 +1,83 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.DDT files (Diffusion Tensor data files)
+# DDT FileVersions supported: 1
+#
+# Please note: compared to VTC/MSK data,
+# the spatial axes order is reversed !!!
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:TensorEigenVs
+Description:Volume diffusion weighted datafiles
+EncodingSyntax:ieee-le
+Extensions:ddt
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# header fields
+FIELD !                       !uint16  !double  !1, 1                     !1       !FileVersion
+FIELD !                       !uint16  !double  !1, 1                     !2       !ProjectType
+
+# DMR/DWI based project
+BLOOP !@ProjectType == 1      ! ! !1 ! !IsDMR
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfRows
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfColumns
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfSlices
+EXPRE !                   !!!!!@Resolution = 1; @XStart = 0; @XEnd = @NrOfRows; @YStart = 0; @YEnd = @NrOfColumns; @ZStart = 0; @ZEnd = @NrOfSlices;
+ELOOP !                       ! ! !  ! !IsDMR
+
+# VDW based project
+BLOOP !@ProjectType == 2      ! ! !1 ! !IsVDW
+EXPRE !                   !!!!!@NrOfRows = []; @NrOfColumns = []; @NrOfSlices = [];
+FIELD !                       !uint16  !double  !1, 1                     !        !Resolution
+FIELD !                       !uint16  !double  !1, 1                     !        !XStart
+FIELD !                       !uint16  !double  !1, 1                     !        !XEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !YStart
+FIELD !                       !uint16  !double  !1, 1                     !        !YEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !ZStart
+FIELD !                       !uint16  !double  !1, 1                     !        !ZEnd
+EXPRE !                   !!!!!$vdwr = @Resolution; @NrOfRows = (@XEnd-@XStart) / $vdwr; @NrOfColumns = (@YEnd-@YStart) / $vdwr; @NrOfSlices = (@ZEnd-@ZStart) / $vdwr;
+FIELD !                       !single  !double  !3, 3                     !        !RotationMatrix
+ELOOP !                       ! ! !  ! !IsVDW
+
+# tensor data
+FIELD !~$HEADERONLY           !single  !single  !12, @NrOfSlices, @NrOfColumns, @NrOfRows !!TensorEigenVs   # 3 eigenvectors, 3 eigenvalues (ordered)
+EXPRE ! $HEADERONLY       !!!!!@TensorEigenVs = []; fseek(fid, 48 * @NrOfSlices * @NrOfColumns * @NrOfRows, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@ProjectType = 2;
+@NrOfRows = [];
+@NrOfColumns = [];
+@NrOfSlices = [];
+@Resolution = 2;
+@XStart = 57;
+@XEnd = 231;
+@YStart = 52;
+@YEnd = 172;
+@ZStart = 59;
+@ZEnd = 197;
+@NrOfRows = (@XEnd - @XStart) / @Resolution;
+@NrOfColumns = (@YEnd - @YStart) / @Resolution;
+@NrOfSlices = (@ZEnd - @ZStart) / @Resolution;
+@RotationMatrix = eye(3);
+@TensorEigenVs = single(0);
+@TensorEigenVs(12, @NrOfRows, @NrOfColumns, @NrOfSlices) = 0;
+EndNewFileCode

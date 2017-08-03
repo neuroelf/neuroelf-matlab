@@ -1,0 +1,66 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX/Trackmark file format for *.ASC files (SUMA ASCII mesh file)
+# SASC FileVersions supported:
+#
+# SASC files contain coordinates and triangles.
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:SUMA ASCII files (*.asc)
+Extensions:sasc # dummy extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+SASC_ASCIIOF  |3, 18       |strfind |ascii version of
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!%[char(35) 'NOT ascii version of xff object']
+EXPRE!$TFFWRITE     !!!!!!@NrOfVertices = size(@Vertices, 1); @NrOfTriangles = size(@Triangles, 1); @NrOfElements = [@NrOfVertices, @NrOfTriangles];
+ARRAY!                   !NrOfElements        !double  !%d     !1, 2   !!NrOfElements
+EXPRE!$TFFREAD      !!!!!!@NrOfVertices = @NrOfElements(1); @NrOfTriangles = @NrOfElements(2);
+
+# for reading
+BLOOP!$TFFREAD           ! ! ! !1 ! !RLoop
+EXPRE!              !!!!!!try, @Vertices = reshape(eval(['[' gluetostring(linecont(linec:linec+2*@NrOfVertices-1), ',') ']']), [4, @NrOfVertices])'; @Vertices(:, 1) = @Vertices(:, 1) + 1; linec = linec + 2*@NrOfVertices; catch ne_eo; neuroelf_lasterr(ne_eo); error('Invalid vertices in file.'); end
+EXPRE!              !!!!!!try, @Triangles = reshape(eval(['[' gluetostring(linecont(linec:linec+2*@NrOfTriangles-1), ',') ']']), [4, @NrOfTriangles])' + 1;; linec = linec + 2*@NrOfTriangles; catch ne_eo; neuroelf_lasterr(ne_eo); error('Invalid vertices in file.'); end
+ELOOP!                   ! ! ! !  ! !RLoop
+
+# loop over Vertices
+BLOOP!$TFFWRITE          ! ! ! !1 ! !WLoop
+BLOOP!                   ! ! ! !@NrOfVertices ! !Vert
+EXPRE!              !!!!!!@VertNr = @Vertices($Vert, 1); @VertCoord = @Vertices($Vert, 2:4);
+ARRAY!                   !VertNr              !double  !%d     !1, 1   !!VertNr
+ARRAY!                   !VertCoord           !double  !%11.6g !1, 3   !!VertCoord
+ELOOP!                   ! ! ! !  ! !Vert
+EXPRE!              !!!!!!@@ = rmfield(@@, 'VertNr'); @@ = rmfield(@@, 'VertCoord');
+
+# loop over Triangles
+BLOOP!                   ! ! ! !@NrOfTriangles ! !Tri
+EXPRE!              !!!!!!@TriNr = @Triangles($Tri, 1); @TriVerts = @Triangles($Tri, 2:4);
+ARRAY!                   !TriNr               !double  !%d     !1, 1   !!TriNr
+ARRAY!                   !TriVerts            !double  !%d     !1, 3   !!TriVerts
+ELOOP!                   ! ! ! !  ! !Tri
+EXPRE!              !!!!!!@@ = rmfield(@@, 'TriNr'); @@ = rmfield(@@, 'TriVerts');
+ELOOP!                   ! ! ! !  ! !WLoop
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfElements = [0, 0];
+@NrOfVertices = @NrOfElements(1);
+@NrOfTriangles = @NrOfElements(2);
+@Vertices = zeros(@NrOfVertices, 4);
+@Triangles = zeros(@NrOfTriangles, 4);
+EndNewFileCode

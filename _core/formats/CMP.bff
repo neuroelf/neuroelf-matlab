@@ -1,0 +1,227 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.CMP files (Custom/Component MaP)
+# CMP FileVersions supported: 3, 4, 5, 6
+#
+# CMPs are the custom maps that are being used as of BrainVoyager QX 1.9
+# for all kinds of statistical outcome (hence superceding VMPs in the
+# native resolution of the data, uninterpolated)
+#
+# Version:  v0.9c
+# Build:    11050617
+# Date:     May-06 2011, 5:26 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:Map
+Description:Component/custom map files,Granger map files,ICA map files
+EncodingSyntax:ieee-le
+Extensions:cmp,gcm,ica
+
+# Field description
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# some checks first
+EXPRE !$BFFWRITE          !!!!!...
+@NrOfMaps = numel(@Map); ...
+if @NrOfMaps < 1, ...
+    error('Illegal number of components'); ...
+end, ...
+$XYZDim = size(@Map(1).CMPData); ...
+$XDim = $XYZDim(1); ...
+$YDim = $XYZDim(2); ...
+$ZDim = $XYZDim(3); ...
+for tv_cc = 2:@NrOfMaps, ...
+    tv_xyz = size(@Map(tv_cc).CMPData); ...
+    if any($XYZDim ~= tv_xyz), ...
+        error('Bad Dims'); ...
+    end, ...
+end
+
+# for magic token, re-read FileVersion
+EXPRE !$BFFWRITE && @FileVersion > 4!!!!!fwrite(fid, uint8([212, 195, 178, 161]), 'uint8');
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+EXPRE !$BFFREAD           !!!!!if @FileVersion > 40962, @FileVersion = fread(fid, [1, 2], 'uint16=>double'); @FileVersion = @FileVersion(2); end
+FIELD !                       !uint16  !double  !1, 1                     !        !DocumentType
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfMaps
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTimePoints
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfMapParameters
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !ShowParamsRangeFrom
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !ShowParamsRangeTo
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !FingerprintParamsRangeFrom
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !FingerprintParamsRangeTo
+EXPRE !$BFFREAD && @FileVersion < 4 !!!!!@ShowParamsRangeFrom = []; @ShowParamsRangeTo = []; @FingerprintParamsRangeFrom = []; @FingerprintParamsRangeTo = [];
+BLOOP !@DocumentType == 0     ! ! !1 ! !FromFMR
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfColumns
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfRows
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSlices
+EXPRE !$BFFREAD           !!!!!$XDim = @NrOfColumns; $YDim = @NrOfRows; $ZDim = @NrOfSlices;
+ELOOP !                       ! ! !  ! !FromFMR
+BLOOP !@DocumentType == 1     ! ! !1 ! !FromVTC
+FIELD !                       !uint32  !double  !1, 1                     !        !XStart
+FIELD !                       !uint32  !double  !1, 1                     !        !XEnd
+FIELD !                       !uint32  !double  !1, 1                     !        !YStart
+FIELD !                       !uint32  !double  !1, 1                     !        !YEnd
+FIELD !                       !uint32  !double  !1, 1                     !        !ZStart
+FIELD !                       !uint32  !double  !1, 1                     !        !ZEnd
+FIELD !                       !uint32  !double  !1, 1                     !        !Resolution
+FIELD !                       !uint32  !double  !1, 1                     !        !VMRDimX
+FIELD !                       !uint32  !double  !1, 1                     !        !VMRDimY
+FIELD !                       !uint32  !double  !1, 1                     !        !VMRDimZ
+EXPRE !$BFFREAD           !!!!!$XDim = (@XEnd - @XStart) / @Resolution; $YDim = (@YEnd - @YStart) / @Resolution; $ZDim = (@ZEnd - @ZStart) / @Resolution;
+ELOOP !                       ! ! !  ! !FromVTC
+BLOOP !@DocumentType == 2     ! ! !1 ! !FromMTC
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+EXPRE !$BFFREAD           !!!!!$XDim = @NrOfVertices; $YDim = 1; $ZDim = 1;
+ELOOP !                       ! ! !  ! !FromMTC
+FIELD !                       !cstring !cstring !1, 1                     !        !OriginatingXTC
+FIELD !                       !cstring !cstring !1, 1                     !        !LinkedPRT
+FIELD !                       !cstring !cstring !1, 1                     !        !OptionalVOI
+
+# loop over maps
+EXPRE !$BFFREAD           !!!!!@Map = emptystruct({ ...
+    'Type', 'LowerThreshold', 'UpperThreshold', 'Name', ...
+    'RGBLowerThreshPos', 'RGBUpperThreshPos', 'RGBLowerThreshNeg', 'RGBUpperThreshNeg', 'UseRGBColor', ...
+    'LUTName', 'TransColorFactor', 'NrOfLags', 'MinLag', 'MaxLag', 'CCOverlay', ...
+    'ClusterSize', 'EnableClusterCheck', 'UseValuesAboveThresh', 'DF1', 'DF2', ...
+    'ShowPositiveNegativeFlag', 'BonferroniValue', 'NrOfFDRThresholds', 'FDRThresholds', ...
+    'UnknownValue', 'TimePointData', 'CMPData', 'CMPDataCT', 'OverlayColors'}, [1, @NrOfMaps]);
+
+BLOOP !                       ! ! !@NrOfMaps ! !CMPNo
+
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).Type
+# the map type is coded as follows:
+# 1: t-Map
+# 2: r-Map
+# 3: CC-Map (with additional fields, if DF1 = 2 and NrOfLags = 20, R-Map!)
+# 4: F-Map
+# 11: %-Map
+# 12: z_ica-Map
+# 13: TH-Map
+
+FIELD !                       !single  !double  !1, 1                     !        !Map($CMPNo).LowerThreshold
+FIELD !                       !single  !double  !1, 1                     !        !Map($CMPNo).UpperThreshold
+FIELD !                       !cstring !cstring !1, 1                     !        !Map($CMPNo).Name
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($CMPNo).RGBLowerThreshPos
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($CMPNo).RGBUpperThreshPos
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($CMPNo).RGBLowerThreshNeg
+FIELD !                       !uint8   !double  !1, 3                     !        !Map($CMPNo).RGBUpperThreshNeg
+FIELD !                       !uint8   !double  !1, 1                     !        !Map($CMPNo).UseRGBColor
+FIELD !@FileVersion > 5       !cstring !cstring !1, 1                     !        !Map($CMPNo).LUTName
+FIELD !                       !single  !double  !1, 1                     !        !Map($CMPNo).TransColorFactor
+BLOOP !@FileVersion > 4       ! ! !1 ! !CMPFVgt4
+BLOOP !@Map($CMPNo).Type == 3 ! ! !1 ! !CMPIsCC
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).NrOfLags
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).MinLag
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).MaxLag
+FIELD !                       !int32   !double  !1, 1                     !        !Map($CMPNo).CCOverlay
+ELOOP !                       ! ! !  ! !CMPIsCC
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).ClusterSize
+FIELD !                       !uint8   !double  !1, 1                     !        !Map($CMPNo).EnableClusterCheck
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).UseValuesAboveThresh
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).DF1
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).DF2
+FIELD !                       !uint8   !double  !1, 1                     !        !Map($CMPNo).ShowPositiveNegativeFlag # sum of flags pos=1 and neg=2
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).BonferroniValue
+FIELD !                       !uint32  !double  !1, 1                     !        !Map($CMPNo).NrOfFDRThresholds
+EXPRE !                   !!!!!$NrOfFDRs = @Map($CMPNo).NrOfFDRThresholds; if $NrOfFDRs < 1, @Map($CMPNo).FDRThresholds = zeros(0, 3); end
+EXPRE !$BFFWRITE          !!!!!@Map($CMPNo).FDRThresholds = @Map($CMPNo).FDRThresholds';
+FIELD !$NrOfFDRs > 0          !single  !double  !3, $NrOfFDRs             !        !Map($CMPNo).FDRThresholds
+EXPRE !                   !!!!!@Map($CMPNo).FDRThresholds = @Map($CMPNo).FDRThresholds';
+FIELD !                       !int32   !double  !1, 1                     !        !Map($CMPNo).UnknownValue
+ELOOP !                       ! ! !  ! !CMPFVgt4
+ELOOP !                       ! ! !  ! !CMPNo
+
+# reading timepoint data if present
+BLOOP !                       ! ! !@NrOfMaps ! !CMPNo2
+FIELD !@NrOfTimePoints > 0    !single  !double  !@NrOfTimePoints, 1       !        !Map($CMPNo2).TimePointData
+EXPRE !@NrOfTimePoints ==0!!!!!@Map($CMPNo2).TimePointData = zeros(0, 1);
+ELOOP !                       ! ! !  ! !CMPNo2
+
+# loop over component parameters
+EXPRE !$BFFREAD           !!!!!@MapParameter = emptystruct({'Name', 'Values'});
+BLOOP !@NrOfMapParameters > 0!!!@NrOfMapParameters ! !CMPPNo
+FIELD !                       !cstring !cstring !1, 1                     !        !MapParameter($CMPPNo).Name
+ELOOP !                       ! ! !  ! !CMPPNo
+
+# loop over components and then component parameters (again...!)
+BLOOP !                       ! ! !@NrOfMaps ! !CMPNo3
+BLOOP !@NrOfMapParameters > 0!!!@NrOfMapParameters ! !CMPPNo2
+FIELD !                       !single  !double  !1, 1                     !        !MapParameter($CMPPNo2).Values($CMPNo3)
+ELOOP !                       ! ! !  ! !CMPPNo2
+ELOOP !                       ! ! !  ! !CMPNo3
+
+# reading component maps
+BLOOP !~$HEADERONLY           ! ! !@NrOfMaps ! !CMPNo4
+FIELD !                       !single  !single  !$XDim, $YDim, $ZDim      !        !Map($CMPNo4).CMPData
+ELOOP !                       ! ! !  ! !CMPNo4
+EXPRE ! $HEADERONLY       !!!!!fseek(fid, 4 * @NrOfMaps * $XDim * $YDim * $ZDim, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 4;
+@DocumentType = 1;
+@NrOfMaps = 1;
+@NrOfTimePoints = 0;
+@NrOfMapParameters = 0;
+@ShowParamsRangeFrom = 0;
+@ShowParamsRangeTo = 0;
+@FingerprintParamsRangeFrom = 0;
+@FingerprintParamsRangeTo = 0;
+@NrOfColumns = 64;
+@NrOfRows = 64;
+@NrOfSlices = 30;
+@XStart = 57;
+@XEnd = 231;
+@YStart = 52;
+@YEnd = 172;
+@ZStart = 59;
+@ZEnd = 197;
+@Resolution = 3;
+@VMRDimX = 256;
+@VMRDimY = 256;
+@VMRDimZ = 256;
+@NrOfVertices = 40962;
+@OriginatingXTC = '';
+@LinkedPRT = '';
+@OptionalVOI = '';
+@Map.Type = 1;
+@Map.LowerThreshold = 2.5;
+@Map.UpperThreshold = 8;
+@Map.Name = 'new component';
+@Map.RGBLowerThreshPos = [0, 0, 100];
+@Map.RGBUpperThreshPos = [0, 0, 255];
+@Map.RGBLowerThreshNeg = [100, 100, 50];
+@Map.RGBUpperThreshNeg = [200, 200, 100];
+@Map.UseRGBColor = 1;
+@Map.LUTName = '<default>';
+@Map.TransColorFactor = 1;
+@Map.NrOfLags = [];
+@Map.MinLag = [];
+@Map.MaxLag = [];
+@Map.CCOverlay = [];
+@Map.ClusterSize = 4;
+@Map.EnableClusterCheck = 0;
+@Map.UseValuesAboveThresh = 1;
+@Map.DF1 = 12;
+@Map.DF2 = 0;
+@Map.ShowPositiveNegativeFlag = 3;
+@Map.BonferroniValue = 106720;
+@Map.NrOfFDRThresholds = 8;
+@Map.FDRThresholds = [0.1, 3, 4; 0.05, 3.2, 4.2; 0.04, 3.3, 4.3; 0.03, 3.4, 4.4; 0.02, 3.5, 4.5; 0.01, 3.75, 4.75; 0.005, 4, 5; 0.001, 5, 6];
+@Map.UnknownValue = -1;
+@Map.TimePointData = zeros(0, 1);
+@Map.CMPData = single(zeros([58, 40, 46]));
+@Map.CMPDataCT = [];
+@Map.OverlayColors = [];
+@MapParameter = emptystruct({'Name', 'Values'});
+EndNewFileCode

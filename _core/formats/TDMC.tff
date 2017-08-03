@@ -1,0 +1,71 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *_3DMC.LOG files (3D Motion Correction LOG)
+# TDMC FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050314
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:3D motion correction log files (*.log)
+Extensions:tdmc # dummy extension!
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+TDMC_LongKey  |1, 192      |regexp  |MaxNrOfLevMarqIterations\:\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FLIST!                   !InterpolationMethod !string  !%s     !1      !        !InterpolationMethod
+FLIST!                   !FullDataSet         !string  !%s     !1      !        !FullDataSet
+FLIST!                   !MaxNrOfLevMarqIterations !double !%d !1      !        !MaxNrOfLevMarqIterations
+WRTLN!!!!!!!!  # empty line
+
+# create struct
+EXPRE!$TFFREAD      !!!!!!@MCParams = struct('Iterations', 0, 'dXmm', 0, 'dYmm', 0, 'dZmm', 0, 'rXdeg', 0, 'rYdeg', 0, 'rZdeg', 0);
+EXPRE!$TFFREAD      !!!!!!$FinishedRead = false; $LinePattern = '^.*vol\w+\:\s*(\d+)\s+n\w*it\w*\:\s*(\d+)\s+dx\:\s*(\-?[0-9\.]+)\s*mm\s+dy\:\s*(\-?[0-9\.]+)\s*mm\s+dz\:\s*(\-?[0-9\.]+)\s*mm\s+rx\:\s*(\-?[0-9\.]+)\s*degs\s+ry\:\s*(\-?[0-9\.]+)\s*degs\s+rz\:\s*(\-?[0-9\.]+)\s*degs';
+
+# reading of lines
+BLOOP!$TFFREAD           ! ! ! !10000 ! !TDMCReading
+EXPRE!!!!!!!if linec > linecount, $FinishedRead = true; end
+XLOOP!$FinishedRead      ! ! ! !      ! !TDMCReading
+EXPRE!!!!!!!t_lc = linecont{linec}; [t_m, t_e, t_t] = regexpi(t_lc, $LinePattern); linec = linec + 1;
+EXPRE!!!!!!!t_r = false; if ~isempty(t_t) && prod(size(t_t{1})) == 16, t_r = true; end
+
+BLOOP!t_r                ! ! ! !1     ! !LineReading
+EXPRE!!!!!!!t_t = t_t{1}; t_vn = str2double(t_lc(t_t(1,1):t_t(1,2)));
+EXPRE!!!!!!!@MCParams(t_vn).Iterations = str2double(t_lc(t_t(2,1):t_t(2,2)));
+EXPRE!!!!!!!@MCParams(t_vn).dXmm = str2double(t_lc(t_t(3,1):t_t(3,2)));
+EXPRE!!!!!!!@MCParams(t_vn).dYmm = str2double(t_lc(t_t(4,1):t_t(4,2)));
+EXPRE!!!!!!!@MCParams(t_vn).dZmm = str2double(t_lc(t_t(5,1):t_t(5,2)));
+EXPRE!!!!!!!@MCParams(t_vn).rXdeg = str2double(t_lc(t_t(6,1):t_t(6,2)));
+EXPRE!!!!!!!@MCParams(t_vn).rYdeg = str2double(t_lc(t_t(7,1):t_t(7,2)));
+EXPRE!!!!!!!@MCParams(t_vn).rZdeg = str2double(t_lc(t_t(8,1):t_t(8,2)));
+ELOOP!                   ! ! ! !      ! !LineReading
+
+ELOOP!                   ! ! ! !      ! !TDMCReading
+EXPRE!$TFFREAD      !!!!!!t_n = length(@MCParams); @MCParamTable = zeros(t_n, 6);
+EXPRE!$TFFREAD      !!!!!!for t_c = 1:t_n, @MCParamTable(t_c,:) = [@MCParams(t_c).dXmm, @MCParams(t_c).dYmm, @MCParams(t_c).dZmm, @MCParams(t_c).rXdeg, @MCParams(t_c).rYdeg, @MCParams(t_c).rZdeg]; end
+
+# writing of lines
+EXPRE!$TFFWRITE     !!!!!!error('writing back of 3DMC files not yet supported');
+BLOOP!$TFFWRITE          ! ! ! !10000 ! !TDMCWriting
+ELOOP!                   ! ! ! !      ! !TDMCWriting
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@InterpolationMethod = 'Trilinear';
+@FullDataSet = 'No (sampling: 4 4 1)';
+@MaxNrOfLevMarqIterations = 100;
+@MCParams = emptystruct({'Iterations', 'dXmm', 'dYmm', 'dZmm', 'rXdeg', 'rYdeg', 'rZdeg'});
+EndNewFileCode

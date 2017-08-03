@@ -1,0 +1,72 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.TAL files (TALairach transformation)
+# TAL FileVersions supported: 1, 2
+#
+# In the TAL file the BrainVoyager system coordinates of 8
+# landmarks of the subject brain are saved. These coordinates
+# are used to warp the subject brain to the Talairach space,
+# that is based on the Talairach&Tournoux brain atlas template.
+#
+# Version:  v1.1
+# Build:    16051016
+# Date:     May-10 2016, 4:06 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Talairach transformation files
+Extensions:tal
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+TAL_APCAPP    |1, 1024     |regexp  |AC\:.*\sPC\:.*\sAP\:.*\sPP\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!$TFFREAD      !!!!!!@FileVersion = 1;
+FLIST!$TFFREAD           !FileVersion         !double  !%.0f   !1      !1       !FileVersion
+FIELD!$TFFWRITE && @FileVersion>1 !FileVersion!double  !%.0f   !1      !1       !FileVersion
+FIELD!                   !Project             !string  !%s     !1      !        !Project
+EXPRE!$TFFREAD      !!!!!! ...
+@AC = [128, 128, 128]; ...
+@PC = [151, 128, 128]; ...
+@AP = [ 58, 128, 128]; ...
+@PP = [230, 128, 128]; ...
+@SP = [128,  54, 128]; ...
+@IP = [128, 170, 128]; ...
+@RP = [128, 128,  60]; ...
+@LP = [128, 128, 196]; ...
+@TALVMRFramingCube = 256; ...
+@TALVMRVoxelRes = 1;
+FLIST!                   !AC                  !double  !%.0f   !3      !        !AC
+FLIST!                   !PC                  !double  !%.0f   !3      !        !PC
+FLIST!                   !AP                  !double  !%.0f   !3      !        !AP
+FLIST!                   !PP                  !double  !%.0f   !3      !        !PP
+FLIST!                   !SP                  !double  !%.0f   !3      !        !SP
+FLIST!                   !IP                  !double  !%.0f   !3      !        !IP
+FLIST!                   !RP                  !double  !%.0f   !3      !        !RP
+FLIST!                   !LP                  !double  !%.0f   !3      !        !LP
+FLIST!@FileVersion > 1   !TALVMRFramingCube   !double  !%.0f   !1      !256     !TALVMRFramingCube
+FLIST!@FileVersion > 1   !TALVMRVoxelRes      !double  !%.0f   !1      !1       !TALVMRVoxelRes
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@Project = '<none>';
+@AC = [128, 128, 128];
+@PC = [151, 128, 128];
+@AP = [ 58, 128, 128];
+@PP = [230, 128, 128];
+@SP = [128,  54, 128];
+@IP = [128, 170, 128];
+@RP = [128, 128,  60];
+@LP = [128, 128, 196];
+@TALVMRFramingCube = 256;
+@TALVMRVoxelRes = 1;
+EndNewFileCode

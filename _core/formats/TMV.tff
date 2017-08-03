@@ -1,0 +1,66 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.TMV files (Tracking seed Markup Volume)
+# TMV FileVersions supported:
+#
+# TMV files contain coordinates of a group voxels of interest.
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Trackmark markup volume files
+Extensions:tmv
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+FBR_NrOfFibers|1, 320      |regexpi |nroffibers\:\s*\d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+FIELD!                   !NrVois              !double  !%d     !1      !        !NrOfVOIs
+
+# loop over Groups
+EXPRE!$TFFREAD      !!!!!!@VOI = emptystruct({'Type', 'Name', 'EditEnabled', 'RenderBounds', 'BoundsColor', 'RenderSeeds', 'SeedsColor', 'XResolution', 'YResolution', 'ZResolution', 'XOffset', 'YOffset', 'ZOffset', 'NrOfVoxXSeeds', 'NrOfVoxYSeeds', 'NrOfVoxZSeeds', 'NrOfVoxels', 'VoxelList'});
+BLOOP!                   ! ! ! !@NrOfVOIs   ! !VOINo
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !Type                !string  !%s     !1      !        !VOI($VOINo).Type
+FLIST!                   !Name                !string  !%s     !1      !        !VOI($VOINo).Name
+FLIST!                   !EditEnabled         !double  !%d     !1      !1       !VOI($VOINo).EditEnabled
+FLIST!                   !RenderBounds        !double  !%d     !1      !1       !VOI($VOINo).RenderBounds
+FLIST!                   !BoundsColor         !double  !%d     !3      !        !VOI($VOINo).BoundsColor
+FLIST!                   !RenderSeeds         !double  !%d     !1      !1       !VOI($VOINo).RenderSeeds
+FLIST!                   !SeedsColor          !double  !%d     !3      !        !VOI($VOINo).SeedsColor
+EXPRE!!!!!!!; # workaround for MATLAB 13 regexp bug
+FLIST!                   !XResolution         !double  !%d     !1      !1       !VOI($VOINo).XResolution
+FLIST!                   !YResolution         !double  !%d     !1      !1       !VOI($VOINo).YResolution
+FLIST!                   !ZResolution         !double  !%d     !1      !1       !VOI($VOINo).ZResolution
+EXPRE!!!!!!!; # workaround for MATLAB 13 regexp bug
+FLIST!                   !XOffset             !double  !%d     !1      !        !VOI($VOINo).XOffset
+FLIST!                   !YOffset             !double  !%d     !1      !        !VOI($VOINo).YOffset
+FLIST!                   !ZOffset             !double  !%d     !1      !        !VOI($VOINo).ZOffset
+EXPRE!!!!!!!; # workaround for MATLAB 13 regexp bug
+FLIST!                   !NrVoxXSeeds         !double  !%d     !1      !2       !VOI($VOINo).NrOfVoxXSeeds
+FLIST!                   !NrVoxYSeeds         !double  !%d     !1      !2       !VOI($VOINo).NrOfVoxYSeeds
+FLIST!                   !NrVoxZSeeds         !double  !%d     !1      !2       !VOI($VOINo).NrOfVoxZSeeds
+
+FIELD!                   !NrVoxels            !double  !%d     !1      !2       !VOI($VOINo).NrOfVoxels
+EXPRE!!!!!!!$NrOfVOIPoints = @VOI($VOINo).NrOfVoxels;
+
+ARRAY!                   !VoxelList           !double  !%d     !$NrOfVOIPoints, 3 !!VOI($VOINo).VoxelList
+ELOOP!                   ! ! ! !  ! !VOINo
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfVOIs = 0;
+@VOI = emptystruct({'Type', 'Name', 'EditEnabled', 'RenderBounds', 'BoundsColor', 'RenderSeeds', 'SeedsColor', 'XResolution', 'YResolution', 'ZResolution', 'XOffset', 'YOffset', 'ZOffset', 'NrOfVoxXSeeds', 'NrOfVoxYSeeds', 'NrOfVoxZSeeds', 'NrOfVoxels', 'VoxelList'});
+EndNewFileCode

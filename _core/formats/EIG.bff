@@ -1,0 +1,43 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.EIG files (EIGenvalues and vectors for ICA)
+# EIG FileVersions supported: (no versioning information yet)
+#
+# Version:  v0.9a
+# Build:    10051702
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Eigenvalues/eigenvectors files
+EncodingSyntax:ieee-le
+Extensions:eig
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# calculate NrOfVolumes for reading
+EXPRE !$BFFREAD           !!!!!@NrOfVolumes = floor(sqrt($FILESIZE / 8)); if $FILESIZE ~= (8 * @NrOfVolumes * (@NrOfVolumes + 1)), error('Bad EIG file'); end
+EXPRE !$BFFWRITE          !!!!!@NrOfVolumes = numel(@EigenValues); if @NrOfVolumes ~= length(@EigenVectors), error('Bad EIG content'); end
+
+# read/write STC data
+FIELD !                       !double  !double  !@NrOfVolumes, 1          !        !EigenValues
+FIELD !~$HEADERONLY           !double  !double  !@NrOfVolumes, @NrOfVolumes !      !EigenVectors
+EXPRE ! $HEADERONLY       !!!!!@EigenVectors = []; fseek(fid, 8 * @NrOfVolumes * @NrOfVolumes, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@NrOfVolumes = 120;
+@EigenValues = zeros(@NrOfVolumes, 1);
+@EigenVectors = zeros(@NrOfVolumes, @NrOfVolumes);
+EndNewFileCode

@@ -1,0 +1,72 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.VVD files (Voi Vtc Data)
+# VVD FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050314
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:VOI-VTC data files
+Extensions:vvd
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# check header
+EXPRE!$TFFREAD      !!!!!!if ~isempty(strfind(lower(linecont{1}), 'header')), @Header = true; else @Header = false; end
+
+# for header
+BLOOP!@Header            ! ! ! !1 ! !HasHeader
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!<header>
+FIELD!                   !NrOfVOIs            !double  !%d     !1      !2       !NrOfVOIs
+FIELD!                   !NrOfVTCs            !double  !%d     !1      !2       !NrOfVTCs
+
+# read VTC lines
+EXPRE!$TFFREAD      !!!!!!@VTC = emptystruct({'NrOfVolumes', 'FileName', 'Values'});
+BLOOP!$TFFREAD           ! ! ! !@NrOfVTCs ! !VTCNumR
+EXPRE!!!!!!![t_ms, t_me, t_mt] = regexpi(deblank(linecont{linec}), '^.*nrofvolumes.\s*(\d+)\s+filename.\s*\"?([^\s\"]*)\"?$'); if isempty(t_ms), error('invalid file'); end
+EXPRE!!!!!!!@VTC($VTCNumR).NrOfVolumes = str2double(linecont{linec}(t_mt{1}(1,1):t_mt{1}(1,2))); @VTC($VTCNumR).FileName = linecont{linec}(t_mt{1}(2,1):t_mt{1}(2,2)); linec = linec + 1;
+ELOOP!                   ! ! ! !          ! !VTCNumR
+
+# write VTC lines
+BLOOP!$TFFWRITE          ! ! ! !@NrOfVTCs ! !VTCNumW
+EXPRE!!!!!!!linecont{end + 1} = sprintf('VTC-File-%d: \tNrOfVolumes: %d\tFilename: "%s"', $VTCNumW, @VTC($VTCNumW).NrOfVolumes, @VTC($VTCNumW).FileName); linecount = linecount + 1;
+ELOOP!                   ! ! ! !          ! !VTCNumW
+
+WRTLN!!!!!!!</header>
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !HasHeader
+
+# handle no header cases
+EXPRE!$TFFREAD && ~@Header!!!!!!@NrOfVOIs = length(splittocell(linecont{end}, char([9, 32]), 1, 1)); @NrOfVTCs = 1; @VTC.NrOfVolumes = linecount - 1; @VTC.FileName = '<none>';
+
+# VOI names
+ARRAY!                   !VOINames            !string  !"%s"   !1, @NrOfVOIs !  !VOINames
+
+# VTC values
+BLOOP!                   ! ! ! !@NrOfVTCs ! !VTCNum
+ARRAY!                   !Values              !double  !%7g    !@VTC($VTCNum).NrOfVolumes, @NrOfVOIs ! !VTC($VTCNum).Values
+ELOOP!                   ! ! ! !          ! !VTCNum
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@Header = true;
+@NrOfVOIs = 0;
+@NrOfVTCs = 1;
+@VTC.NrOfVolumes = 0;
+@VTC.FileName = '<none>';
+@VTC.Values = [];
+@VOINames = cell(1, 0);
+EndNewFileCode

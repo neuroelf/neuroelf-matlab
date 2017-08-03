@@ -1,0 +1,198 @@
+---  BEGIN_COMMENTS  ---
+
+NeuroElf - MDM creation and GLM computation
+
+Version:  1.1
+Build:    16052509
+Date:     May-25 2016, 9:54 AM EST
+Figure:   NeuroElf GUI - MDM creation and running
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - MDM creation and running
+
+% Copyright (c) 2010 - 2016, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+bsttypes|]{'Area-under-the-curve';'Calhoun Boost';'Maximum amplitude';'Positive AUC';'none'}
+imminus |]imread([neuroelf_path('icons') '/minus.tif'])
+implus  |]imread([neuroelf_path('icons') '/plus.tif'])
+rgbbt   |]permute(uint8(cat(2, repmat([255; 0; 0], [1, 6, 12]), repmat([0; 255; 0], [1, 6, 12]), repmat([0; 0; 255], [1, 6, 12]))), [3, 2, 1])
+---  END_VARIABLES   ---
+
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                 |Tag                        |CallbackClReq
+        |pixels|off    |$   -1   -1  704  496  |NeuroElf GUI - run a multi-study RFX GLM |Wnd_NeuroElf_mdm        |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Page|Value|MinMaxTop|ColorFG|ToolTip
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$   12  464   88   18 |Base folder:                              |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$   96    0  480  -24 |                                          |ED_NeuroElf_mdm_basefld|$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Button     |$  488    0 -100    0 |Browse                                    |BT_NeuroElf_mdm_browse |$ 9 |center|      |       |       |      |$ 1 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -584  -30   88  -18 |VTC file pattern:                         |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$   96    0  224  -24 |  subj*/*/fun*/*.vtc                      |ED_NeuroElf_mdm_xtcpatt|$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Label      |$  232    0  112  -18 |SDM/PRT file pattern:                     |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$  120    0  236  -24 |  subj*/*/fun*/*.prt                      |ED_NeuroElf_mdm_despatt|$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -448  -30  120  -18 |Motion parameter files:                   |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |CheckBox   |$  124    2  -18    0 |                                          |CB_NeuroElf_mdm_motpatt|    |center|      |       |       |      |$ 1 |$ 0  |         ||
+        |Edit       |$   28   -2  272  -24 |  subj*/*/fun*/*/rp*.txt                  |ED_NeuroElf_mdm_motpatt|$ 9 |left  |      |off    |MotParm|      |$ 1 |     |         ||
+        |Label      |$  280    0   36  -18 |]'+ diff '                                |                       |$ 9 |right |      |off    |MotParm|      |$ 1 |     |         ||
+        |CheckBox   |$   40    2  -18    0 |                                          |CB_NeuroElf_mdm_mparmsd|    |center|      |off    |MotParm|      |$ 1 |$ 0  |         ||
+        |Label      |$   24   -2   56  -18 |]'+ squared '                             |                       |$ 9 |right |      |off    |MotParm|      |$ 1 |     |         ||
+        |CheckBox   |$   60    2  -18    0 |                                          |CB_NeuroElf_mdm_mparmsq|    |center|      |off    |MotParm|      |$ 1 |$ 0  |         ||
+        |Button     |$   28   -2  100  -24 |Find files                                |BT_NeuroElf_mdm_ffiles |$ 9 |center|      |off    |FoldOK |      |$ 1 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -584  -30  208  -18 |List of VTC files to be regressed:        |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Label      |$  234    0 -120    0 |List of design files:                     |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Label      |$  214    0  208  -18 |List of motion parameter files:           |                       |$ 9 |left  |      |off    |MotParm|      |$ 1 |     |         ||
+        |ListBox    |$ -448 -140  208 -140 |]{'<no files selected>'}                  |LB_NeuroElf_mdm_func   |$ 9 |      |      |off    |FFound |      |$ 1 |     |$ 0 2 1  ||
+        |Button     |$  212  122   18  -18 |]imread([neuroelf_path('icons') '/props.tif'])|BT_NeuroElf_mdm_dsc|    |center|      |off    |SSelect|      |$ 1 |     |         ||inspect time course and select discarded volumes
+        |ListBox    |$   22 -122  208 -140 |]{'<no files selected>'}                  |LB_NeuroElf_mdm_design |$ 9 |      |      |off    |FFound |      |$ 1 |     |$ 0 2 1  ||
+        |ListBox    |$  214    0 -212    0 |]{'<no files selected>'}                  |LB_NeuroElf_mdm_mparam |$ 9 |      |      |off    |FFound,MotParm||$ 1|     |$ 0 2 1  ||
+        |Button     |$  218  122   18  -18 |]imread([neuroelf_path('icons') '/plot.tif']) |BT_NeuroElf_mdm_pmp|    |center|      |off    |MSelect|      |$ 1 |     |         ||inspect motion parameters via plot
+        |Button     |$    0 -100    0    0 |]tfgtv.implus                             |BT_NeuroElf_mdm_add    |    |center|      |       |       |      |$ 1 |     |         ||
+        |Button     |$    0  -22    0    0 |]tfgtv.imminus                            |BT_NeuroElf_mdm_del    |    |center|      |off    |FFound |      |$ 1 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -666  -30  -88    0 |Transformation:                           |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |RadioButton|$   98    0  -52    0 |none                                      |RB_NeuroElf_mdm_trnull |$ 9 |left  |      |       |       |Trans |$ 1 |     |         ||
+        |RadioButton|$   58    0  -52    0 |PSC                                       |RB_NeuroElf_mdm_trpsc  |$ 9 |left  |      |       |       |Trans |$ 1 |$ 1  |         ||
+        |RadioButton|$   58    0  -42    0 |z                                         |RB_NeuroElf_mdm_trz    |$ 9 |left  |      |       |       |Trans |$ 1 |     |         ||
+        |Label      |$   48    0 -100    0 |Intensity threshold:                      |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$  100    0   52  -24 |100                                       |ED_NeuroElf_mdm_ithresh|$ 9 |center|      |       |       |      |$ 1 |     |         ||intensity threshold, use fraction for overall mean fraction (e.g. 0.25)
+        |Label      |$   66    0   60  -18 |Mask file:                                |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |DropDown   |$   60   -2  200  -24 |]{'Click to select...'}                   |DD_NeuroElf_mdm_mask   |$ 9 |left  |      |off    |FFound |      |$ 1 |     |         ||click and select browse to choose file...
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -488  -30   88  -18 |Regression type:                          |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |RadioButton|$   98    0 -184    0 |Ordinary Least Squares (OLS)              |RB_NeuroElf_mdm_rols   |$ 9 |left  |      |       |       |OLSRob|$ 1 |$ 1  |         ||
+        |RadioButton|$  192    0 -160    0 |Robust regression                         |RB_NeuroElf_mdm_rrob   |$ 9 |left  |      |       |       |OLSRob|$ 1 |     |         ||
+        |Label      |$  138    0  -96    0 |Deconvolution / FIR                       |                       |$ 9 |left  |      |off    |PRTDsgn|      |$ 1 |     |         ||
+        |CheckBox   |$  104    2  -18    0 |                                          |CB_NeuroElf_mdm_prtdcnv|    |center|      |off    |PRTDsgn|      |$ 1 |     |         ||perform deconvolution instead of HRF-convolution (for PRTs only!)
+        |Label      |$   28   -2  -82    0 |Number of lags:                           |                       |$ 9 |left  |      |off    |PRTDsgn|      |$ 1 |     |         ||
+        |Edit       |$   86    0   36  -24 |12                                        |ED_NeuroElf_mdm_prtlags|$ 9 |center|      |off    |PRTDsgn|      |$ 1 |     |         ||number of lags (stick functions) used to estimate HRF shape per condition
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -646  -32   88  -18 |Temp. filter:                             |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |RadioButton|$   98    0  -52    0 |none                                      |RB_NeuroElf_mdm_fltnull|$ 9 |left  |      |       |       |Filter|$ 1 |     |         ||
+        |RadioButton|$   58    0  -52    0 |DCT                                       |RB_NeuroElf_mdm_fltdct |$ 9 |left  |      |       |       |Filter|$ 1 |     |         ||
+        |RadioButton|$   58    0  -64    0 |Fourier                                   |RB_NeuroElf_mdm_fltfour|$ 9 |left  |      |       |       |Filter|$ 1 |$ 1  |         ||
+        |Label      |$   76    0  -72    0 |Cut-off (sec):                            |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$   72    0   52  -24 |180                                       |ED_NeuroElf_mdm_fltsecs|$ 9 |center|      |       |       |      |$ 1 |     |         ||filtering cut-off (wavelength in seconds)
+        |Label      |$   66    0   60  -18 |Global sigs:                              |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |DropDown   |$   60   -2  200  -24 |]{'0';'1';'2';'Anatomical selection'}     |DD_NeuroElf_mdm_gsig   |$ 9 |left  |      |off    |FFound |      |$ 1 |     |         ||click and select browse to choose file...
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -488  -30   88  -18 |Modeling type:                            |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |RadioButton|$   98    0 -188    0 |fixed effects (no separation)             |RB_NeuroElf_mdm_mdlffx |$ 9 |left  |      |       |       |Model |$ 1 |     |         ||
+        |RadioButton|$  192    0 -136    0 |separate by subjects                      |RB_NeuroElf_mdm_mdlspsb|$ 9 |left  |      |       |       |Model |$ 1 |     |         ||
+        |RadioButton|$  136    0 -136    0 |separate by studies                       |RB_NeuroElf_mdm_mdlspst|$ 9 |left  |      |       |       |Model |$ 1 |     |         ||
+        |RadioButton|$  156    0 -112    0 |random effects                            |RB_NeuroElf_mdm_mdlrfx |$ 9 |left  |      |       |       |Model |$ 1 |$ 1  |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -582  -32  -88    0 |Model options:                            |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Label      |$   98    0 -116    0 |single-trial (only PRT):                  |                       |$ 9 |left  |      |off    |PRTDsgn|      |$ 1 |     |         ||
+        |CheckBox   |$  116    2  -18    0 |                                          |CB_NeuroElf_mdm_sngtrl |    |center|      |off    |PRTDsgn|      |$ 1 |$ 0  |         ||convert PRTs to single-trial models
+        |Label      |$   48   -2 -164    0 |combine RFX-GLM from FFX:                 |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |CheckBox   |$  164    2  -18    0 |                                          |CB_NeuroElf_mdm_cmbffx |    |center|      |       |       |      |$ 1 |$ 0  |         ||create per-subject FFX models and then use those to create RFX-GLM
+        |Label      |$   36   -2 -200    0 |Weigh betas by variance across runs:      |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |CheckBox   |$  200    2  -18    0 |                                          |CB_NeuroElf_mdm_vweight|    |center|      |       |       |      |$ 1 |$ 1  |         ||when combining several runs for each subject, weigh per-run betas by amount of regressor variance
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$   12   44   88   18 |Target GLM file:                          |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Edit       |$   96    0  368  -24 |  <unsaved.glm>                           |ED_NeuroElf_mdm_glmfile|$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |Button     |$  378   -2  -88    0 |Specify...                                |BT_NeuroElf_mdm_glmset |$ 9 |center|      |       |       |      |$ 1 |     |         ||
+        |Label      |$  100    2   80  -18 |Redo subjects:                            |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |CheckBox   |$   88    2  -18    0 |                                          |CB_NeuroElf_mdm_redosub|    |center|      |       |       |      |$ 1 |$ 0  |         ||overwrite existing subjects in GLM with new regression output (re-sorting!)
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Button     |$   12    8   94   24 |Load .mdm...                              |BT_NeuroElf_mdm_load   |$ 9 |center|      |       |       |      |$ 1 |     |         ||
+        |Button     |$  102    0    0    0 |Save .mdm...                              |BT_NeuroElf_mdm_save   |$ 9 |center|      |off    |FFound |      |$ 1 |     |         ||
+        |Label      |$  102    2   84  -18 |Show designs:                             |                       |$ 9 |left  |      |       |       |      |$ 1 |     |         ||
+        |CheckBox   |$   84    2  -18    0 |                                          |CB_NeuroElf_mdm_showdsg|    |center|      |       |       |      |$ 1 |     |         ||show design matrices while regressing data
+        |Button     |$   30   -4  -72  -24 |Cancel                                    |BT_NeuroElf_mdm_cancel |$ 9 |center|      |       |       |      |$1 2|     |         ||
+        |Button     |$   84    0  -80    0 |Options                                   |BT_NeuroElf_mdm_condopt|$ 9 |center|      |off    |PRTDsgn|      |$ 1 |     |         ||
+        |Button     |$   84    0    0    0 |VOI GLM...                                |BT_NeuroElf_mdm_compvoi|$ 9 |center|      |off    |FFound,VOIGLM||$1 2|     |         ||
+        |Button     |$   84    0 -112    0 |Compute...                                |BT_NeuroElf_mdm_compute|$ 9 |center|      |off    |FFound |      |$1 2|     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$   12  464  208   18 |Model derivatives:                        |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |RadioButton|$   98    0  -72    0 |HRF only                                  |RB_NeuroElf_mdm_deriv0 |$ 9 |left  |      |       |PRTDsgn|Deriv |$ 2 |$ 1  |         ||
+        |RadioButton|$   80    0 -144    0 |HRF + temporal deriv.                     |RB_NeuroElf_mdm_deriv1 |$ 9 |left  |      |       |PRTDsgn|Deriv |$ 2 |     |         ||
+        |RadioButton|$  150    0 -160    0 |temporal+dispersion deriv.                |RB_NeuroElf_mdm_deriv12|$ 9 |left  |      |       |PRTDsgn|Deriv |$ 2 |     |         ||
+        |DropDown   |$  168   -2  188  -24 |]tfgtv.bsttypes                           |DD_NeuroElf_mdm_dboost |$ 9 |left  |      |off    |PRTDsgn,Derivs||$2 |$ 2  |         ||choose the desired type of HRF-boosting
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -496  -30 -176    0 |List of conditions:                       |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |Label      |$  200    0 -152    0 |Dropped (rest) conditions:                |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |Label      |$  160    0    0    0 |HRF-only conditions:                      |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |Label      |$  160    0    0    0 |Not single-trial conditions:              |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |ListBox    |$ -520 -140  176 -140 |]{'<no conditions detected>'}             |LB_NeuroElf_mdm_pcond  |$ 9 |      |      |       |PRTDsgn|      |$ 2 |     |$ 0 2 1  ||
+        |ListBox    |$  200    0 -136    0 |]{'<no rest conditions>'}                 |LB_NeuroElf_mdm_dropcnd|$ 9 |      |      |off    |PRTDsgn|      |$ 2 |     |$ 0 2 1  ||
+        |Button     |$  138   23   18  -18 |]tfgtv.implus                             |BT_NeuroElf_dcond_add  |    |center|      |       |PRTDsgn|      |$ 2 |     |         ||
+        |Button     |$    0  -22    0    0 |]tfgtv.imminus                            |BT_NeuroElf_dcond_del  |    |center|      |off    |PRTDsgn|      |$ 2 |     |         ||
+        |ListBox    |$   22   -1 -136  140 |]{'<no derivatives>'}                     |LB_NeuroElf_mdm_nodvcnd|$ 9 |      |      |off    |PRTDsgn|      |$ 2 |     |$ 0 2 1  ||
+        |ListBox    |$  160    0 -136    0 |]{'<not applicable>'}                     |LB_NeuroElf_mdm_sstcnd |$ 9 |      |      |off    |PRTDsgn|      |$ 2 |     |$ 0 2 1  ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Frame      |$ -526   -6  692   -1 |                                          |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |Frame      |$  212 -246   -1  216 |                                          |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         |$ 0.6 0.6 0.6 |
+        |Frame      |$  220    0    0    0 |                                          |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -426  216  176  -24 |VTC-averaging conditions:                 |                       |$ 9 |left  |      |       |       |      |$ 2 |     |         ||
+        |ListBox    |$    0 -130    0 -130 |]{'<no conditions selected>'}             |LB_NeuroElf_mdm_acond  |$ 9 |      |      |       |PRTDsgn|      |$ 2 |     |$ 0 2 1  ||
+        |Button     |$  178  112   18  -18 |]imread([neuroelf_path('icons') '/up.tif'])|BT_NeuroElf_acond_up  |    |center|      |       |PRTDsgn|      |$ 2 |     |         ||move selected conditions (or collections) up
+        |Button     |$    0  -22    0    0 |]imread([neuroelf_path('icons') '/down.tif'])|BT_NeuroElf_acond_down | |center|      |       |PRTDsgn|      |$ 2 |     |         ||move selected conditions (or collections) down
+        |Button     |$    0  -22    0    0 |]tfgtv.rgbbt                              |BT_NeuroElf_acond_ccols|    |center|      |off    |       |      |$ 2 |     |         ||set condition colors
+        |Button     |$    0  -23    0    0 |]imread([neuroelf_path('icons') '/sigma.tif'])|BT_NeuroElf_acond_addcl||center|      |       |PRTDsgn|      |$ 2 |     |         ||add selected conditions (from list above) as a collection (collapsed)
+        |Button     |$    0  -22    0    0 |]tfgtv.implus                             |BT_NeuroElf_acond_add  |    |center|      |       |PRTDsgn|      |$ 2 |     |         ||add selected conditions (from list above) as individual conditions
+        |Button     |$    0  -22    0    0 |]tfgtv.imminus                            |BT_NeuroElf_acond_del  |    |center|      |off    |PRTDsgn|      |$ 2 |     |         ||remove selected conditions (or collections)
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$   36  107  116  -20 |Baseline window (sec):                    |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |Edit       |$  124    0   80  -24 |]['-2.0:1.0:0.0']                         |ED_NeuroElf_avgvtcbwin |$ 9 |center|      |off    |PRTDsgn|      |$ 2 |     |         ||enter the array expression for the (per-trial) baseline window (in seconds)
+        |Label      |$ -124  -28  148  -20 |Averaging window length (s):              |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |Edit       |$  156    0   48  -24 |]['20.0']                                 |ED_NeuroElf_avgvtcswin |$ 9 |center|      |off    |PRTDsgn|      |$ 2 |     |         ||enter the length for the (per-trial) sampling window (in seconds)
+        |Label      |$ -156  -28  148  -20 |Virtual (sampling) TR (sec):              |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |Edit       |$  156    0   48  -24 |0.4                                       |ED_NeuroElf_avgvtcstr  |$ 9 |center|      |off    |PRTDsgn|      |$ 2 |     |         ||enter the (virtual) sampling rate for the averaging window (in seconds)
+        |Label      |$ -156  -28  180  -20 |Remove confounds only from data:          |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$  186    2   18  -18 |                                          |CB_NeuroElf_avgvtcnaive|    |center|      |       |PRTDsgn|      |$ 2 |$ 1  |         ||if checked, only effects of no interest are regressed out prior to averaging
+        |Label      |$ -186  -30  180  -20 |Remove global signal from data:           |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$  186    2   18  -18 |                                          |CB_NeuroElf_avgvtcremgs|    |center|      |       |PRTDsgn|      |$ 2 |$ 1  |         ||if checked, only effects of no interest are regressed out prior to averaging
+        |Label      |$ -186  -30  180  -20 |Regress out all but extracted trial:      |                       |$ 9 |left  |      |off    |AVNaive|      |$ 2 |     |         ||
+        |CheckBox   |$  186    2   18  -18 |                                          |CB_NeuroElf_avgvtcrsngt|    |center|      |off    |AVNaive|      |$ 2 |     |         ||if checked, only effects of no interest are regressed out prior to averaging
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -400   -2  196  -20 |Averaging options (into separate VTCs):   |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |Label      |$   -2  -28  -28    0 |FFX                                       |                       |$ 9 |right |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$   32    2   18  -18 |                                          |CB_NeuroElf_mdm_ffxavg |    |center|      |off    |PRTDsgn|      |$ 2 |$ 1  |         ||average into a fixed-effects VTC
+        |Label      |$   36   -2   32  -20 |RFX                                       |                       |$ 9 |right |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$   36    2   18  -18 |                                          |CB_NeuroElf_mdm_rfxavg |    |center|      |off    |PRTDsgn|      |$ 2 |$ 1  |         ||average into a (pure) random-effects VTC
+        |Label      |$   40   -2   32  -20 |wRFX                                      |                       |$ 9 |right |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$   36    2   18  -18 |                                          |CB_NeuroElf_mdm_wrfxavg|    |center|      |off    |PRTDsgn|      |$ 2 |$ 0  |         ||average into a (variance weighted) random-effects VTC
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Label      |$ -178  -28 -160    0 |Re-weigh timepoints robustly:             |                       |$ 9 |left  |      |       |PRTDsgn|      |$ 2 |     |         ||
+        |CheckBox   |$  178    0  -18    0 |                                          |CB_NeuroElf_mdm_robavg |    |center|      |off    |PRTDsgn|      |$ 2 |$ 0  |         ||apply (single-pass) robust re-weighting to time points
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+        |Button     |$   12    8  198   24 |Compute trial-average VTCs...             |BT_NeuroElf_mdm_avgvtcs|$ 9 |center|      |off    |       |      |$ 2 |     |         ||
+        |Button     |$  400    0  -80    0 |Main page                                 |BT_NeuroElf_mdm_mainpag|$ 9 |center|      |       |       |      |$ 2 |     |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |    |     |         ||
+---  END_UICONTROLS  ---

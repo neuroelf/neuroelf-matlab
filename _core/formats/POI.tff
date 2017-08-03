@@ -1,0 +1,76 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.POI files (Patch Of Interest)
+# POI FileVersions supported: 2
+#
+# POI files contain coordinates of a group voxels of interest.
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:POI
+Description:Patch of interest files
+Extensions:poi
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+POI_NrPOIs    |1, 256      |regexpi |nrofpois\:\s*\d+\s*nameofpoi\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !2       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FromMeshFile        !string  !"%s"   !1      !        !FromMeshFile
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NrOfMeshVertices    !double  !%d     !1      !40962   !NrOfMeshVertices
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfPOIs = numel(@POI);
+FIELD!                   !NrOfPOIs            !double  !%d     !1      !1       !NrOfPOIs
+
+# loop over POIs
+EXPRE!$TFFREAD      !!!!!!@POI = emptystruct({'Name', 'InfoTextFile', 'Color', 'LabelVertex', 'NrOfVertices', 'Vertices'}); if @NrOfPOIs > 0, @POI(@NrOfPOIs).Name = ''; end
+BLOOP!                   ! ! ! !@NrOfPOIs ! !POINo
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NameOfPOI           !string  !"%s"   !1      !1       !POI($POINo).Name
+FLIST!                   !InfoTextFile        !string  !"%s"   !1      !1       !POI($POINo).InfoTextFile
+FLIST!                   !ColorOfPOI          !double  !%d     !3      !        !POI($POINo).Color
+FLIST!                   !LabelVertex         !double  !%d     !1      !        !POI($POINo).LabelVertex
+EXPRE!$TFFWRITE     !!!!!!@POI($POINo).Vertices = @POI($POINo).Vertices(:) - 1; @POI($POINo).NrOfVertices = numel(@POI($POINo).Vertices);
+FIELD!                   !NrOfVertices        !double  !%d     !1      !        !POI($POINo).NrOfVertices
+ARRAY!                   !Vertices            !double  !%d     !@POI($POINo).NrOfVertices, 1 !!POI($POINo).Vertices
+EXPRE!              !!!!!!@POI($POINo).Vertices = @POI($POINo).Vertices + 1;
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !POINo
+
+# MTCs
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfMTCs = numel(@MTCList);
+FIELD!                   !NrOfPOIMTCs         !double  !%d     !1      !1       !NrOfMTCs
+ARRAY!                   !MTCList             !string  !"%s"   !@NrOfMTCs, 1 !  !MTCList
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 2;
+@FromMeshFile = '<none>';
+@NrOfMeshVertices = 40962;
+@NrOfPOIs = 1;
+@POI.Name = 'empty_POI';
+@POI.InfoTextFile = '<none>';
+@POI.Color = [128, 128, 128];
+@POI.LabelVertex = 0;
+@POI.NrOfVertices = 0;
+@POI.Vertices = zeros(0, 1);
+@NrOfMTCs = 0;
+@MTCList = cell(0, 1);
+EndNewFileCode

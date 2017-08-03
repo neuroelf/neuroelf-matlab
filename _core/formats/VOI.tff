@@ -1,0 +1,100 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.VOI files (Volume Of Interest)
+# VOI FileVersions supported: 1, 3, 4 (1 only reading, converted to 3)
+#
+# VOI files contain coordinates of a group voxels of interest.
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:VOI
+Description:Volume of interest files
+Extensions:voi
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+VOI_NrVOIs    |1, 256      |regexpi |nrofvois\:\s*\d+\s*nameofvoi\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!$TFFREAD      !!!!!!@FileVersion = 4; @ReferenceSpace = 'BV'; @OriginalVMRResolutionX = 1; @OriginalVMRResolutionY = 1; @OriginalVMRResolutionZ = 1; @OriginalVMROffsetX = 0; @OriginalVMROffsetY = 0; @OriginalVMROffsetZ = 0; @OriginalVMRFramingCubeDim = 256; @Convention = 1; @SubjectVOINamingConvention = '<SUBJ>_<VOI>';
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !2       !FileVersion
+WRTLN!!!!!!!!  # empty line
+FIELD!@FileVersion < 4   !CoordsType          !string  !%s     !1      !        !ReferenceSpace
+FIELD!@FileVersion > 3   !ReferenceSpace      !string  !%s     !1      !        !ReferenceSpace
+WRTLN!!!!!!!!  # empty line
+BLOOP!@FileVersion > 3   ! ! ! !1 ! !FV4pp
+FIELD!                   !OriginalVMRResolutionX !double !%d   !1      !1       !OriginalVMRResolutionX
+FIELD!                   !OriginalVMRResolutionY !double !%d   !1      !1       !OriginalVMRResolutionY
+FIELD!                   !OriginalVMRResolutionZ !double !%d   !1      !1       !OriginalVMRResolutionZ
+FIELD!                   !OriginalVMROffsetX  !double  !%d     !1      !0       !OriginalVMROffsetX
+FIELD!                   !OriginalVMROffsetY  !double  !%d     !1      !0       !OriginalVMROffsetY
+FIELD!                   !OriginalVMROffsetZ  !double  !%d     !1      !0       !OriginalVMROffsetZ
+FIELD!                   !OriginalVMRFramingCubeDim !double !%d !1     !256     !OriginalVMRFramingCubeDim
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !LeftRightConvention !double  !%d     !1      !1       !Convention
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !FV4pp
+FLIST!                   !SubjectVOINamingConvention!string!%s !1      !        !SubjectVOINamingConvention
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfVOIs = prod(size(@VOI));
+FIELD!                   !NrOfVOIs            !double  !%d     !1      !1       !NrOfVOIs
+
+# loop over VOIs
+EXPRE!$TFFREAD      !!!!!!@VOI = emptystruct({'Name', 'Color', 'NrOfVoxels', 'Voxels'}, [1, @NrOfVOIs]);
+BLOOP!                   ! ! ! !@NrOfVOIs ! !VOINo
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !NameOfVOI           !string  !%s     !1      !1       !VOI($VOINo).Name
+EXPRE!$TFFREAD      !!!!!!@VOI($VOINo).Color = floor(255.999 * rand(1, 3));
+FLIST!                   !ColorOfVOI          !double  !%d     !3      !        !VOI($VOINo).Color
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@VOI($VOINo).NrOfVoxels = size(@VOI($VOINo).Voxels, 1);
+FIELD!                   !NrOfVoxels          !double  !%d     !1      !        !VOI($VOINo).NrOfVoxels
+ARRAY!                   !Voxels              !double  !%.0f   !@VOI($VOINo).NrOfVoxels, 3 !!VOI($VOINo).Voxels
+WRTLN!!!!!!!!  # empty line
+ELOOP!                   ! ! ! !  ! !VOINo
+
+# VTCs
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@NrOfVTCs = prod(size(@VTCList));
+FIELD!                   !NrOfVOIVTCs         !double  !%d     !1      !1       !NrOfVTCs
+ARRAY!$TFFWRITE          !VTCList             !string  !%s     !@NrOfVTCs, 1 !  !VTCList
+
+# for reading, take care of empty lines (possible bug in BrainVoyager QX's ROI interface)
+EXPRE!$TFFREAD      !!!!!!@VTCList = cell(@NrOfVTCs, 1);
+BLOOP!$TFFREAD           ! ! ! !@NrOfVTCs ! !VTCNo
+XLOOP!linec > linecount  ! ! ! !  ! !VTCNo
+EXPRE!              !!!!!!@VTCList{$VTCNo} = linecont{linec}; linec = linec + 1;
+ELOOP!                   ! ! ! !  ! !VTCNo
+EXPRE!$TFFREAD      !!!!!!@VTCList($VTCNo:end) = []; @VTCList = @VTCList(:); @NrOfVTCs = numel(@VTCList);
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 3;
+@ReferenceSpace = 'TAL';
+@OriginalVMRResolutionX = 1;
+@OriginalVMRResolutionY = 1;
+@OriginalVMRResolutionZ = 1;
+@OriginalVMROffsetX = 0;
+@OriginalVMROffsetY = 0;
+@OriginalVMROffsetZ = 0;
+@OriginalVMRFramingCubeDim = 256;
+@Convention = 1;
+@SubjectVOINamingConvention = '<SUBJ>_<VOI>';
+@NrOfVOIs = 0;
+@VOI = emptystruct({'Name', 'Color', 'NrOfVoxels', 'Voxels'});
+@NrOfVTCs = 0;
+@VTCList = cell(0, 1);
+EndNewFileCode

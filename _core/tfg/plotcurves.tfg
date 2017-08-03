@@ -1,0 +1,90 @@
+---  BEGIN_COMMENTS  ---
+
+plotcurves
+
+Version:  0.9d
+Build:    14062015
+Date:     Jun-20 2014, 3:41 PM EST
+Figure:   NeuroElf curve plotter
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf - plotcurves.m
+
+% Copyright (c) 2010 - 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+filters |]{'0.00s filter'; '0.01s filter'; '0.02s filter'; '0.05s filter'; '0.10s filter'; '0.20s filter'; '0.30s filter'; '0.40s filter'; '0.50s filter'; '0.60s filter'; '0.80s filter'; '1.00s filter'; '1.20s filter'; '1.50s filter'; '2.00s filter'; '2.50s filter'; '3.00s filter'}
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position           |Title                    |Tag                        |CallbackClReq
+        |pixels|off    |$  -1  -1  784  576|NeuroElf - plotcurves    |Wnd_NeuroElf_plotcurves    |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                  |Tag               |FontSize|HAlign|VAlign|Visible|VGroups|Callback
+        |           |                      |                         |                      |    |      |      |       |       |
+labels, etc. |      |                      |                         |                      |    |      |      |       |       |
+        |Label      |$   12  544   64   18 |Select plot:             |                      |$ 9 |left  |      |       |       |
+        |Dropdown   |$   64    2  112  -22 |]tfgtv.filters           |DD_plotcurves_filter  |$ 9 |left  |      |       |       |
+        |Label      |$  164   -1  120  -18 |Force spots on curve:    |                      |$ 9 |left  |      |       |       |
+        |CheckBox   |$  120    3  -18    0 |                         |CB_plotcurves_focurve |$ 9 |left  |      |       |       |
+        |ListBox    |$ -348 -276  176 -272 |curve 1                  |LB_plotcurves_curves  |$ 9 |left  |      |       |       |
+        |Label      |$    0  -26 -152  -18 |Means w/ std error:      |                      |$ 9 |left  |      |       |       |
+        |CheckBox   |$  158    4  -18    0 |                         |CB_plotcurves_stderror|$ 9 |left  |      |       |       |
+        |Label      |$ -158  -30 -152    0 |Use the current curve:   |                      |$ 9 |left  |      |       |       |
+        |CheckBox   |$  158    4  -18    0 |                         |CB_plotcurves_usecurve|$ 9 |left  |      |       |       |
+        |Label      |$ -158  -30 -152    0 |Variables                |                      |$ 9 |left  |      |       |       |
+        |Label      |$    0  -26    0    0 |VAR1                     |TX_plotcurves_var1    |$ 9 |left  |      |off    |GVar1  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar1  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var1    |$ 9 |center|      |off    |GVar1  |
+        |Label      |$  -96  -28    0  -18 |VAR2                     |TX_plotcurves_var2    |$ 9 |left  |      |off    |GVar2  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar2  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var2    |$ 9 |center|      |off    |GVar2  |
+        |Label      |$  -96  -28    0  -18 |VAR3                     |TX_plotcurves_var3    |$ 9 |left  |      |off    |GVar3  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar3  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var3    |$ 9 |center|      |off    |GVar3  |
+        |Label      |$  -96  -28    0  -18 |VAR4                     |TX_plotcurves_var4    |$ 9 |left  |      |off    |GVar4  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar4  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var4    |$ 9 |center|      |off    |GVar4  |
+        |Label      |$  -96  -28    0  -18 |VAR5                     |TX_plotcurves_var5    |$ 9 |left  |      |off    |GVar5  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar5  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var5    |$ 9 |center|      |off    |GVar5  |
+        |Label      |$  -96  -28    0  -18 |VAR6                     |TX_plotcurves_var6    |$ 9 |left  |      |off    |GVar6  |
+        |Label      |$   84    0   -8    0 |=                        |                      |$ 9 |left  |      |off    |GVar6  |
+        |Edit       |$   12    2   80  -24 | 0.0                     |ED_plotcurves_var6    |$ 9 |center|      |off    |GVar6  |
+        |Button     |$  -96  -30 -176    0 |Accept curves and variables |BT_plotcurves_ok   |$ 9 |center|      |       |       |
+        |           |                      |                         |                      |    |      |      |       |       |
+        |Frame      |$  192    6    1  564 |                         |                      |    |      |      |       |       |
+        |           |                      |                         |                      |    |      |      |       |       |
+        |XAxes      |$  240  192  528  352 |                         |AX_plotcurves_plot    |    |      |      |       |       |
+        |XAxes      |$    0  -48    0  -20 |                         |AX_plotcurves_zoombar |    |      |      |       |       |
+        |XAxes      |$    0 -112    0  -96 |                         |AX_plotcurves_overview|    |      |      |       |       |
+        |           |                      |                         |                      |    |      |      |       |       |
+---  END_UICONTROLS  ---

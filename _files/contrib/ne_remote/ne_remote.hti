@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<title>NeuroElf v09d - remote web interface</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link rel="stylesheet" href="ne_remote.css" />
+		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="ne_remote_client.js"></script>
+
+<!--
+
+	NeuroElf remote web interface
+	HTML component
+
+Version:  v0.9d
+Build:    14071615
+Date:     Jul-16 2014, 3:26 PM EST
+Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+URL/Info: http://neuroelf.net/
+
+Copyright (c) 2012 - 2014, Jochen Weber
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+	* Redistributions of source code must retain the above copyright
+	  notice, this list of conditions and the following disclaimer.
+	* Redistributions in binary form must reproduce the above copyright
+	  notice, this list of conditions and the following disclaimer in the
+	  documentation and/or other materials provided with the distribution.
+	* Neither the name of Columbia University nor the
+	  names of its contributors may be used to endorse or promote products
+	  derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-->
+
+	</head>
+
+	<body id="FIG_NeuroElf_MainFig" onload="NE_RemoteInit();"><form action="">
+
+		<table border="0" cellpadding="0" cellspacing="1">
+
+			<tr><td align="left" valign="top" style="border-right:1px solid #000000;">
+
+<!-- selection -->
+
+<table border="0" cellpadding="0" cellspacing="0">
+
+	<tr valign="top">
+		<td colspan="2"><table border="0" cellpadding="2" cellspacing="0" style="width:100%;">
+			<tr valign="middle" style="height:26px;">
+				<td style="width:132px;">Loaded&nbsp;objects:&nbsp;</td>
+				<td style="fixed-width:288px;">
+
+<!-- selection: slicing object -->
+
+					<div><select id="DD_NeuroElf_varlist" style="width:100%;"
+						onchange="NE_Select('DD_NeuroElf_varlist', true);">
+							<option value="slcv0001">SliceVar 0001</option>
+					</select></div>
+
+				</td>
+				<td align="left" style="width:18px;">
+
+<!-- selection: slicing object close button -->
+
+					<img src="icons/trash.png" width="16" height="16"
+						id="BT_NeuroElf_varclose" alt="Close slicing object"
+						onclick="NE_Click('BT_NeuroElf_varclose', true);" />
+
+				</td>
+			</tr>
+
+			<tr valign="middle" style="height:26px;">
+				<td style="width:132px;">Available&nbsp;statistics:&nbsp;</td>
+				<td>
+
+<!-- selection: statistics object -->
+
+					<div><select id="DD_NeuroElf_statlist" style="width:100%;"
+						onchange="NE_Select('DD_NeuroElf_statlist', true);">
+							<option value="stsv0001">StatsVar 0001</option>
+					</select></div>
+
+				</td>
+				<td>
+
+<!-- selection: slicing object close button -->
+
+					<img src="icons/trash.png" width="16" height="16"
+						id="BT_NeuroElf_statclose" alt="Close statistics object"
+						onclick="NE_Click('BT_NeuroElf_statclose', true);" />
+
+				</td>
+			</tr>
+
+			<tr style="height:4px;"><td colspan="3"></td></tr>
+
+		</table></td>
+	</tr>
+
+	<tr valign="top">
+		<td style="width:400px;">
+
+<!-- selection: maps contained in statistics object -->
+
+			<div><select id="LB_NeuroElf_statmaps" size="10" multiple="multiple"
+				onchange="NE_Select('LB_NeuroElf_statmaps', true);"
+				style="width:100%;height:148px;">
+					<option value="stvm0001">Map 1</option>
+			</select></div>
+
+		</td>
+
+<!-- selection: statistics maps controls (buttons) -->
+
+		<td align="center" valign="bottom" style="width:24px;"><table width="18" border="0" cellpadding="2" cellspacing="0">
+			<tr><td>
+				<img src="icons/up.png" width="16" height="16" id="BT_NeuroElf_statmup"
+					onclick="NE_Click('BT_NeuroElf_statmup', true);"
+					alt="Move selected maps one position up" />
+			</td></tr>
+			<tr><td>
+				<img src="icons/down.png" width="16" height="16" id="BT_NeuroElf_statmdown"
+					onclick="NE_Click('BT_NeuroElf_statmdown', true);"
+					alt="Move selected maps one position down" />
+			</td></tr>
+			<tr><td>
+				<img src="icons/trash.png" width="16" height="16" id="BT_NeuroElf_statmdel"
+					onclick="NE_Click('BT_NeuroElf_statmdel', true);"
+					alt="Delete selected maps" />
+			</td></tr>
+		</table></td>
+
+	</tr>
+
+	<tr valign="bottom" style="height:26px;">
+		<td colspan="2">Clusters/VOIs:</td>
+	</tr>
+
+	<tr valign="top">
+		<td style="width:400px;">
+
+<!-- selection: clusters (VOIs) -->
+
+			<div><select id="LB_NeuroElf_clusters" size="10" multiple="multiple"
+				onchange="NE_Select('LB_NeuroElf_clusters', true);"
+				style="width:100%;height:148px;">
+					<option value="stvm0001">no clusters...</option>
+			</select></div>
+
+		</td>
+		<td align="center" valign="middle"></td>
+	</tr>
+
+	<tr valign="bottom" style="height:26px;">
+		<td colspan="2">Text output:</td>
+	</tr>
+
+	<tr valign="top">
+		<td colspan="2" style="width:400px;">
+
+<!-- output: cluster table and extracts -->
+
+			<textarea id="ED_NeuroElf_clusters" cols="60" rows="12"
+				style="width:98%;height:112px;font-family:'Courier',monospace;font-size:8pt;"></textarea>
+
+		</td>
+	</tr>
+</table>
+
+			</td><td valign="top">
+
+<!-- browsing and manipulation area -->
+
+<table border="0" cellpadding="1" cellspacing="0" style="height:512px;">
+
+	<tr valign="top" style="height:256px;">
+		<td align="left">
+
+<!-- browsing: sagittal slice -->
+
+			<img src="?cmd=sagslice" id="SagSlice" width="256" height="256"
+				onclick="NE_UpdateSlicePos(event, 'SagSlice');"
+				alt="SAG slice"/>
+
+		</td>
+		<td align="left">
+
+<!-- browsing: coronal slice -->
+
+			<img src="?cmd=corslice" id="CorSlice" width="256" height="256"
+				onclick="NE_UpdateSlicePos(event, 'CorSlice');"
+				alt="COR slice" />
+
+		</td>
+	</tr>
+
+<!-- browsing: controls -->
+
+	<tr valign="top" style="height:256px;">
+		<td>
+			<table border="0" cellpadding="0" cellspacing="0" style="width:256px;height:256px;">
+				<tr><td style="border-bottom:1px solid #000000;">
+					<table border="0" cellpadding="3" cellspacing="0" style="width:80px;height:120px;">
+
+<!-- browsing: X/Y/Z coordinate + volume-->
+
+<tr><td align="right" style="width:26px;">X:&nbsp;</td>
+	<td><input type="text" id="ED_NeuroElf_TALX" size="6"
+		style="width:36px;text-align:center;"
+		onblur="NE_OnBlur('ED_NeuroElf_TALX'); NE_UpdateSliceImgs();"
+		onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_TALX')) NE_UpdateSliceImgs();" />
+	</td>
+</tr>
+<tr><td align="right">Y:&nbsp;</td>
+	<td><input type="text" id="ED_NeuroElf_TALY" size="6"
+		style="width:36px;text-align:center;"
+		onblur="NE_OnBlur('ED_NeuroElf_TALY'); NE_UpdateSliceImgs();"
+		onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_TALY')) NE_UpdateSliceImgs();" />
+	</td>
+</tr>
+<tr><td align="right">Z:&nbsp;</td>
+	<td><input type="text" id="ED_NeuroElf_TALZ" size="6"
+		style="width:36px;text-align:center;"
+		onblur="NE_OnBlur('ED_NeuroElf_TALZ'); NE_UpdateSliceImgs();"
+		onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_TALZ')) NE_UpdateSliceImgs();" />
+	</td>
+</tr>
+<tr><td align="right">Vol:</td>
+	<td><input type="text" id="ED_NeuroElf_TempPos" size="6"
+		style="width:36px;text-align:center;"
+		onblur="NE_SetVolume('ED_NeuroElf_TempPos'); NE_UpdateSliceImgs();"
+		onkeydown="if (NE_SetVolumeOnReturn(event, 'ED_NeuroElf_TempPos')) NE_UpdateSliceImgs();" />
+	</td>
+</tr>
+
+
+					</table>
+				</td>
+				<td style="border-bottom:1px solid #000000;width:6px;"></td>
+				<td style="border-bottom:1px solid #000000;">
+					<table border="0" cellpadding="3" cellspacing="0" style="width:168px;height:120px;">
+
+<!-- manipulation: positive and negative tails -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="right">+ tail:&nbsp;</td>
+	<td align="center" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_PositivStat"
+			onchange="NE_SetValue('CB_NeuroElf_PositivStat', true);" /></td>
+	<td align="center">&nbsp;- tail:&nbsp;</td>
+	<td align="left" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_NegativStat"
+			onchange="NE_SetValue('CB_NeuroElf_NegativStat', true);" /></td>
+</tr></table></td></tr>
+
+<!-- manipulation: p-value threshold (dropdown) -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="right">Set p &lt;&nbsp;&nbsp;</td>
+	<td align="left"><div><select id="DD_NeuroElf_StatSetP" size="1"
+		onchange="NE_Select('DD_NeuroElf_StatSetP', true);"
+		style="width:72px;">
+			<option value="0.05">0.05</option>
+	</select></div></td>
+</tr></table></td></tr>
+
+<!-- manipulation: raw thresholds (edit fields) -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="right">
+		<input type="text" id="ED_NeuroElf_LowerThresh" size="4"
+			style="width:44px;text-align:center;"
+			onblur="NE_OnBlur('ED_NeuroElf_LowerThresh', true); NE_UpdateSliceImgs();"
+			onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_LowerThresh', true)) NE_UpdateSliceImgs();" /></td>
+	<td align="center">&lt;v&lt;</td>
+	<td align="left">
+		<input type="text" id="ED_NeuroElf_UpperThresh" size="4"
+			style="width:44px;text-align:center;"
+			onblur="NE_OnBlur('ED_NeuroElf_UpperThresh', true); NE_UpdateSliceImgs();"
+			onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_UpperThresh', true)) NE_UpdateSliceImgs();" /></td>
+</tr></table></td></tr>
+
+<!-- manipulation: cluster size (edit + checkbox) -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="right">k-thresh:&nbsp;</td>
+	<td align="center" valign="middle">
+		<input type="text" id="ED_NeuroElf_kExtThresh" size="4"
+			style="width:48px;"
+			onblur="NE_OnBlur('ED_NeuroElf_kExtThresh'); NE_UpdateSliceImgs();"
+			onkeydown="if (NE_BlurOnReturn(event, 'ED_NeuroElf_kExtThresh')) NE_UpdateSliceImgs();" /></td>
+	<td align="left" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_kExtThresh"
+			onchange="NE_SetValue('CB_NeuroElf_kExtThresh', true);" /></td>
+</tr></table></td></tr>
+
+
+					</table>
+				</td></tr>
+
+				<tr><td colspan="3"><table border="0" cellpadding="3" cellspacing="0">
+
+
+<!-- settings: ICBM2TAL, TDclient, interpolation -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="left">ICBM2TAL&nbsp;</td>
+	<td align="left" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_ICBM2TAL"
+			onchange="NE_SetValue('CB_NeuroElf_ICBM2TAL');" /></td>
+	<td align="center">TDClient&nbsp;</td>
+	<td align="center" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_TDClient"
+			onchange="NE_SetValue('CB_NeuroElf_TDClient');" /></td>
+	<td align="right">interp.&nbsp;</td>
+	<td align="right" valign="middle">
+		<input type="checkbox" id="CB_NeuroElf_Interpolate"
+			onchange="NE_SetValue('CB_NeuroElf_Interpolate', true);" /></td>
+</tr></table></td></tr>
+
+<!-- action buttons: alphasim, clustertable -->
+
+<tr><td><table border="0" cellpadding="0" cellspacing="0" style="width:100%;"><tr>
+	<td align="center" style="width:50%;">
+		<input type="button" value="Alphasim" id="BT_NeuroElf_alphasim"
+			onclick="NE_Click('BT_NeuroElf_alphasim', true, true, [200]);"
+			style="width:96px;" /></td>
+	<td align="center" style="width:50%;">
+		<input type="button" value="Clustertable" id="BT_NeuroElf_ClusterTable"
+			onclick="NE_Click('BT_NeuroElf_ClusterTable', true);"
+			style="width:96px;" /></td>
+</tr></table></td></tr>
+
+					</table>
+				</td></tr>
+
+
+<!-- info section -->
+
+			</table>
+		</td>
+		<td align="left">
+
+<!-- browsing: coronal slice -->
+
+			<img src="?cmd=traslice" id="TraSlice" width="256" height="256"
+				onclick="NE_UpdateSlicePos(event, 'TraSlice');"
+				alt="TRA slice" />
+
+		</td>
+	</tr>
+</table>
+
+			</td></tr>
+
+<!-- time course plot -->
+            <tr><td>&nbsp;</td><td><svg id="tcplotsvg" width="516" height="120">
+            </svg></td></tr>
+
+<!-- browsing: open files -->
+
+			<tr><td colspan="2">
+				<ul data-role="listview" data-theme="g" id="LB_NeuroElf_DirList">
+				</ul>
+			</td></tr>
+
+		</table>
+	</form></body>
+</html>

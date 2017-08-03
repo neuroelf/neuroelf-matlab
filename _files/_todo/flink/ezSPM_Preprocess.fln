@@ -1,0 +1,77 @@
+//
+// FieldLink info file for
+// %EZSPM/figures/ezSPM_Preprocess.tfg
+//
+// Files linked:
+// %EZSPM/templates/epipp.ini     -> study folder structure template
+// %STUDY/ezSPM/config/epipp.ini  -> study folder structure
+//
+// build:  5063009
+// Toask: EPIpp_page2
+
+[EPIpp_page1]
+CB_ezSPM_PP_Orientation   ={{'epipp', 'Steps',       'Orientation'  }, {'onoff'}}
+CB_ezSPM_PP_Slicetiming   ={{'epipp', 'Steps',       'SliceTiming'  }, {'onoff'}}
+CB_ezSPM_PP_Reslice       ={{'epipp', 'Steps',       'Realign'      }, {'onoff'}}
+CB_ezSPM_PP_Unwarp        ={{'epipp', 'Realign',     'Unwarp'       }, {'onoff'}}
+CB_ezSPM_PP_Normalize     ={{'epipp', 'Steps',       'Normalize'    }, {'onoff'}}
+CB_ezSPM_PP_Smooth        ={{'epipp', 'Steps',       'Smoothing'    }, {'onoff'}}
+CB_ezSPM_PP_AutoPrefixes  ={{'epipp', 'Prefixes',    'AutoPrefixes' }, {'onoff'}}
+CB_ezSPM_PP_SwapSliceReal ={{'epipp', 'SliceTiming', 'AfterRealign' }, {'onoff'}}
+ED_ezSPM_PP_OrientPrefix  ={{'epipp', 'Prefixes',    'Orientation'  }, {'char'}}
+ED_ezSPM_PP_SlicePrefix   ={{'epipp', 'Prefixes',    'SliceTiming'  }, {'char'}}
+ED_ezSPM_PP_RealignPrefix ={{'epipp', 'Prefixes',    'Reslice'      }, {'char'}}
+ED_ezSPM_PP_UnwarpPrefix  ={{'epipp', 'Prefixes',    'Unwarp'       }, {'char'}}
+ED_ezSPM_PP_NormPrefix    ={{'epipp', 'Prefixes',    'Normalize'    }, {'char'}}
+ED_ezSPM_PP_SmoothPrefix  ={{'epipp', 'Prefixes',    'Smooth'       }, {'char'}}
+CB_ezSPM_PP_KFBSlice      ={{'epipp', 'SliceTiming', 'KeepFiles'    }, {'onoff'}}
+CB_ezSPM_PP_KFBRealign    ={{'epipp', 'Realign',     'KeepFiles'    }, {'onoff'}}
+CB_ezSPM_PP_KFBUnwarp     ={{'epipp', 'Unwarp',      'KeepFiles'    }, {'onoff'}}
+CB_ezSPM_PP_KFBNormalize  ={{'epipp', 'Normalize',   'KeepFiles'    }, {'onoff'}}
+CB_ezSPM_PP_KFBSmooth     ={{'epipp', 'Smoothing',   'KeepFiles'    }, {'onoff'}}
+
+[EPIpp_page2_Orient]
+DD_ezSPM_PP_RotPitch      ={{'rotat', 'PROTO',       'Rotation'     },{'subindex',1}}
+DD_ezSPM_PP_RotRoll       ={{'rotat', 'PROTO',       'Rotation'     },{'subindex',2}}
+DD_ezSPM_PP_RotYaw        ={{'rotat', 'PROTO',       'Rotation'     },{'subindex',3}}
+CB_ezSPM_PP_FlipX         ={{'rotat', 'PROTO',       'Flipping'     },{'subonoff',1}}
+CB_ezSPM_PP_FlipY         ={{'rotat', 'PROTO',       'Flipping'     },{'subonoff',2}}
+CB_ezSPM_PP_FlipZ         ={{'rotat', 'PROTO',       'Flipping'     },{'subonoff',3}}
+
+[EPIpp_page3]
+DD_ezSPM_PP_SeqTypes      ={{'epipp', 'SliceTiming', 'SeqTypes'     },{'index'}}
+ED_ezSPM_PP_SeqCustom	  ={{'epipp', 'SliceTiming', 'SeqCustom'    },{'numarray'}}
+CB_ezSPM_PP_RefAuto       ={{'epipp', 'SliceTiming', 'RefAuto'      },{'onoff'}}
+ED_ezSPM_PP_RefSlice      ={{'epipp', 'SliceTiming', 'RefSlice'     },{'numeric'}}
+ED_ezSPM_PP_TRTime        ={{'epipp', 'SliceTiming', 'TRTime'       },{'numeric'}}
+CB_ezSPM_PP_TAAuto        ={{'epipp', 'SliceTiming', 'TAAuto'       },{'onoff'}}
+ED_ezSPM_PP_TATime        ={{'epipp', 'SliceTiming', 'TATime'       },{'numeric'}}
+ED_ezSPM_PP_NumberOfSlices={{'epipp', 'SliceTiming', 'SliceNumber'  },{'numeric'}}
+
+[EPIpp_page4]
+CB_ezSPM_PP_Reslice 	  ={{'epipp', 'Realign',     'Reslice'	    },{'onoff'}}
+CB_ezSPM_PP_CreateMean    ={{'epipp', 'Realign',     'CreateMean'   },{'onoff'}}
+ED_ezSPM_PP_RefImage      ={{'epipp', 'Realign',     'RefImage'     },{'numeric'}}
+ED_ezSPM_PP_WRTSpec       ={{'epipp', 'Unwarp',      'WRTSpec'      },{'numarray'}}
+CB_ezSPM_PP_WeightReg     ={{'epipp', 'Unwarp',      'WeightReg'    },{'onoff'}}
+CB_ezSPM_PP_SecondFX      ={{'epipp', 'Unwarp',      'SecondFX'     },{'onoff'}}
+ED_ezSPM_PP_SecondCustom  ={{'epipp', 'Unwarp',      'SecondCustom' },{'numarray'}}
+
+[EPIpp_page5]
+DD_ezSPM_PP_AnaSessions   ={{'rotat', 'GUI',         'AnaSessNames' },{'stringlist'}}
+ED_ezSPM_PP_TmplEPIPath   ={{'epipp', 'Normalize',   'TmplEPIPath'  },{'chararray'}}
+ED_ezSPM_PP_EPIVoxSize    ={{'epipp', 'Normalize',   'EPIVoxSize'   },{'numarray'}}
+
+[EPIpp_page5_idx]
+DD_ezSPM_PP_AnaSessions   ={{'rotat', 'GUI',         'AnaSessIndex' },{'index'}}
+
+[EPIpp_page5_Ana]
+CB_ezSPM_PP_NormAna       ={{'rotat', 'PROTO',       'Normalize'    },{'onoff'}}
+ED_ezSPM_PP_TmplAnaPath   ={{'rotat', 'PROTO',       'TemplatePath' },{'chararray'}}
+ED_ezSPM_PP_AnaVoxSize    ={{'rotat', 'PROTO',       'NormVox'      },{'numarray'}}
+
+[EPIpp_page6]
+DD_ezSPM_PP_SmoothCustom  ={{'epipp', 'Smoothing',   'Custom'       },{'index'}}
+ED_ezSPM_PP_FWHM          ={{'epipp', 'Smoothing',   'FWHM'         },{'numarray'}}
+
+[/EndOfICCRIniFile]

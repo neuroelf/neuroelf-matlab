@@ -1,0 +1,59 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for VGD files (VOI GLM Data)
+# VGD FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+ArrayFormat: %-12s
+Description:VOI GLM Data files
+Extensions:vgd
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+VGD_header    |1, 256      |regexp  |^\s+\<header\>\s+NrOf.*BetaStat.*RowLabels\:.*\s+\<\/header\>\s+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+WRTLN!!!!!!!!  # empty line
+WRTLN!!!!!!!<header>
+FLIST!                   !NrOfVOIs            !double  !%d     !1      !        !NrOfVOIs
+FLIST!                   !NrOfBetas           !double  !%d     !1      !        !NrOfBetas
+FLIST!                   !BetaStatistics      !string  !%s     !1      !no      !BetaStatistics
+FLIST!                   !IncludeConfounds    !string  !%s     !1      !no      !IncludeConfounds
+FLIST!                   !SepSubjPreds        !string  !%s     !1      !yes     !SepSubjPreds
+FLIST!                   !SepStudyPreds       !string  !%s     !1      !no      !SepStudyPreds
+FLIST!                   !zTransformation     !string  !%s     !1      !no      !zTransformation
+EXPRE!$TFFWRITE     !!!!!!@RowLabels = ['"' gluetostring(@RowLabels, '" "') '"'];
+FIELD!                   !RowLabels           !string  !%s     !1      !        !RowLabels
+EXPRE!              !!!!!!try, $rlt = @RowLabels(2:end-1); catch ne_eo; neuroelf_lasterr(ne_eo); $rlt = ''; end, @RowLabels = splittocell($rlt, '" "'); @RowLabels = @RowLabels(:); @NrOfRows = numel(@RowLabels);
+WRTLN!!!!!!!</header>
+
+# loop over Voxels
+ARRAY!                   !VOILabels           !string  !"%s"   !1, @NrOfVOIs !  !VOILabels
+ARRAY!                   !GLMData             !double  !%9f    !@NrOfRows, @NrOfVOIs ! !GLMData
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfVOIs = 1;
+@NrOfBetas = 3;
+@BetaStatistics = 'no';
+@IncludeConfounds = 'no';
+@SepSubjPreds = 'yes';
+@SepStudyPreds = 'no';
+@zTransformation = 'no';
+@RowLabels = {'1 Subject A: R1  b1'; '2 Subject B: R1  b2'; '3 Subject C: R1  b3'};
+@VOILabels = {'VOI'};
+@GLMData = zeros(3, 1);
+EndNewFileCode

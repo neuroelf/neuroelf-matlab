@@ -1,0 +1,106 @@
+---  BEGIN_COMMENTS  ---
+
+importrfxglmfromspms
+
+Version:  0.9d
+Build:    14082910
+Date:     Aug-29 2014, 10:48 AM EST
+Figure:   NeuroElf GUI - import RFX GLM dialog
+Author:   Jochen Weber
+Info:     Figure created for NeuroElf GUI - importrfxglmfromspms
+
+% Copyright (c) 2010, 2014, Jochen Weber
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions are met:
+%     * Redistributions of source code must retain the above copyright
+%       notice, this list of conditions and the following disclaimer.
+%     * Redistributions in binary form must reproduce the above copyright
+%       notice, this list of conditions and the following disclaimer in the
+%       documentation and/or other materials provided with the distribution.
+%     * Neither the name of Columbia University nor the
+%       names of its contributors may be used to endorse or promote products
+%       derived from this software without specific prior written permission.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+% ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+% WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+% (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+% LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+% ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+% (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---   END_COMMENTS   ---
+
+--- BEGIN_VARIABLES  ---
+VarName |VarContent
+rgbbt   |]permute(uint8(cat(2, repmat([255; 0; 0], [1, 5, 16]), repmat([0; 255; 0], [1, 6, 16]), repmat([0; 0; 255], [1, 5, 16]))), [3, 2, 1])
+---  END_VARIABLES   ---
+
+---   BEGIN_FIGURE   ---
+Comment |Units |Visible|Position               |Title                                 |Tag                        |CallbackClReq
+        |pixels|off    |$   -1   -1  622  600  |NeuroElf - Import RFX GLM from SPMs   |Wnd_NeuroElf_importrfxglm  |
+---    END_FIGURE    ---
+
+
+--- BEGIN_UICONTROLS ---
+Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Value|MinMaxTop|Callback
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$   12  576  332   18 |Please search for/select the SPM.mat files to import...|          |    |left  |      |       |       |      |     |         |
+        |Label      |$  336    0 -240    0 |Keep basis-function (bf) in condition names|                      |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  248    2  -18    0 |                                          |CB_importrfxglm_keepbf |    |center|      |       |KeepBF |      |$ 0  |         |
+        |Label      |$ -584  -30  100  -18 |Searchpattern:                            |                       |    |left  |      |       |       |      |     |         |
+        |Edit       |$  108    0  412  -24 |  (please browse for one SPM.mat file...) |ED_importrfxglm_folder |$ 9 |left  |      |off    |       |      |     |         |
+        |Button     |$  420    0  -76    0 |Browse...                                 |BT_importrfxglm_folder |    |center|      |       |       |      |     |         |
+        |Label      |$ -528  -28  500  -18 |Selected Subjects and their SPM.mat files:|                       |    |left  |      |       |       |      |     |         |
+        |Button     |$  528    0  -76  -24 |Search...                                 |BT_importrfxglm_search |    |center|      |off    |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |ListBox    |$ -528 -160   92 -156 |empty                                     |LB_importrfxglm_subids |$ 9 |left  |      |       |       |      |     |$ 0 2 1  |
+        |ListBox    |$  100    0 -480    0 |empty                                     |LB_importrfxglm_files  |$ 9 |left  |      |       |       |      |     |$ 0 2 1  |
+        |Button     |$  484  136  -18   18 |]imread([neuroelf_path('icons') '/up.tif'])   |BT_importrfxglm_fup   | |center|      |       |       |      |     |         |
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/down.tif']) |BT_importrfxglm_fdown | |center|      |       |       |      |     |         |
+        |Button     |$    0  -24    0    0 |]neuroelf_file('i', 'props')              |BT_importrfxglm_subjprop  | |center|      |       |       |      |     |         |
+        |Button     |$    0  -60    0    0 |]imread([neuroelf_path('icons') '/plus.tif']) |BT_importrfxglm_fplus | |center|      |       |       |      |     |         |
+        |Button     |$    0  -24    0    0 |]imread([neuroelf_path('icons') '/minus.tif'])|BT_importrfxglm_fminus| |center|      |       |       |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$ -584  -32  290  -18 |SPM.mat condition names:                  |                       |    |left  |      |       |       |      |     |         |
+        |Label      |$  296    0  290  -18 |BV RFX GLM condition names:               |                       |    |left  |      |       |       |      |     |         |
+        |ListBox    |$ -296 -134  288 -134 |empty                                     |LB_importrfxglm_spmcond|$ 9 |left  |      |off    |MCond  |      |     |$ 0 2 1  |
+        |ListBox    |$  296   0  -282    0 |empty                                     |LB_importrfxglm_glmcond|$ 9 |left  |      |off    |MCond  |      |     |$ 0 2 1  |
+        |Button     |$  288  114  -18   18 |]imread([neuroelf_path('icons') '/up.tif'])   |BT_importrfxglm_cup   | |center|      |off    |MCond  |      |     |         |
+        |Button     |$    0  -22    0    0 |]imread([neuroelf_path('icons') '/down.tif']) |BT_importrfxglm_cdown | |center|      |off    |MCond  |      |     |         |
+        |Button     |$    0  -22    0    0 |]neuroelf_file('i', 'props')              |BT_importrfxglm_glmcprop  | |center|      |off    |MCond  |      |     |         |
+        |Button     |$    0  -22    0    0 |]tfgtv.rgbbt                              |BT_importrfxglm_glmccol|    |center|      |off    |MCond  |      |     |         |
+        |Button     |$    0  -22    0    0 |]imread([neuroelf_path('icons') '/plus.tif']) |BT_importrfxglm_cplus | |center|      |off    |MCond  |      |     |         |
+        |Button     |$    0  -22    0    0 |]imread([neuroelf_path('icons') '/minus.tif'])|BT_importrfxglm_cminus| |center|      |off    |MCond  |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Label      |$ -584  -32  160  -18 |Autodetect condition names                |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  164    2  -18    0 |                                          |CB_importrfxglm_autcond|    |center|      |       |       |      |$ 1  |         |
+        |Label      |$ -164  -32 -160    0 |PSC transform beta maps                   |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  164    2  -18    0 |                                          |CB_importrfxglm_psctr  |    |center|      |       |       |      |$ 1  |         |
+        |Label      |$   28   -2 -152    0 |Variance-weight beta maps                 |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  156    2  -18    0 |                                          |CB_importrfxglm_vweight|    |center|      |       |       |      |$ 1  |         |
+        |Label      |$   32   -2 -124    0 |Interpolation method:                     |                       |    |left  |      |       |       |      |     |         |
+        |DropDown   |$  132    2  -96    0 |]{'linear';'cubic';'sinc3'}               |DD_importrfxglm_imeth  |$ 9 |left  |      |       |       |      |     |         |
+        |Label      |$ -512  -32 -160    0 |Auto-set resolution/box                   |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  164    2  -18    0 |                                          |CB_importrfxglm_autores|    |center|      |       |       |      |$ 1  |         |
+        |Label      |$   28   -2  -72    0 |Resolution:                               |                       |    |right |      |       |       |      |     |         |
+        |Edit       |$   80    0   32  -24 |3                                         |ED_importrfxglm_res    |$ 9 |center|      |off    |MResBox|      |     |         |
+        |Label      |$   48    0   80  -18 |Bounding Box:                             |                       |    |left  |      |       |       |      |     |         |
+        |Edit       |$   88    0  192  -24 |]['[44, 38, 44; 241, 193, 211]']          |ED_importrfxglm_bbox   |$ 9 |center|      |off    |MResBox|      |     |         |
+        |Label      |$ -408  -32  160  -18 |Save import GLM as...:                    |                       |    |left  |      |       |       |      |     |         |
+        |Edit       |$  164    0  352  -24 |  <unspecified>                           |ED_importrfxglm_target |$ 9 |left  |      |       |       |      |     |         |
+        |Button     |$  358    0  -80    0 |Save as...                                |BT_importrfxglm_saveas |    |center|      |       |       |      |     |         |
+        |Label      |$ -522  -32  204  -18 |Also import data to VTC/PRT/SDMs          |                       |    |left  |      |       |       |      |     |         |
+        |CheckBox   |$  208    2  -18    0 |                                          |CB_importrfxglm_impvtc |    |center|      |       |       |      |$ 0  |         |
+        |Label      |$   28   -2   96  -18 |Filename pattern:                         |                       |    |right |      |       |       |      |     |         |
+        |Edit       |$  108    0  256  -24 |#/#_run%02d_MNI.vtc                       |ED_importrfxglm_impvtc |$ 9 |left  |      |off    |ImpVTC |      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+        |Button     |$   12    8   76   24 |Cancel                                    |BT_importrfxglm_cancel |    |center|      |       |       |      |     |         |
+        |Button     |$  524    0    0    0 |Import...                                 |BT_importrfxglm_import |    |center|      |off    |FSelect|      |     |         |
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         |
+---  END_UICONTROLS  ---

@@ -1,0 +1,104 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.TRF files (TRansFormation information)
+# TRF FileVersions supported: 2, 5 (2 cannot be created from scratch!)
+#
+# Version:  v1.1
+# Build:    16051016
+# Date:     May-10 2016, 4:05 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Transformation information files
+Extensions:trf
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+TRF_TTCSNS    |1, 384      |regexpi |transformationtype\:\s*\d+\s+coordinatesystem\:\s*\d+\s+nslicesfmrvmr\:
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+EXPRE!$TFFREAD      !!!!!!eval(tffspec.NewFileCode);
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !FileVersion         !double  !%d     !1      !5       !FileVersion
+
+# for Fileversion <= 2
+BLOOP!@FileVersion <= 2  ! ! ! !1 ! !FV12
+FIELD!                   !x                   !double  !%.6f   !1      !        !X
+FIELD!                   !y                   !double  !%.6f   !1      !        !Y
+FIELD!                   !z                   !double  !%.6f   !1      !        !Z
+FIELD!                   !TraCor              !double  !%.6f   !1      !        !TraCor
+FIELD!                   !TraSag              !double  !%.6f   !1      !        !TraSag
+FIELD!                   !SagCor              !double  !%.6f   !1      !        !SagCor
+FIELD!                   !xFoV                !double  !%.6f   !1      !        !XFoV
+FIELD!                   !yFoV                !double  !%.6f   !1      !        !YFoV
+FIELD!                   !zFoV                !double  !%.6f   !1      !        !ZFoV
+FIELD!                   !n_slices            !double  !%.6f   !1      !        !NrOfSlices
+FIELD!                   !sl_thick            !double  !%.6f   !1      !        !SliceThickness
+FIELD!                   !sl_gap              !double  !%.6f   !1      !        !SliceGap
+FIELD!                   !TransformationType  !double  !%d     !1      !1       !TransformationType
+FIELD!                   !CoordinateSystem    !double  !%d     !1      !1       !CoordinateSystem
+ELOOP!                   ! ! ! !  ! !FV12
+
+# for FileVersion > 2
+BLOOP!@FileVersion > 2   ! ! ! !1 ! !FV3PP
+WRTLN!!!!!!!!  # empty line
+FIELD!                   !DataFormat          !string  !%s     !1      !        !DataFormat
+
+# determine matrix format
+EXPRE!!!!!!!$D1 = 0; $D2 = 0; $Type = 0;
+EXPRE!!!!!!!if strcmpi(@DataFormat, 'matrix'), $D1 = 4; $D2 = 4; $Type = 1; end
+EXPRE!!!!!!!if $Type == 0, error('Currently unsupported data format'); end
+
+# matrix
+WRTLN!!!!!!!!  # empty line
+ARRAY!$Type == 1         !TFMatrix            !double  !%.15f  !$D1,$D2!        !TFMatrix
+WRTLN!!!!!!!!  # empty line
+
+# further fields
+FLIST!                   !TransformationType  !double  !%d     !1      !1       !TransformationType
+FLIST!                   !CoordinateSystem    !double  !%d     !1      !1       !CoordinateSystem
+BLOOP!@TransformationType == 1 ! ! ! !1 ! !FV3PPT3
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !NSlicesFMRVMR       !double  !%d     !1      !        !NSlicesFMRVMR
+FLIST!                   !SlThickFMRVMR       !double  !%f     !1      !        !SlThickFMRVMR
+FLIST!                   !SlGapFMRVMR         !double  !%f     !1      !        !SlGapFMRVMR
+FLIST!                   !CreateFMR3DMethod   !double  !%d     !1      !        !CreateFMR3DMethod
+FLIST!                   !AlignmentStep       !double  !%d     !1      !        !AlignmentStep
+WRTLN!!!!!!!!  # empty line
+EXPRE!$TFFREAD!!!!!!@ExtraVMRTransf = 0; @ExtraVMRTransfValues = eye(4);
+FLIST!                   !ExtraVMRTransf      !double  !%d     !1      !0       !ExtraVMRTransf
+ARRAY!@ExtraVMRTransf > 0!ExtraVMRTransfValues!double  !%.15f  !4, 4   !        !ExtraVMRTransfValues
+ELOOP!                   ! ! ! !  ! !FV3PPT3
+WRTLN!!!!!!!!  # empty line
+FLIST!                   !SourceFile          !string  !"%s"   !1      !        !SourceFile
+FLIST!                   !TargetFile          !string  !"%s"   !1      !        !TargetFile
+FLIST!@FileVersion > 5   !ACPCVMRFramingCube  !double  !%d     !1      !256     !ACPCVMRFramingCube
+FLIST!@FileVersion > 5   !ACPCVMRVoxelRes     !double  !%d     !1      !1       !ACPCVMRVoxelRes
+ELOOP!                   ! ! ! !  ! !FV3PP
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 5;
+@DataFormat = 'Matrix';
+@TFMatrix = eye(4);
+@TransformationType = 1;
+@CoordinateSystem = 1;
+@NSlicesFMRVMR = 30;
+@SlThickFMRVMR = 4;
+@SlGapFMRVMR = 0;
+@CreateFMR3DMethod = 3;
+@AlignmentStep = 1;
+@ExtraVMRTransf = 0;
+@ExtraVMRTransfValues = eye(4);
+@SourceFile = '<none>';
+@TargetFile = '<none>';
+@ACPCVMRFramingCube = 256;
+@ACPCVMRVoxelRes = 1;
+EndNewFileCode

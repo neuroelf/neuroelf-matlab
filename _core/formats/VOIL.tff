@@ -1,0 +1,65 @@
+# TextFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for voxel extraction list files
+# VOI_List FileVersions supported:
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:VoxelData
+Description:VOI time course extraction files (*.txt)
+Extensions:voil # dummy extension
+FieldDelimiters: {[32]}
+LineDelimiters: {[13, 10], [10]}
+ParagraphArrays:0
+SkipEmptyLines:1
+Magic:|
+name          |range       |type    |magic
+VOIL_VoxelList|1, 48       |regexp  |^\s+"1"\s+"2"\s+"3"\s+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type !cond               !field               !datatype!format !dim    !default !varname
+
+# read only support
+EXPRE!$TFFWRITE!!!!!!error('VOI extraction lists can only be read.');
+
+# get number of voxels
+EXPRE!!!!!!![numvox{1:3}] = regexp(linecont{1}, '.*"(\d+)"$'); if isempty(numvox{3}) || isempty(numvox{3}{1}), error('Couldn''t extract number of voxels.'); end
+EXPRE!!!!!!!@NrOfVoxels = str2double(linecont{1}(numvox{3}{1}(1):numvox{3}{1}(2)));
+
+# x/y/z coordinates?
+EXPRE!!!!!!!if ~isempty(regexp(linecont{2}, '^"x"')), hascoords = true; else, hascoords = false; end, @HasCoordinates = hascoords;
+
+# first line number, number of time points
+EXPRE!!!!!!!if hascoords, firstvline = 5; @VoxelCoords = zeros(@NrOfVoxels, 3); else, @VoxelCoords = []; firstvline = 2; end
+
+# check for voxel data
+EXPRE!!!!!!!if isempty(regexp(linecont{firstvline}, '^"1"')), error('No voxel data found.'); end
+EXPRE!!!!!!!numlin = numel(linecont); numtp = numlin + 1 - firstvline;
+EXPRE!!!!!!!@NrOfTimePoints = numtp;
+EXPRE!!!!!!!@VoxelData = zeros(numtp, @NrOfVoxels);
+
+# read coordinates if needed
+EXPRE!!!!!!!if hascoords, try, for mylc = 2:4, @VoxelCoords(:, mylc-1) = str2num(linecont{mylc}(4:end))'; end, catch ne_eo; neuroelf_lasterr(ne_eo); error('Couldn''t extract voxel coordinates.'); end, end
+
+# read data
+EXPRE!!!!!!!try, mytc = 1; for mylc = firstvline:numlin, myline = linecont{mylc}; for mycc = 2:numel(myline), if myline(mycc) == '"', break; end, end, @VoxelData(mytc, :) = str2num(myline(mycc+1:end)); mytc = mytc + 1; end, catch ne_eo; neuroelf_lasterr(ne_eo); error(['Error parsing voxel line for time point ' num2str(mytc) '.']); end
+
+# go beyond end of file !
+EXPRE!!!!!!!linec = linecount + 1;
+
+EndListOfFields
+
+NewFileCode:!
+@NrOfVoxels = 0;
+@HasCoordinates = false;
+@VoxelCoords = [];
+@NrOfTimePoints = 0;
+@VoxelData = [];
+EndNewFileCode

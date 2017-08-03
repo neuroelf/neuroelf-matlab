@@ -1,0 +1,83 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.SRF files (SuRFaces)
+# SRF FileVersions supported: 3, 4
+#
+# Version:  v0.9a
+# Build:    14021311
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Surface mesh files
+EncodingSyntax:ieee-le
+Extensions:srf
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+FIELD !                       !single  !double  !1, 1                     !        !FileVersion
+FIELD !                       !int32   !double  !1, 1                     !0       !ExtendedNeighbors
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTriangles
+FIELD !                       !single  !double  !1, 3                     !        !MeshCenter
+FIELD !~$HEADERONLY           !single  !double  !@NrOfVertices, 3         !        !VertexCoordinate
+FIELD !~$HEADERONLY           !single  !double  !@NrOfVertices, 3         !        !VertexNormal
+EXPRE ! $HEADERONLY       !!!!!@VertexCoordinate = []; @VertexNormal = []; fseek(fid, 24 * @NrOfVertices, 0);
+FIELD !                       !single  !double  !1, 4                     !        !ConvexRGBA
+FIELD !                       !single  !double  !1, 4                     !        !ConcaveRGBA
+FIELD !~$HEADERONLY           !uint32  !colcode !@NrOfVertices, 1         !        !VertexColor
+EXPRE ! $HEADERONLY       !!!!!@VertexColor = []; @Neighbors = []; @TriangleVertex = []; @NrOfTriangleStrips = []; @TriangleStripSequence = []; @AutoLinkedSRF = []; fseek(fid, 0, 1); rulec = 999;
+
+# reading/writing nearest neighbors lists (external function to speed IO up)
+EXPRE !$BFFREAD           !!!!!@Neighbors = xffsrfparseneighbors(fid, @NrOfVertices);
+EXPRE !$BFFWRITE          !!!!!xffsrfwriteneighbors(fid, @Neighbors);
+
+# triangles & strips
+EXPRE !$BFFWRITE          !!!!!@TriangleVertex = @TriangleVertex' - 1;
+FIELD !                       !uint32  !double  !3, @NrOfTriangles        !        !TriangleVertex
+EXPRE !                   !!!!!@TriangleVertex = @TriangleVertex' + 1;
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTriangleStrips
+EXPRE !$BFFREAD           !!!!!@TriangleStripSequence = zeros(0, 1);
+EXPRE !$BFFWRITE          !!!!!@TriangleStripSequence = @TriangleStripSequence - 1;
+FIELD !@NrOfTriangleStrips > 0!uint32  !double  !@NrOfTriangleStrips, 1   !        !TriangleStripSequence
+EXPRE !                   !!!!!@TriangleStripSequence = @TriangleStripSequence + 1;
+
+# auto-linked SRF filename
+FIELD !@FileVersion > 3       !cstring !cstring !1, 1                     !        !AutoLinkedSRF
+
+# generate VertexVMRData field (empty!)
+EXPRE !$BFFREAD           !!!!!@VertexVMRData = uint8([]);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 4;
+@ExtendedNeighbors = 0;
+@NrOfVertices = 40962;
+@NrOfTriangles = 81920;
+@MeshCenter = [128, 128, 128];
+@VertexCoordinate = 128 * ones(@NrOfVertices, 3);
+@VertexNormal = [ones(@NrOfVertices, 1), zeros(@NrOfVertices, 2)];
+@ConvexRGBA = [0.333, 0.677, 0.980, 0.400];
+@ConcaveRGBA = [0.10, 0.240, 0.333, 0.400];
+@VertexColor = uint322colcode(uint32(zeros(@NrOfVertices, 1)));
+@Neighbors = cell(@NrOfVertices, 2);
+@Neighbors{1, 1} = 5;
+@Neighbors{1, 2} = zeros(1, 5);
+@Neighbors(2:12, :) = @Neighbors(ones(1, 11), :);
+@Neighbors{13, 1} = 6;
+@Neighbors{13, 2} = zeros(1, 6);
+@Neighbors(14:@NrOfVertices, :) = @Neighbors(13 * ones(1, @NrOfVertices - 13), :);
+@TriangleVertex = zeros(@NrOfTriangles, 3);
+@NrOfTriangleStrips = 0;
+@TriangleStripSequence = zeros(0, 1);
+@AutoLinkedSRF = '';
+@VertexVMRData = uint8([]);
+EndNewFileCode

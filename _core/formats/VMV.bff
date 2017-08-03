@@ -1,0 +1,71 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.VMV files (Vertex MoVie)
+# VMV FileVersions supported: 1
+#
+# Vertex movies contain several SRFs/positions to build a
+# morphing sequence
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:Vertex movie files
+EncodingSyntax:ieee-le
+Extensions:vmv
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfPositions
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+FIELD !                       !uint16  !double  !1, 1                     !        !UseViewPoint
+FIELD !                       !uint16  !double  !1, 1                     !        !UseVertexColor
+FIELD !                       !cstring !cstring !1, 1                     !        !NameOfOriginateSRF
+
+# loop over number of positions
+EXPRE !$BFFREAD           !!!!!@VertexPosition = emptystruct({'Coordinates', 'Normals', 'Colors', 'ViewPoint', 'ViewAngle', 'UsePerspective', 'MorphingSteps', 'NameOfState'}, [1, @NrOfPositions]); if @UseVertexColor, t_rwdth = 7; else t_rwdth = 6; end
+BLOOP !                       ! ! !@NrOfPositions ! !VMPos
+EXPRE !$BFFREAD           !!!!!if $HEADERONLY, @VertexPosition($VMPos).Coordinates = []; @VertexPosition($VMPos).Normals = []; @VertexPosition($VMPos).Colors = []; fseek(fid, 4 * (6 + @UseVertexColor) * @NrOfVertices, 0); else, try, [t_crdc{1:3}] = vmvreadpos(fid, @NrOfVertices, @UseVertexColor); @VertexPosition($VMPos).Coordinates = t_crdc{1}; @VertexPosition($VMPos).Normals = t_crdc{2}; @VertexPosition($VMPos).Colors = t_crdc{3}; catch ne_eo; neuroelf_lasterr(ne_eo); error('ERROR READING MOVIE POSITION DATA'); end, end
+EXPRE !$BFFWRITE          !!!!!try, vmvwritepos(fid, @VertexPosition($VMPos), @UseVertexColor); catch ne_eo; neuroelf_lasterr(ne_eo); error('ERROR WRITING MOVIE POSITION DATA'); end
+
+# conditional on UseViewPoint
+BLOOP !@UseViewPoint > 0      ! ! !1 ! !UseVP
+FIELD !                       !single  !double  !1, 3                     !        !VertexPosition($VMPos).ViewPoint
+FIELD !                       !single  !double  !1, 3                     !        !VertexPosition($VMPos).ViewAngle
+FIELD !                       !uint32  !double  !1, 1                     !        !VertexPosition($VMPos).UsePerspective
+ELOOP !                       ! ! !  ! !UseVP
+
+# continue loop
+FIELD !                       !uint32  !double  !1, 1                     !        !VertexPosition($VMPos).MorphingSteps
+FIELD !                       !cstring !cstring !1, 1                     !        !VertexPosition($VMPos).NameOfState
+ELOOP !                       ! ! !  ! !VMPos
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileVersion = 1;
+@NrOfPositions = 1;
+@NrOfVertices = 40962;
+@UseViewPoint = 1;
+@UseVertexColor = 1;
+@NameOfOriginateSRF = 'untitled.srf';
+@VertexPosition.Coordinates = 128 * ones(@NrOfVertices, 3);
+@VertexPosition.Normals = [ones(@NrOfVertices, 1), zeros(@NrOfVertices, 2)];
+@VertexPosition.Colors = uint322colcode(uint32(zeros(@NrOfVertices, 1)));
+@VertexPosition.ViewPoint = [0, 0, -500];
+@VertexPosition.ViewAngle = [180, 0, 0];
+@VertexPosition.UsePerspective = 0;
+@VertexPosition.MorphingSteps = 30;
+@VertexPosition.NameOfState = 'InitialState';
+EndNewFileCode

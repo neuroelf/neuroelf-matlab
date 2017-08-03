@@ -1,0 +1,54 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.STC files (Slice Time Course data)
+# STC FileVersions supported: 0 (no versioning information yet)
+#
+# An STC file contains the functional data (time series) of one
+# slice of an experimental run. During FMR project creation, as
+# many STC files as there are slices will be created. An FMR
+# project links to the STC files with an "STCPrefix".
+#
+# Version:  v0.9a
+# Build:    11050213
+# Date:     May-16 2010, 8:24 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:STCData
+Description:Slice time course files
+EncodingSyntax:ieee-le
+Extensions:stc
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+EXPRE !$BFFREAD           !!!!!@FileVersion = 1;
+EXPRE !$BFFWRITE          !!!!!@NrOfRows = size(@STCData, 2); @NrOfCols = size(@STCData, 1); @NrOfVolumes = size(@STCData, 3);
+FIELD !@FileVersion == 1      !uint16  !double  !1, 1                     !        !NrOfRows
+FIELD !@FileVersion == 1      !uint16  !double  !1, 1                     !        !NrOfCols
+
+# calculate NrOfVolumes for reading case...
+EXPRE !$BFFREAD           !!!!!@NrOfVolumes = ($FILESIZE - 4) / (2 * @NrOfRows * @NrOfCols); @NrOfSlices = 1; if @NrOfRows == 0 || @NrOfCols == 0 || @NrOfVolumes ~= round(@NrOfVolumes), @FileVersion = 2; fseek(fid, 0, -1); [t_file{1:3}] = fileparts($FILENAME); if isempty(t_file{1}), t_file{1} = '.'; end, try, t_fmr = xff([t_file{1} filesep t_file{2} '.fmr']); catch ne_eo; neuroelf_lasterr(ne_eo); error('Missing required information from FMR.'); end, try, @NrOfSlices = t_fmr.NrOfSlices; @NrOfVolumes = t_fmr.NrOfVolumes; @NrOfCols = t_fmr.ResolutionX; @NrOfRows = t_fmr.ResolutionY; catch ne_eo; neuroelf_lasterr(ne_eo); Call(t_fmr, 'ClearObject'); error('Missing fields in FMR.'); end, Call(t_fmr, 'ClearObject'); end
+
+# read/write STC data
+FIELD !~$HEADERONLY           !uint16  !uint16  !@NrOfCols, @NrOfRows, @NrOfVolumes, @NrOfSlices ! !STCData
+EXPRE ! $HEADERONLY       !!!!!@STCData = []; fseek(fid, 2 * @NrOfCols * @NrOfRows * @NrOfVolumes * @NrOfSlices, 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+# new file code snippet
+NewFileCode:!
+@FileVersion = 1;
+@NrOfRows = 64;
+@NrOfCols = 64;
+@NrOfVolumes = 1;
+@NrOfSlices = 1;
+@STCData = uint16(0); @STCData(@NrOfCols, @NrOfRows, @NrOfVolumes) = @STCData(1);
+EndNewFileCode

@@ -1,0 +1,16 @@
+#
+#  Author:  Jochen Weber
+#
+#  Purpose:
+#  This is the Philips specific DICOM data dictionary
+#
+# Tag		VR	Name			VM	Version
+#
+(0040,0280) ST  CommentsOnThePerformedProcedureStep 1 Philips
+(2001,100A) SH  SliceNumber 1 Philips
+(2001,100B) SH  SliceOrientation 1 Philips
+(2001,1018) UL  NumberOfSlices 1 Philips
+(2001,101D) UL  SubSeriesNumber 1 Philips
+#
+# EOF
+#

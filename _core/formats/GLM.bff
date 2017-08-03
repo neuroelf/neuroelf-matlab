@@ -1,0 +1,321 @@
+# BinaryFileFormat (leave this tag as magic token!)
+
+# BrainVoyager QX file format for *.GLM files (General Linear Model)
+# GLM FileVersions supported: 1, 2, 3, 4
+#
+# Version:  v1.1
+# Build:    16022910
+# Date:     Feb-29 2016, 10:40 AM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:General Linear Model files
+EncodingSyntax:ieee-le
+Extensions:glm
+Magic:!
+name           !range       !type    !magic
+GLM_Predictor  !1, 1024     !regexp  !Predictor\: \d+
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# Preset content !
+EXPRE !$BFFREAD           !!!!!eval(bffspec.NewFileCode);
+
+# Reading first uint16, check for file version ...
+FIELD !                       !uint16  !double  !1, 1                     !        !FileVersion
+
+# Handle FileVersion 2 with special type
+EXPRE !$BFFWRITE && @FileVersion == 2 !!!!!if @ProjectTypeRFX > 0, @ProjectType = @ProjectType + 10; end
+
+# Additional fields for FileVersion > 1, part 1
+BLOOP !@FileVersion > 1       ! ! !1 ! !FileVersion2pp_1
+FIELD !                       !uint8   !double  !1, 1                     !        !ProjectType
+FIELD !@FileVersion > 2       !uint8   !double  !1, 1                     !        !ProjectTypeRFX
+ELOOP !                       ! ! !  ! !FileVersion2pp_1
+
+# Handle FileVersion 2 with special type
+EXPRE !@FileVersion == 2  !!!!!if @ProjectType > 10, @ProjectTypeRFX = 1; @ProjectType = @ProjectType - 10; end
+
+# Additional fields for RFX projects
+BLOOP !@ProjectTypeRFX > 0    ! ! !1 ! !ProjectTypeRFX1
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSubjects
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfSubjectPredictors
+ELOOP !                       ! ! !  ! !ProjectTypeRFX1
+
+# Basic fields (in all versions)
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfTimePoints
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfPredictors
+EXPRE !$BFFREAD           !!!!! ...
+if @ProjectTypeRFX > 0, ...
+    @NrOfConfounds = @NrOfSubjects; ...
+else, ...
+    @NrOfConfounds = 1; ...
+end, ...
+@RunTimeVars.Map = repmat(struct( ...
+        'Type', 15, 'LowerThreshold', [], 'UpperThreshold', [], 'Name', '', ...
+        'RGBLowerThreshPos', [255, 0, 0], 'RGBUpperThreshPos', [255, 255, 0], ...
+        'RGBLowerThreshNeg', [255, 0, 255], 'RGBUpperThreshNeg', [0, 0, 255], ...
+        'UseRGBColor', 0, 'LUTName', '<default>', 'TransColorFactor', 1, ...
+        'NrOfLags', 0, 'MinLag', 0, 'MaxLag', 0, 'CCOverlay', 0, ...
+        'ClusterSize', 4, 'EnableClusterCheck', 0, 'UseValuesAboveThresh', 1, ...
+        'DF1', 0, 'DF2', 0, 'ShowPositiveNegativeFlag', 3, ...
+        'BonferroniValue', 0, 'NrOfFDRThresholds', 0, 'FDRThresholds', zeros(0, 3), ...
+        'OverlayColors', []), 1, @NrOfPredictors);
+FIELD !@FileVersion > 3       !uint32  !double  !1, 1                     !        !NrOfConfounds
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfStudies
+EXPRE !$BFFREAD           !!!!!@NrOfStudiesWithConfounds = @NrOfStudies; @NrOfConfoundsPerStudy = ones(1, @NrOfStudies);
+FIELD !@FileVersion > 3 && @NrOfStudies > 1 !uint32 !double !1, 1         !        !NrOfStudiesWithConfounds
+FIELD !@FileVersion > 3 && @NrOfStudies > 1 !uint32 !double !1, @NrOfStudies !     !NrOfConfoundsPerStudy
+
+# predictor separation: 0=none (full FFX), 1=studies (rare), 2=by-subjects (allows RFX)
+FIELD !                       !uint8   !double  !1, 1                     !        !SeparatePredictors
+
+# transformation type: 0=none, 1=z, 3=psc
+FIELD !                       !uint8   !double  !1, 1                     !        !TransformationType
+FIELD !                       !uint16  !double  !1, 1                     !        !Resolution
+
+# Preset SerialCorrelation !
+EXPRE !$BFFREAD           !!!!!@SerialCorrelation = 1;
+
+# Some field that are, in this fashion, only present in FileVersion 1
+BLOOP !@FileVersion == 1      ! ! !1 ! !FileVersion1
+FIELD !                       !uint16  !double  !1, 1                     !        !XStart
+FIELD !                       !uint16  !double  !1, 1                     !        !XEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !YStart
+FIELD !                       !uint16  !double  !1, 1                     !        !YEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !ZStart
+FIELD !                       !uint16  !double  !1, 1                     !        !ZEnd
+ELOOP !                       ! ! !  ! !FileVersion1
+
+# Additional fields for FileVersion > 1, part 2
+BLOOP !@FileVersion > 1       ! ! !1 ! !FileVersion2pp_2
+FIELD !                       !uint8   !double  !1, 1                     !        !SerialCorrelation
+FIELD !                       !single  !double  !1, 1                     !        !MeanARPre
+FIELD !                       !single  !double  !1, 1                     !        !MeanARPost
+
+# Some additional fields for FMR projects (ProjectType == 0)
+BLOOP !@ProjectType == 0      ! ! !1 ! !ProjectType0
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfColumns
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfRows
+FIELD !                       !uint16  !double  !1, 1                     !        !NrOfSlices
+EXPRE !$BFFREAD               ! ! !  ! !$NrOfDimPPoints = [@NrOfColumns @NrOfRows @NrOfSlices];
+ELOOP !                       ! ! !  ! !ProjectType0
+
+# Some additional fields for VTC projects (ProjectType == 1)
+BLOOP !@ProjectType == 1      ! ! !1 ! !ProjectType1
+FIELD !                       !uint16  !double  !1, 1                     !        !XStart
+FIELD !                       !uint16  !double  !1, 1                     !        !XEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !YStart
+FIELD !                       !uint16  !double  !1, 1                     !        !YEnd
+FIELD !                       !uint16  !double  !1, 1                     !        !ZStart
+FIELD !                       !uint16  !double  !1, 1                     !        !ZEnd
+EXPRE !$BFFREAD               ! ! !  ! !$XDim = (@XEnd - @XStart) / @Resolution;
+EXPRE !$BFFREAD               ! ! !  ! !$YDim = (@YEnd - @YStart) / @Resolution;
+EXPRE !$BFFREAD               ! ! !  ! !$ZDim = (@ZEnd - @ZStart) / @Resolution;
+EXPRE !$BFFREAD               ! ! !  ! !$NrOfDimPPoints = [$XDim $YDim $ZDim];
+ELOOP !                       ! ! !  ! !ProjectType1
+
+# Some additional fields for MTC projects (ProjectType == 2)
+BLOOP !@ProjectType == 2      ! ! !1 ! !ProjectType2
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfVertices
+EXPRE !$BFFREAD               ! ! !  ! !$NrOfDimPPoints = @NrOfVertices;
+ELOOP !                       ! ! !  ! !ProjectType2
+
+# For writing NrOfDimPPoints must be known to check dimension
+EXPRE !$BFFWRITE              ! ! !  ! !if  @ProjectTypeRFX, $NrOfDimPPoints = size(@GLMData.RFXGlobalMap); end
+EXPRE !$BFFWRITE              ! ! !  ! !if ~@ProjectTypeRFX, $NrOfDimPPoints = size(@GLMData.MCorrSS); end
+EXPRE !$BFFWRITE              ! ! !  ! !if $NrOfDimPPoints(end) == 1, $NrOfDimPPoints(end) = []; end
+
+# Further fields in LOOP FileVesion2pp_2
+FIELD !                       !uint8   !double  !1, 1                     !        !CortexBasedStatistics
+FIELD !                       !int32   !double  !1, 1                     !        !NrOfVoxelsForBonfCorrection
+FIELD !                       !cstring !cstring !1, 1                     !        !CortexBasedStatisticsMaskFile
+
+# End of LOOP FileVersion2pp_2
+ELOOP !                       ! ! !  ! !FileVersion2pp_2
+
+# LOOP over NrOfStudies
+EXPRE !$BFFREAD           !!!!!if @NrOfStudies > 0, @Study(@NrOfStudies).NameOfAnalyzedFile = ''; end
+BLOOP !                       ! ! !@NrOfStudies ! !StudyNumber
+FIELD !                       !uint32  !double  !1, 1                     !        !Study($StudyNumber).NrOfTimePoints
+FIELD !                       !cstring !cstring !1, 1                     !        !Study($StudyNumber).NameOfAnalyzedFile
+FIELD !@ProjectType == 2      !cstring !cstring !1, 1                     !        !Study($StudyNumber).NameOfSSMFile
+FIELD !                       !cstring !cstring !1, 1                     !        !Study($StudyNumber).NameOfSDMFile
+ELOOP !                       ! ! !  ! !StudyNumber
+
+# LOOP over NrOfPredictors
+EXPRE !$BFFREAD           !!!!!if @NrOfPredictors > 0, @Predictor(@NrOfPredictors).Name1 = ''; end
+BLOOP !                       ! ! !@NrOfPredictors ! !PredictorNumber
+FIELD !                       !cstring !cstring !1, 1                     !        !Predictor($PredictorNumber).Name1
+FIELD !                       !cstring !cstring !1, 1                     !        !Predictor($PredictorNumber).Name2
+FIELD !                       !uint8   !double  !4, 3                     !        !Predictor($PredictorNumber).RGB
+ELOOP !                       ! ! !  ! !PredictorNumber
+
+# For all non-RFX models
+BLOOP !@ProjectTypeRFX == 0   ! ! !1 ! !NoRFXModel
+
+# Design matrix, iXX
+EXPRE !$BFFWRITE          !!!!!if numel(@DesignMatrix) <= 1000000, @DesignMatrix = full(@DesignMatrix'); else, fwrite(fid, full(@DesignMatrix'), 'single'); end, @iXX = full(@iXX);
+FIELD !$BFFREAD || (@NrOfPredictors * @NrOfTimePoints) <= 1000000 !single  !double  !@NrOfPredictors, @NrOfTimePoints !!DesignMatrix
+FIELD !@FileVersion > 1       !single  !double  !@NrOfPredictors, @NrOfPredictors !!iXX
+EXPRE !                   !!!!!...
+if ~issparse(@DesignMatrix) && ...
+    sum(@DesignMatrix(:) ~= 0) <= (0.25 * numel(@DesignMatrix)), ...
+    @DesignMatrix = sparse(@DesignMatrix); ...
+end, ...
+if ~issparse(@iXX) && ...
+    sum(@iXX(:) ~= 0) <= (0.25 * numel(@iXX)), ...
+    @iXX = sparse(@iXX); ...
+end, ...
+if $BFFREAD || numel(@DesignMatrix) <= 1000000, ...
+    @DesignMatrix = @DesignMatrix'; ...
+end
+
+# GLMData
+BLOOP !~$HEADERONLY           ! ! !1 ! !NoRFXModelData
+FIELD !                       !single  !single  !$NrOfDimPPoints, 1       !        !GLMData.MultipleRegressionR
+FIELD !                       !single  !single  !$NrOfDimPPoints, 1       !        !GLMData.MCorrSS
+FIELD !                       !single  !single  !$NrOfDimPPoints, @NrOfPredictors !!GLMData.BetaMaps
+FIELD !@FileVersion > 1       !single  !single  !$NrOfDimPPoints, @NrOfPredictors !!GLMData.XY
+FIELD !@FileVersion > 1       !single  !single  !$NrOfDimPPoints, 1       !        !GLMData.TimeCourseMean
+FIELD !@SerialCorrelation > 0 !single  !single  !$NrOfDimPPoints, @SerialCorrelation ! !GLMData.ARLag
+ELOOP !                       ! ! !  ! !NoRFXModelData
+EXPRE !$HEADERONLY        !!!!!...
+@GLMData.MultipleRegressionR = []; ...
+@GLMData.MCorrSS = []; ...
+@GLMData.BetaMaps = []; ...
+@GLMData.XY = []; ...
+@GLMData.TimeCourseMean = []; ...
+@GLMData.ARLag = []; ...
+fseek(fid, 4 * prod($NrOfDimPPoints) * (4 + 2 * @NrOfPredictors), 0);
+EXPRE !                   !!!!!...
+glmsubs = {@Study(:).NameOfAnalyzedFile}; ...
+glmsubs = glmsubs(:); ...
+for glmsubc = 1:numel(glmsubs), ...
+    [glmsubp, glmsubs{glmsubc}] = fileparts(glmsubs{glmsubc}); ...
+    glmsubs{glmsubc} = regexprep(glmsubs{glmsubc}, '^([^_]+)_.*$', '$1'); ...
+end, ...
+@NrOfSubjects = numel(unique(glmsubs));
+
+# end of NoRFXModel loop
+ELOOP !                       ! ! !  ! !NoRFXModel
+
+# For RFX model instead
+BLOOP !@ProjectTypeRFX > 0 && ~$HEADERONLY ! ! !1 ! !DoRFXModel
+
+# read one global map
+FIELD !                       !single  !single  !$NrOfDimPPoints, 1       !        !GLMData.RFXGlobalMap
+
+# read subject/predictor maps
+EXPRE !$BFFREAD           !!!!!...
+if @NrOfSubjects > 0, ...
+    @GLMData.Subject(@NrOfSubjects).BetaMaps = []; ...
+end
+BLOOP !                       ! ! !@NrOfSubjects ! !SubjectNr
+FIELD !                       !single  !single  !$NrOfDimPPoints, @NrOfSubjectPredictors ! !GLMData.Subject($SubjectNr).BetaMaps
+ELOOP !                       ! ! !  ! !SubjectNr
+
+# end of DoRFXModel loop
+ELOOP !                       ! ! !  ! !DoRFXModel
+EXPRE !@ProjectTypeRFX > 0 &&  $HEADERONLY !!!!!...
+@GLMData.RFXGlobalMap = []; ...
+@GLMData.Subject(1).BetaMaps = []; ...
+@GLMData.Subject(@NrOfSubjects).BetaMaps = []; ...
+fseek(fid, ...
+    4 * prod($NrOfDimPPoints) * (1 + @NrOfSubjects * @NrOfSubjectPredictors), 0);
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!...
+$RemSize = 0; ...
+try, ...
+    if isfield(@@, 'REMAININGCONTENT'), ...
+        $RemSize = prod(size(@REMAININGCONTENT)); ...
+    end, ...
+end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@ProjectType = 1;
+@ProjectTypeRFX = 0;
+@FileVersion = 4;
+@NrOfSubjects = 0;
+@NrOfSubjectPredictors = 0;
+@NrOfTimePoints = 250;
+@NrOfPredictors = 0;
+@NrOfConfounds = 0;
+@NrOfStudies = 0;
+@NrOfStudiesWithConfounds = @NrOfStudies;
+@NrOfConfoundsPerStudy = zeros(1, @NrOfStudiesWithConfounds);
+@SeparatePredictors = 0;
+@TransformationType = 0;
+@Resolution = 3;
+@SerialCorrelation = 0;
+@MeanARPre = 0;
+@MeanARPost = 0;
+@NrOfColumns = 0;
+@NrOfRows = 0;
+@NrOfSlices = 0;
+@XStart = 57;
+@XEnd = 231;
+@YStart = 52;
+@YEnd = 172;
+@ZStart = 59;
+@ZEnd = 197;
+@NrOfVertices = 0;
+@CortexBasedStatistics = 0;
+t_xdim = round((@XEnd - @XStart) / @Resolution);
+t_ydim = round((@YEnd - @YStart) / @Resolution);
+t_zdim = round((@ZEnd - @ZStart) / @Resolution);
+@NrOfVoxelsForBonfCorrection = t_xdim * t_ydim * t_zdim;
+@CortexBasedStatisticsMaskFile = '';
+@Study = emptystruct({ ...
+    'NrOfTimePoints', 'NameOfAnalyzedFile', 'NameOfSSMFile', 'NameOfSDMFile'});
+@Predictor = emptystruct({'Name1', 'Name2', 'RGB'});
+@DesignMatrix = ones(@NrOfTimePoints, 1);
+@iXX = 1 / @NrOfTimePoints;
+@GLMData = emptystruct({ ...
+    'MultipleRegressionR', 'MCorrSS', 'BetaMaps', 'XY', 'TimeCourseMean', ...
+    'ARLag', 'RFXGlobalMap', 'Subject'});
+@GLMData(1).Subject = emptystruct({'BetaMaps'});
+@RunTimeVars = struct( ...
+    'AutoSave', true, ...
+    'Contrasts', {cell(0, 2)}, ...
+    'ContrastColors', zeros(0, 3), ...
+    'CovariatesColors', {cell(0, 2)}, ...
+    'CovariatesData', [], ...
+    'CovariatesNames', {{}}, ...
+    'FFXWeights', [], ...
+    'FFXwiXX', [], ...
+    'Groups', {cell(0, 2)}, ...
+    'Map', emptystruct({'Type', 'LowerThreshold', 'UpperThreshold', 'Name', ...
+        'RGBLowerThreshPos', 'RGBUpperThreshPos', 'RGBLowerThreshNeg', 'RGBUpperThreshNeg', ...
+        'UseRGBColor', 'LUTName', 'TransColorFactor', 'NrOfLags', 'MinLag', 'MaxLag', ...
+        'CCOverlay', 'ClusterSize', 'EnableClusterCheck', 'UseValuesAboveThresh', ...
+        'DF1', 'DF2', 'ShowPositiveNegativeFlag', 'BonferroniValue', ...
+        'NrOfFDRThresholds', 'FDRThresholds', 'OverlayColors'}), ...
+    'MapSelection', {{{}, []}}, ...
+    'MotionParameters', [], ...
+    'MotionParamsDiff', false, ...
+    'MotionParamsSquared', false, ...
+    'PerSubjectGLMs', emptystruct({'SourceFile', 'SubjectID', ...
+        'Predictors', 'iXX', 'DF1', 'SEMap', 'ARLag'}), ...
+    'PredictorColors', [], ...
+    'RobustRegression', false, ...
+    'SubjectSPMsn', struct, ...
+    'SubjectTrfPlus', struct, ...
+    'SubSels', {{'default', {}}}, ...
+    'SubSelsSel', 'default', ...
+    'SubSel', {{}}, ...
+    'TempFilterCutoff', Inf, ...
+    'TempFilterType', 'dct', ...
+    'TrfPlus', eye(4), ...
+    'UseGroups', false);
+EndNewFileCode

@@ -1,0 +1,53 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# DICOM files
+#
+# Version:  v1.1
+# Build:    16060112
+# Date:     Jun-01 2016, 12:20 PM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+Description:DICOM files
+EncodingSyntax:ieee-le
+Extensions:dcm
+Magic:|
+name             |range       |type    |magic
+DCM_DICMMagic    |129, 132    |hex     |44,49,43,4d
+EndMagic
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# no write support at the moment
+EXPRE !$BFFWRITE              !!!!!error('no write support');
+
+# use external reader !
+EXPRE !$BFFREAD               !!!!!...
+try, ...
+    t_obj = dcmio($FILENAME); ...
+    @@ = getcont(t_obj); ...
+    delete(t_obj); ...
+catch ne_eo; ...
+    rethrow(ne_eo); ...
+end
+
+EndListOfFields
+
+NewFileCode:!
+@Magic = 'DICM';
+@Preamble = 1;
+@MetaTSExplicit = 1;
+@MetaLittleEndian = 1;
+@Meta = emptystruct({'Key', 'VR', 'VLShort', 'VLLong', 'Value'});
+@MetaKeys = cell(0, 1);
+@MetaKeyLookup = struct;
+@DataDictionary = 'OFFIS';
+@DataTSExplicit = 1;
+@DataLittleEndian = 1;
+@Data = emptystruct({'Key', 'VR', 'VLShort', 'VLLong', 'Value'});
+@DataKeys = cell(0, 1);
+@DataKeyLookup = struct;
+EndNewFileCode

@@ -1,0 +1,320 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# BrainVoyager QX file format for *.VMR/*.V16 files (Volumetric MR dataset)
+# VMR/V16 FileVersions supported: 0, 1, 2, 3, 4
+#
+# VMR files contain anatomical 3D data stored as bytes. The VMR
+# format version 2, which was designed for BrainVoyager QX in
+# 2003, contains also the positioning data. An important point
+# is that you understand how the three axes are ordered (see
+# below).
+#
+# The positioning information is saved at the end of the file,
+# after the actual data. 
+#
+# Intensity values ranging from 0 to 225 are gray scale values.
+# Special color values are stored in the range 226-255.
+#
+# mapping to Talairach axes is as follows:
+# - BV X front -> back = Y in Tal space
+# - BV Y top -> bottom = Z in Tal space
+# - BV Z left -> right = X in Tal space 
+#
+# Version:  v1.1
+# Build:    16012401
+# Date:     Jan-24 2016, 1:06 AM EST
+# Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+# URL/Info: http://neuroelf.net/
+
+# FILE FORMAT
+DefaultProperty:VMRData
+Description:Volumetric anatomical MRI files,Volumetric anatomical MRI 16-bit files
+EncodingSyntax:ieee-le
+Extensions:vmr,v16
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+
+# although it costs some time, preset all fields!
+EXPRE !$BFFREAD           !!!!!fftype = 'vmr'; eval(bffspec.NewFileCode);
+
+# Assume using a FileVersion tag
+EXPRE !                   !!!!!$UFV = true;
+EXPRE !$BFFREAD           !!!!!@FileVersion = 1;
+
+# On read, check for FileVersion 1
+FIELD !$BFFREAD               !uint16  !double  !1, 1                     !        !DimX
+FIELD !$BFFREAD               !uint16  !double  !1, 1                     !        !DimY
+FIELD !$BFFREAD               !uint16  !double  !1, 1                     !        !DimZ
+
+# check filesize for VMR **and** V16 files
+EXPRE !$BFFREAD           !!!!!if (@DimX * @DimY * @DimZ) == ($FILESIZE + 6), $UFV = false; end
+EXPRE !$BFFREAD           !!!!!if (@DimX * @DimY * @DimZ) == (2 * $FILESIZE + 6), $UFV = false; end
+
+# only allow FileVersion < 16
+EXPRE !$BFFREAD           !!!!!if @DimX >= 16, $UFV = false; end
+
+# which VMR version
+EXPRE !$BFFREAD           !!!!!@VMR8bit = true; if ~isempty(strfind($EXTENSION, '16')), @VMR8bit = false; end
+
+# rewind in any case
+EXPRE !                   !!!!!fseek(fid, 0, -1);
+
+# Handle NO FileVersion given -> only write VMRData
+EXPRE !$BFFWRITE  !  !  !  !  !@VMR8bit = isempty(strfind(class(@VMRData), '16')); $OFV = @FileVersion; if ~@VMR8bit, @FileVersion = 1; end; try, if @FileVersion == 1, $UFV = false; end, catch ne_eo; neuroelf_lasterr(ne_eo); $UFV = false; end
+
+# Reading first uint16, check for file version ...
+FIELD !$UFV                   !uint16  !double  !1, 1                     !        !FileVersion
+
+# If FileVersion is zero, we have to read NrOfCrossCorrLags
+FIELD !@FileVersion == 0      !uint16  !double  !1, 1                     !0       !NrOfCrossCorrLags
+
+# Setting up variables for writing ...
+EXPRE !$BFFWRITE          !!!!!@DimX = size(@VMRData, 1);  # size taken from data
+EXPRE !$BFFWRITE          !!!!!@DimY = size(@VMRData, 2);  # size taken from data
+EXPRE !$BFFWRITE          !!!!!@DimZ = size(@VMRData, 3);  # size taken from data
+
+# Read/write DimX, DimY, DimZ, VMRData
+FIELD !                       !uint16  !double  !1, 1                     !        !DimX
+FIELD !                       !uint16  !double  !1, 1                     !        !DimY
+FIELD !                       !uint16  !double  !1, 1                     !        !DimZ
+FIELD ! @VMR8bit && ~$HEADERONLY !uint8  !uint8  !@DimX, @DimY, @DimZ     !        !VMRData
+FIELD !~@VMR8bit && ~$HEADERONLY !uint16 !uint16 !@DimX, @DimY, @DimZ     !        !VMRData
+EXPRE !$HEADERONLY        !!!!!@VMRData = []; fseek(fid, (2 - @VMR8bit) * @DimX * @DimY * @DimZ, 0);
+
+# Some additional fields for FileVersion 2
+BLOOP !@FileVersion > 1       ! ! !1 ! !FileVersion2pp
+
+# And yet some more fields in VMR FileVersion 3
+BLOOP !@FileVersion > 2       ! ! !1 ! !FileVersion3pp
+FIELD !                       !int16   !double  !1, 1                     !        !OffsetX
+FIELD !                       !int16   !double  !1, 1                     !        !OffsetY
+FIELD !                       !int16   !double  !1, 1                     !        !OffsetZ
+FIELD !                       !uint16  !double  !1, 1                     !        !FramingCube
+ELOOP !                       ! ! !  ! !FileVersion3pp
+
+# Continuing with FileVersion 2 fields...
+FIELD !                       !uint32  !logical !1, 1                     !        !PosInfoVerified
+FIELD !                       !uint32  !double  !1, 1                     !        !CoordinateSystem
+FIELD !                       !single  !double  !1, 1                     !        !Slice1CenterX
+FIELD !                       !single  !double  !1, 1                     !        !Slice1CenterY
+FIELD !                       !single  !double  !1, 1                     !        !Slice1CenterZ
+FIELD !                       !single  !double  !1, 1                     !        !SliceNCenterX
+FIELD !                       !single  !double  !1, 1                     !        !SliceNCenterY
+FIELD !                       !single  !double  !1, 1                     !        !SliceNCenterZ
+FIELD !                       !single  !double  !1, 1                     !        !RowDirX
+FIELD !                       !single  !double  !1, 1                     !        !RowDirY
+FIELD !                       !single  !double  !1, 1                     !        !RowDirZ
+FIELD !                       !single  !double  !1, 1                     !        !ColDirX
+FIELD !                       !single  !double  !1, 1                     !        !ColDirY
+FIELD !                       !single  !double  !1, 1                     !        !ColDirZ
+FIELD !                       !uint32  !double  !1, 1                     !        !NRows
+FIELD !                       !uint32  !double  !1, 1                     !        !NCols
+FIELD !                       !single  !double  !1, 1                     !        !FoVRows
+FIELD !                       !single  !double  !1, 1                     !        !FoVCols
+FIELD !                       !single  !double  !1, 1                     !        !SliceThickness
+FIELD !                       !single  !double  !1, 1                     !        !GapThickness
+
+# Read spatial transformation information
+FIELD !                       !uint32  !double  !1, 1                     !        !NrOfPastSpatialTransformations
+EXPRE !$BFFREAD           !!!!! ...
+@Trf = emptystruct({ ...
+    'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', ...
+    'SourceFileOfSpatialTransformation', 'NrOfSpatialTransformationValues', ...
+    'TransformationValues'});
+BLOOP !                       ! ! !@NrOfPastSpatialTransformations ! !NumTrf
+FIELD !                       !cstring !cstring !1                        !        !Trf($NumTrf).NameOfSpatialTransformation
+FIELD !                       !uint32  !double  !1, 1                     !        !Trf($NumTrf).TypeOfSpatialTransformation
+FIELD !                       !cstring !cstring !1                        !        !Trf($NumTrf).SourceFileOfSpatialTransformation
+FIELD !                       !uint32  !double  !1, 1                     !        !Trf($NumTrf).NrOfSpatialTransformationValues
+FIELD !@Trf($NumTrf).TypeOfSpatialTransformation == 1!single!double!3, 3  !        !Trf($NumTrf).TransformationValues
+EXPRE !$BFFWRITE && @Trf($NumTrf).TypeOfSpatialTransformation == 2!!!!!@Trf($NumTrf).TransformationValues = @Trf($NumTrf).TransformationValues';
+FIELD !@Trf($NumTrf).TypeOfSpatialTransformation == 2!single!double!4, 4  !        !Trf($NumTrf).TransformationValues
+EXPRE !$BFFREAD && @Trf($NumTrf).TypeOfSpatialTransformation == 2!!!!!@Trf($NumTrf).TransformationValues = @Trf($NumTrf).TransformationValues';
+FIELD !@Trf($NumTrf).TypeOfSpatialTransformation >  2!single!double!@Trf($NumTrf).NrOfSpatialTransformationValues, 1!!Trf($NumTrf).TransformationValues
+ELOOP !                       ! ! !  ! !NumTrf
+
+# if no transformations, yet initialize field
+EXPRE !@NrOfPastSpatialTransformations < 1!!!!! ...
+@Trf = emptystruct({ ...
+    'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', ...
+    'SourceFileOfSpatialTransformation', 'NrOfSpatialTransformationValues', ...
+    'TransformationValues'});
+
+# further fields
+FIELD !                       !uint8   !double  !1, 1                     !        !Convention
+FIELD !@FileVersion > 3       !uint8   !double  !1, 1                     !        !ReferenceSpace
+
+# And yet some additional fields for more recent versions
+FIELD !                       !single  !double  !1, 1                     !        !VoxResX
+FIELD !                       !single  !double  !1, 1                     !        !VoxResY
+FIELD !                       !single  !double  !1, 1                     !        !VoxResZ
+FIELD !                       !uint8   !logical !1, 1                     !        !VoxResInTalairach
+FIELD !                       !uint8   !logical !1, 1                     !        !VoxResVerified
+
+# check resolutions (strange BV behavior...?)
+EXPRE !$BFFREAD           !!!!!if all(abs([@VoxResX, @VoxResY, @VoxResZ] - 1) < 1e-5), @VoxResX = 1; @VoxResY = 1; @VoxResZ = 1; end, if all(abs([@VoxResX, @VoxResY, @VoxResZ] - 0.5) < 1e-5), @VoxResX = 0.5; @VoxResY = 0.5; @VoxResZ = 0.5; end
+
+# in some cases there are extra fields even for version 2
+BLOOP !@FileVersion > 2 && (($BFFREAD && ($FILESIZE - ftell(fid)) >= 12) || ($BFFWRITE)) ! ! !1 ! !FileVersion3pp2
+FIELD !                       !int32   !double  !1, 1                     !        !MinOriginalValue
+FIELD !                       !int32   !double  !1, 1                     !        !MeanOriginalValue
+FIELD !                       !int32   !double  !1, 1                     !        !MaxOriginalValue
+ELOOP !                       ! ! !  ! !FileVersion3pp2
+
+# End of Loop @FileVersion > 1
+ELOOP !                       ! ! !  ! !FileVersion2pp
+
+# give VMR back as received
+EXPRE !$BFFWRITE          !!!!!@FileVersion = $OFV;
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$HEADERONLY        !!!!!fseek(fid, 0, 1);
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+# guess framingcube and offset if needed
+EXPRE !$BFFREAD          !!!!!if any(diff([@VoxResX; @VoxResY; @VoxResZ])) && all([@OffsetX, @OffsetY, @OffsetZ] == 0) && any([@DimX, @DimY, @DimZ] ~= @FramingCube), if @FileVersion < 3, if any([@DimX, @DimY, @DimZ] > 256), @FramingCube = 512; else, @FramingCube = 256; end, end, tfc = round(@FramingCube / 2); @OffsetX = floor(tfc - round(@VoxResX * @DimX / 2)); @OffsetY = floor(tfc - round(@VoxResY * @DimY / 2)); @OffsetZ = floor(tfc - round(@VoxResZ * @DimZ / 2)); end
+
+# if V16 is available load/save it, too (if autov16 enabled)
+EXPRE !$BFFREAD           !!!!! ...
+xfftr = xff(); ...
+[tfname{1:3}] = fileparts($FILENAME); ...
+if @VMR8bit && xfftr.Config('vmr', 'autov16'), ...
+    v16f = ''; ...
+    tnlc = [tfname{1} '/' tfname{2} '.v16']; ...
+    tnuc = [tfname{1} '/' tfname{2} '.V16']; ...
+    if exist(tnlc, 'file') == 2, ...
+        v16f = tnlc; ...
+    elseif exist(tnuc, 'file') == 2, ...
+        v16f = tnuc; ...
+    end, ...
+    if ~isempty(v16f), ...
+        try, ...
+            v16o = []; ...
+            if istransio(@VMRData), ...
+                tioflag = {'t'}; ...
+            else, ...
+                tioflag = {}; ...
+            end, ...
+            v16o = xff(v16f, tioflag{:}); ...
+            v16c = getcont(v16o); ...
+            delete(v16o); ...
+            if all([@DimX, @DimY, @DimZ] == [v16c.DimX, v16c.DimY, v16c.DimZ]), ...
+                @VMRData16 = v16c.VMRData; ...
+            end, ...
+        catch ne_eo; ...
+            neuroelf_lasterr(ne_eo); ...
+            delete(v16o); ...
+        end, ...
+    end, ...
+end
+
+EXPRE !$BFFWRITE          !!!!! ...
+xfftr = xff(); ...
+[tfname{1:3}] = fileparts($FILENAME); ...
+v16o = []; ...
+v16f = [tfname{1} '/' tfname{2} '.v16']; ...
+if strcmpi(class(@VMRData), 'uint8') && strcmpi(class(@VMRData16), 'uint16') && ...
+    xfftr.Config('vmr', 'autov16') && isequal(size(@VMRData), size(@VMRData16)) && ...
+    (~istransio(@VMRData16) || ~strcmpi(v16f, filename(@VMRData16))), ...
+    try, ...
+        v16o = xff('new:v16'); ...
+        v16c = getcont(v16o); ...
+        v16c.FileVersion = 1; ...
+        v16c.DimX = @DimX; ...
+        v16c.DimY = @DimY; ...
+        v16c.DimZ = @DimZ; ...
+        v16c.VMR8bit = false; ...
+        v16c.VMRData = @VMRData16; ...
+        setcont(v16o, v16c); ...
+        Call(v16o, 'SaveAs', v16f); ...
+        if istransio(@VMRData16), ...
+            v16c = getcont(v16o); ...
+            @VMRData16 = v16c.VMRData; ...
+        end, ...
+        delete(v16o); ...
+    catch ne_eo; ...
+        neuroelf_lasterr(ne_eo); ...
+        delete(v16o); ...
+    end; ...
+end
+EndListOfFields
+
+NewFileCode:!
+# check which extension
+if ~strcmpi(fftype, 'v16')
+#
+# for VMR files
+@FileVersion = 3;
+@DimX = 256;
+@DimY = 256;
+@DimZ = 256;
+@VMR8bit = true;
+@VMRData = uint8(0);
+@VMRData(256, 256, 256) = @VMRData(1);
+@VMRData16 = [];
+@OffsetX = 0;
+@OffsetY = 0;
+@OffsetZ = 0;
+@FramingCube = 256;
+@PosInfoVerified = false;
+@CoordinateSystem = 1;
+@Slice1CenterX = 127.5;
+@Slice1CenterY = 0;
+@Slice1CenterZ = 0;
+@SliceNCenterX = -127.5;
+@SliceNCenterY = 0;
+@SliceNCenterZ = 0;
+@RowDirX = 0;
+@RowDirY = 1;
+@RowDirZ = 0;
+@ColDirX = 0;
+@ColDirY = 0;
+@ColDirZ = -1;
+@NRows = 256;
+@NCols = 256;
+@FoVRows = 256;
+@FoVCols = 256;
+@SliceThickness = 1;
+@GapThickness = 0;
+@NrOfPastSpatialTransformations = 0;
+@Trf = emptystruct({ ...
+    'NameOfSpatialTransformation', 'TypeOfSpatialTransformation', ...
+    'SourceFileOfSpatialTransformation', 'NrOfSpatialTransformationValues', ...
+    'TransformationValues'});
+@Convention = 1;
+@ReferenceSpace = 0;
+@VoxResX = 1;
+@VoxResY = 1;
+@VoxResZ = 1;
+@VoxResInTalairach = false;
+@VoxResVerified = false;
+@MinOriginalValue = 0;
+@MeanOriginalValue = 127;
+@MaxOriginalValue = 255;
+#
+# for V16 files
+else
+#
+@FileVersion = 1;
+@DimX = 256;
+@DimY = 256;
+@DimZ = 256;
+@VMR8bit = false;
+@VMRData = uint16(0);
+@VMRData(256, 256, 256) = @VMRData(1);
+@VMRData16 = [];
+@OffsetX = 0;
+@OffsetY = 0;
+@OffsetZ = 0;
+@FramingCube = 256;
+@VoxResX = 1;
+@VoxResY = 1;
+@VoxResZ = 1;
+@VoxResInTalairach = false;
+@VoxResVerified = false;
+end
+EndNewFileCode
