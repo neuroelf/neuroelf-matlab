@@ -42,24 +42,24 @@ And last but not least, I thank my partner, Changyu Zhu, who supports me at time
 
 ### Overview
 
-The NeuroElf toolbox has three main components, a graphical user interface (`neuroelf_gui`), a file handling class (`@xff`) and a library of functions for general data processing (`@neuroelf).
+The NeuroElf toolbox has three main components, a graphical user interface (`neuroelf_gui`), a file handling class (`@xff`) and a library of functions for general data processing (`@neuroelf`).
 
 This readme (manual) uses the following notation: two greater-than symbols at the beginning of a paragraph (>>) in a "code box" indicate a single line of code to be entered at the MATLAB prompt (please enter without the >> symbols!). For a longer paragraph of code, an initial line (and possibly one or several subsequent lines) will begin with a per-cent symbol (%) indicating a MATLAB comment.
 
 #### Installation
 
-Depending on whether you downloaded the installation M-file+MAT-file version or the flat folder version, instructions slightly differ.
+Depending on whether you downloaded the installation M-file+MAT-file version, or the flat folder version, or cloned from github, instructions slightly differ.
 
-The archive containing NeuroElf is about 20 Megabytes in length. Once unpacked and installed, NeuroElf requires at least 100 Megabyte and, if all additional files are created, can require as much as 2.5 Gigabyte of disk space. So please make sure that the folder you choose as installation folder is on a medium that offers enough free space (i.e. does not come with a hard limitation or quota).
+The archive containing NeuroElf is about 30 Megabytes in length. Once unpacked and installed, NeuroElf requires at least 100 Megabyte and, if all additional files are created, can require as much as 2.5 Gigabyte of disk space. So please make sure that the folder you choose as installation folder is on a medium that offers enough free space (i.e. does not come with a hard limitation or quota).
 
-Please be aware that as a user of NeuroElf, you should have write-access to a few critical folders located in the <span class="nefile">_files</span> folder, and also the files located in the <span class="nefile">_core/config</span> folder. Without write access in these folders some functions may not work properly!
+Please be aware that as a user of NeuroElf, you should have write-access to a few critical folders located in the `_files` folder, and also the files located in the `_core/config` folder. Without write access in these folders some functions may not work properly!
 
 ##### M-file version installation
 
-To install NeuroElf, unzip the content (three files: `NeuroElf_v10.m`, `NeuroElf_v10.mat`, and `ne_eo.m`), then open MATLAB and change the current folder into the folder containing those three files. Then enter
+To install NeuroElf, unzip the content (three files: `NeuroElf_v11.m`, `NeuroElf_v11.mat`, and `ne_eo.m`), then open MATLAB and change the current folder into the folder containing those three files. Then enter
 
 ```
->> NeuroElf_v10 -i
+>> NeuroElf_v11 -i
 ```
 
 to start the installation process. You will be asked where to install the toolbox, with the default being the toolbox folder of your MATLAB installation. If you do not have write permissions in that folder, please choose "n" when being asked whether this is a good location and then enter a more suitable folder path. If in doubt, enter a path within your home folder (unless there is a quota restriction in place, at which point you should talk to your system administrator to determine a good location).
@@ -89,7 +89,7 @@ The installation folder has the following folder structure:
 * `@xfigure/` - class providing object-oriented design patterns for to MATLAB's graphics handles
 * `@xini/` - class providing an interface to *.ini configuration files
 * `@xprogress/` - simplified class for progress bars
-* `_core/>` - control, text, and image files required for NeuroElf's core functionality
+* `_core/` - control, text, and image files required for NeuroElf's core functionality
 * `_files/` - auxiliary files required for additional functions
 
 #### Files coming with NeuroElf
@@ -138,7 +138,7 @@ The highlighted areas are:
 3b. Statistical map configuration: used to configure a single statistical map (thresholds, visible tails, cluster size thresholding, coloring).
 
 <table border=0><tr><td height=144><img src="_files/manual/NE_stats_buttons2.png" height=144 width=280 alt="NeuroElf GUI statistical map configuration" /></td>
-<td>The two edit boxes with values represent the lower and upper threshold for the currently selected (single) map. All statistical values (absolutely) below the lower boundary will not be shown (transparent). For LUT configuration, values will be scaled between 1 and the number of lookup-colors defined in the LUT and then be shown in that color. For RGB configuration, all values above the upper boundary will be shown in the colors configured with the "++" and "--" buttons (depending on the sign of the statistic and enabled tails). Values inbetween the boundaries will be shown in a color between the "+" and "++" color for the positive tail or between the "-" and "--" colors for the negative tail. The p-value dropdown can be used to set a specific p-value as the lower boundary. The p-value will be converted into the appropriate statistical threshold by NeuroElf. In addition to a "height threshold", a cluster size (extent) threshold can be set in the edit box following the "k-thresh:" label and enable with the checkbox right before.</td></table>
+<td width=420>The two edit boxes with values represent the lower and upper threshold for the currently selected (single) map. All statistical values (absolutely) below the lower boundary will not be shown (transparent). For LUT configuration, values will be scaled between 1 and the number of lookup-colors defined in the LUT and then be shown in that color. For RGB configuration, all values above the upper boundary will be shown in the colors configured with the "++" and "--" buttons (depending on the sign of the statistic and enabled tails). Values inbetween the boundaries will be shown in a color between the "+" and "++" color for the positive tail or between the "-" and "--" colors for the negative tail. The p-value dropdown can be used to set a specific p-value as the lower boundary. The p-value will be converted into the appropriate statistical threshold by NeuroElf. In addition to a "height threshold", a cluster size (extent) threshold can be set in the edit box following the "k-thresh:" label and enable with the checkbox right before.</td></table>
 
 4. Cluster/VOI tools: used to select a cluster and update the cursor position to its peak coordinate, also possibly auto-extracting data from clusters. The buttons can be used to:
 
@@ -320,7 +320,7 @@ Additional functions that are part of the drawing tools are (from the forth butt
 
 The drawing function itself is implemented in `@neuroelf/private/ne_draw.m`. Scripting of this function (e.g. to draw a specific shape or remove a specific area from a dataset) can be done with `neuroelf_gui('draw', [X, Y, Z] [, SLICINGDIRECTION])`. The function that controls the drawing mode is implemented in `@neuroelf/private/ne_setdrawmode.m`, and before using this via script, it is recommended to read the help from `neuroelf_gui('help', 'setdrawmode')`.
 
-##### Surface reconstruction<
+##### Surface reconstruction
 
 This function allows binary VMR datasets (where voxels are either 0 or have a unique, common foreground value, usually 240) to be represented as a surface mesh. A marching-cubes algorithm is applied and the resulting surface (SRF object) is added to the viewer and shown.
 
