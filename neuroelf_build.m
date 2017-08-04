@@ -14,8 +14,8 @@ function [b, bnl, v] = neuroelf_build
 % Using: findfiles, grep.
 
 % Version:  v1.1
-% Build:    17080311
-% Date:     Aug-03 2017, 11:12 AM EST
+% Build:    17080412
+% Date:     Aug-04 2017, 12:48 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 

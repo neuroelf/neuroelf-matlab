@@ -18,12 +18,12 @@ function neuroelf_pack(tfolder, update)
 % Both types of installation contain the necessary files!
 
 % Version:  v1.1
-% Build:    16071513
-% Date:     Jul-15 2016, 1:19 PM EST
+% Build:    17080412
+% Date:     Aug-04 2017, 12:45 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2016, 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -131,6 +131,9 @@ if ~isempty(regexpi(computer, '^maci'))
     if ~isempty(shenfiles)
         renamefile(shenfiles, nelftp);
     end
+    if exist([nelffld '/.git'], 'dir') == 7
+        movefile([nelffld '/.git'], [nelftp '/.git']);
+    end
     if exist([nelffld '/_files/spm/dartel'], 'dir') == 7
         movefile([nelffld '/_files/spm/dartel'], [nelftp '/dartel']);
     end
@@ -165,6 +168,9 @@ if ~isempty(regexpi(computer, '^maci'))
     if ~isempty(shenfiles)
         renamefile(shenfiles, [nelffld '/_files/shenparcel']);
     end
+    if exist([nelftp '/.git'], 'dir') == 7
+        movefile([nelftp '/.git'], [nelffld '/.git']);
+    end
     if exist([nelftp '/dartel'], 'dir') == 7
         movefile([nelftp '/dartel'], [nelffld '/_files/spm/dartel']);
     end
@@ -198,7 +204,8 @@ popt.exclude = { ...
     'Template.*mm_.*', ...
     '.*_term\.nii\.gz$', ...
     '_todo', ...
-    '.*\~$' ...
+    '.*\~$', ...
+    '.git' ...
     };
 popt.finish = {'neuroelf_setup'; 'try, neuroelf_makefiles ask; end'};
 if ~isempty(update)
