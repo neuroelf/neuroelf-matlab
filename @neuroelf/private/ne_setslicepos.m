@@ -20,12 +20,12 @@ function varargout = ne_setslicepos(varargin)
 % See also ne_draw.
 
 % Version:  v1.1
-% Build:    16061500
-% Date:     Jun-15 2016, 12:20 AM EST
+% Build:    17080322
+% Date:     Aug-03 2017, 10:12 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2015, 2016, Jochen Weber
+% Copyright (c) 2010 - 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -1036,12 +1036,12 @@ else
 
     % set image data to zeros
     if cpg == 1
-        sag = uint8(zeros(256, 256));
+        sag = uint8(zeros(cc.tioosz, cc.tioosz));
         setlayer(tio(1), 1, sag);
         setlayer(tio(2), 1, sag);
         setlayer(tio(3), 1, sag);
     elseif cpg == 2
-        setlayer(tio, 1, uint8(zeros(512, 512)));
+        setlayer(tio, 1, uint8(zeros(2 * cc.tioosz, 2 * cc.tioosz)));
     end
 
     % disable timecourse display
