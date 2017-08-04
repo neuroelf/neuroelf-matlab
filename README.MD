@@ -1,5 +1,13 @@
 # NeuroElf (MATLAB)
 
+Please note: if you clone/download from GitHub or install from a "flat" folder ZIP file, you must manually add the NeuroElf main folder to the MATLAB path (without sub-folders), and subsequently call the `neuroelf_setup` function:
+
+```
+>> neuroelf_setup;
+```
+
+and then follow the prompts on screen, to select a suitable temporary folder and decide whether or not you wish to build a set of binary files, which for a fresh install can take up to an hour of processing time.
+
 ## User manual
 
 ![NeuroElf GUI without datasets](_files/manual/NE_gui_empty.png)
