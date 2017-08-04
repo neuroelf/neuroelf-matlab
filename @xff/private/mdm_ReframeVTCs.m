@@ -136,50 +136,83 @@ for fc = 1:numel(workfiles)
         if istransio(vtcd)
             vtcd = resolve(transio);
         end
+        vtcsz = size(vtcd);
+        vv = vtcsz(1);
+        vx = vtcsz(2);
+        vy = vtcsz(3);
+        vz = vtcsz(4);
 
         % delete source object
         delete(vtco{1});
         vtco{1} = [];
 
-        % create an array of the same type with the required size
+        % create an 1x1 value of the same type with the required size = 0
         newd = vtcd(1);
-        newd(:) = repmat(newd, [size(vtcd, 1), sbox]);
+        newd(:) = 0;
 
-        % figure out the from/to in the source and target data
+        % figure out how many voxels to add/delete at each dimensions 1/end
         srcbox = reshape(bboxes(workfiles(fc), 2:7), 2, 3);
-        if srcbox(1, 1) < bbox(1, 1)
-            sfromx = 1 + round((bbox(1, 1) - srcbox(1, 1)) / res);
-            tfromx = 1;
-        else
-            sfromx = 1;
-            tfromx = 1 + round((srcbox(1, 1) - bbox(1, 1)) / res);
+        difbox = round((srcbox - bbox) / res);
+        difbox(2, :) = -difbox(2, :);
+        
+        % add at XStart
+        if difbox(1, 1) > 0
+            vtcd = cat(2, repmat(newd, [vv, difbox(1, 1), vtcsz(3:4)]), vtcd);
+
+        % remove at XStart
+        elseif difbox(1, 1) < 0
+            vtcd(:, 1:-difbox(1, 1), :, :) = [];
         end
-        if srcbox(1, 2) < bbox(1, 2)
-            sfromy = 1 + round((bbox(1, 2) - srcbox(1, 2)) / res);
-            tfromy = 1;
-        else
-            sfromy = 1;
-            tfromy = 1 + round((srcbox(1, 2) - bbox(1, 2)) / res);
+        
+        % add at XEnd
+        if difbox(2, 1) > 0
+            vtcd = cat(2, vtcd, repmat(newd, [vv, difbox(2, 1), vtcsz(3:4)]));
+
+        % remove at XEnd
+        elseif difbox(2, 1) < 0
+            vtcd(:, end+1+difbox(2, 1):end, :, :) = [];
         end
-        if srcbox(1, 3) < bbox(1, 3)
-            sfromz = 1 + round((bbox(1, 3) - srcbox(1, 3)) / res);
-            tfromz = 1;
-        else
-            sfromz = 1;
-            tfromz = 1 + round((srcbox(1, 3) - bbox(1, 3)) / res);
+        vx = size(vtcd, 2);
+        
+        % work on YStart/YEnd
+        if difbox(1, 2) > 0
+            vtcd = cat(3, repmat(newd, [vv, vx, difbox(1, 2), vz]), vtcd);
+        elseif difbox(1, 1) < 0
+            vtcd(:, :, 1:-difbox(1, 2), :) = [];
+        end
+        if difbox(2, 2) > 0
+            vtcd = cat(3, vtcd, repmat(newd, [vv, vx, difbox(2, 2), vz]));
+        elseif difbox(2, 1) < 0
+            vtcd(:, :, end+1+difbox(2, 2):end, :) = [];
+        end
+        vy = size(vtcd, 3);
+        
+        % work on ZStart/ZEnd
+        if difbox(1, 3) > 0
+            vtcd = cat(4, repmat(newd, [vv, vx, vy, difbox(1, 3)]), vtcd);
+        elseif difbox(1, 3) < 0
+            vtcd(:, :, :, 1:-difbox(1, 3)) = [];
+        end
+        if difbox(2, 3) > 0
+            vtcd = cat(4, vtcd, repmat(newd, [vv, vx, vy, difbox(2, 3)]));
+        elseif difbox(2, 3) < 0
+            vtcd(:, :, :, end+1+difbox(2, 3):end) = [];
         end
         
         % set data
-        newd(:, tfromx:ttox, tfromy:ttoy, tfromz:ttoz) = ...
-            vtcd(:, sfromx:stox, sfromy:stoy, sfromz:stoz);
-        vtco{2}.C.VTCData = newd;
+        vtco{2}.C.XStart = bbox(1, 1);
+        vtco{2}.C.XEnd = bbox(2, 1);
+        vtco{2}.C.YStart = bbox(1, 2);
+        vtco{2}.C.YEnd = bbox(2, 2);
+        vtco{2}.C.ZStart = bbox(1, 3);
+        vtco{2}.C.ZEnd = bbox(2, 3);
+        vtco{2}.C.VTCData = vtcd;
 
-        % process data in RunTimeVars
+        % add information to RunTimeVars
         rtv = vtco{2}.C.RunTimeVars;
         if isfield(rtv, 'DVARS') && iscell(rtv.DVARS) && numel(rtv.DVARS) == 2 && ...
            ~isempty(rtv.DVARS{1})
-            oldlist = rtv.DVARS{1};
-            vtco{2}.C.RunTimeVars.DVARS{1} = newlist;
+            vtco{2}.C.RunTimeVars.DVARSBBox = reshape(bboxes(workfiles(fc), 2:7), 2, 3);
         end
 
         % save with old filename
