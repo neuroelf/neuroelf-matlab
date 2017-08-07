@@ -138,7 +138,7 @@ for fc = 1:numel(workfiles)
         end
         vtcsz = size(vtcd);
         vv = vtcsz(1);
-        vx = vtcsz(2);
+        % vx = vtcsz(2);  %% variable not needed
         vy = vtcsz(3);
         vz = vtcsz(4);
 
@@ -157,7 +157,7 @@ for fc = 1:numel(workfiles)
         
         % add at XStart
         if difbox(1, 1) > 0
-            vtcd = cat(2, repmat(newd, [vv, difbox(1, 1), vtcsz(3:4)]), vtcd);
+            vtcd = cat(2, repmat(newd, [vv, difbox(1, 1), vy, vz]), vtcd);
 
         % remove at XStart
         elseif difbox(1, 1) < 0
@@ -166,7 +166,7 @@ for fc = 1:numel(workfiles)
         
         % add at XEnd
         if difbox(2, 1) > 0
-            vtcd = cat(2, vtcd, repmat(newd, [vv, difbox(2, 1), vtcsz(3:4)]));
+            vtcd = cat(2, vtcd, repmat(newd, [vv, difbox(2, 1), vy, vz]));
 
         % remove at XEnd
         elseif difbox(2, 1) < 0
@@ -236,4 +236,9 @@ for fc = 1:numel(workfiles)
         end
         rethrow(xfferror);
     end
+end
+
+% no error occurred? update MDM object's VTC filenames if necessary
+if ~isempty(newext)
+    xo.C.XTC_RTC(workfiles, 1) = regexprep(vtcfiles(workfiles), '\.vtc$', newext);
 end
