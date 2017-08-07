@@ -9,12 +9,12 @@ function neuroelf_setup
 %        neuroelf_makelibs, neuroelf_splash, splittocell, tdlocal2.
 
 % Version:  v1.1
-% Build:    16061411
-% Date:     Jun-14 2016, 11:45 AM EST
+% Build:    17080709
+% Date:     Aug-07 2017, 9:33 AM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -85,34 +85,46 @@ else
     npbuild = 'release';
 end
 
-% write out "done" flag
-ne_methods.asciiwrite( ...
-    [neuroelf_path('cache') filesep 'setup_' npbuild '.done'], 'done');
+% write out "done" flag file
+ne_methods.asciiwrite([neuroelf_path('cache') filesep 'setup_' npbuild '.done'], 'done');
 
 try
+    % get screen size
     rs = get(0, 'ScreenSize');
+
+    % if screen is large enough (and available)
     if all(rs(3:4) >= [640, 480])
-        hFig = xfigure( ...
-            [neuroelf_path('tfg') '/splash.tfg']);
+
+        % open splash figure
+        hFig = xfigure([neuroelf_path('tfg') '/splash.tfg']);
+
+        % get handles to progress text, bar, and children
         hPrg = hFig.TagStruct.LB_Progress;
         hBar = hFig.TagStruct.PB_Progress;
         imgh = hFig.TagStruct.IM_Splash.Children;
         imgh = imgh(strcmpi('image', get(imgh, 'Type')));
+
+        % initialize splash animation
         imgt = ne_methods.neuroelf_splash(imgh);
+
+        % show figure
         hFig.HandleVisibility = 'callback';
         hFig.Visible = 'on';
         drawnow;
+
+        % and start animation
         start(imgt);
+
+    % with too small (or non existing) screen
     else
         hPrg = [];
         hBar = [];
     end
+
+% deal with an error here
 catch ne_eo;
-    warning( ...
-        'neuroelf:xfigureError', ...
-        'Error with xfigure class: %s.', ...
-        ne_eo.message ...
-    );
+    warning('neuroelf:xfigureError:errorOpeningSplashScreen', ...
+        'Error with xfigure class: %s.', ne_eo.message);
     hPrg = [];
     hBar = [];
 end
@@ -161,7 +173,7 @@ catch ne_eo;
           'not come with pre-compiled files for your platform: ', upper(mxs)]);
 end
 
-% compiled files not available
+% make sure path and toolbox cache are updated
 try
     rehash path;
     rehash toolboxcache;
@@ -177,8 +189,18 @@ try
         error('CLASS_FAILURE');
     end
     try
-        v = xini([neuroelf_path('config') '/neuroelf.ini'], 'convert');
-        vc = xini([neuroelf_path('config') '/neuroelf_clean.ini'], 'convert');
+
+        % copy "clean" configuration file if file doesn't exist
+        cfgpath = [neuroelf_path('config') '/'];
+        if exist([cfgpath 'neuroelf.ini'], 'file') ~= 2
+            copyfile([cfgpath 'neuroelf_clean.ini'], [cfgpath 'neuroelf.ini']);
+        end
+
+        % load configuration file and original file
+        v = xini([cfgpath 'neuroelf.ini'], 'convert');
+        vc = xini([cfgpath 'neuroelf_clean.ini'], 'convert');
+
+        % copy values over (ensure that erroneous values don't break things)
         vs = vc.GetSections;
         for sc = 1:numel(vs)
             ss = vc.(vs{sc});
@@ -187,8 +209,14 @@ try
                 v.(vs{sc}).(sn{nc}) = vc.(vs{sc}).(sn{nc});
             end
         end
+
+        % get information on tools
         vtools = v.Tools;
+        
+        % save (update) ini file
         v.Save;
+        
+        % release both objects
         v.Release;
         vc.Release;
     catch ne_eo;
@@ -201,8 +229,12 @@ try
             'w64',    'dcm2nii.exe'));
         rethrow(ne_eo);
     end
+
+    % check xff.ini
     try
         v = xini([neuroelf_path('config') '/xff.ini'], 'convert');
+
+        % correctly request new temporary folder name (needs fix for 2017b+)
         if ~isempty(hPrg)
             vui = inputdlg({'Use the following folder as temporary disk space:'}, ...
                 'NeuroElf - temp folder config', 1, {['  ' tempdir]});
@@ -211,38 +243,48 @@ try
                 'Please enter the folder used for temporary disk space (%s): ', ...
                 tempdir), 's')};
         end
-        if iscell(vui) && ...
-            numel(vui) == 1 && ...
-           ~isempty(ne_methods.ddeblank(vui{1}))
+
+        % with new temp dir entry
+        if iscell(vui) && numel(vui) == 1 && ~isempty(ne_methods.ddeblank(vui{1}))
+
+            % remove leading/trailing spaces
             vui = ne_methods.ddeblank(vui{1});
-            if ~isempty(vui) && ...
-               ~strcmpi(vui, tempdir) && ...
-                exist(vui, 'dir') == 7
-                if vui(end) ~= '/' && ...
-                    vui(end) ~= '\'
-                    v(end+1) = filesep;
+
+            % if directory exists
+            if ~isempty(vui) && ~strcmpi(vui, tempdir) && exist(vui, 'dir') == 7
+
+                % make sure it ends in filesep
+                if vui(end) ~= '/' && vui(end) ~= '\'
+                    vui(end+1) = filesep;
                 end
+
+                % update
                 v.GZip.TempDir = vui;
                 v.Save;
             end
         end
+
+        % release object
         v.Release;
     catch ne_eo;
         rethrow(ne_eo);
     end
 catch ne_eo;
-    warning( ...
-        'neuroelf:xiniError', ...
-        'Error with xini class: %s.', ...
-        ne_eo.message ...
-    );
+    warning('neuroelf:xiniError:objectMethodFailed', ...
+        'Error with xini class: %s.', ne_eo.message);
 end
 
 % check xff class
 try
     instprog(hPrg, hBar, 'Checking xff class...', 0.52, '', splittocell);
+
+    % instantiate factory
     v = xff();
+
+    % get available extensions (file types)
     x = sort(fieldnames(v.Extensions));
+
+    % and print out a Rx8 matrix with extensions
     nx = numel(x);
     if mod(nx, 8) > 0
         x(end+1:8 * ceil(nx / 8)) = {''};
@@ -251,10 +293,14 @@ try
     for xc = 1:numel(x8)
         x8{xc} = sprintf('%5s ', x{(xc - 1) * 8 + 1:xc*8});
     end
+
+    % add to output
     info = [char(10), ...
         sprintf('Current release supports %d xff filetypes:', nx), char(10), ...
     	char(10), ...
         upper(ne_methods.gluetostring(x8, char(10))), char(10)];
+
+    % and keep track of which types fail (new:XXX)
     xok = false(size(x));
     for xc = 1:numel(xok)
         try
@@ -269,12 +315,16 @@ try
             clearxffobjects(xobj);
         end
     end
+
+    % set ROOT object to true (will always fail!)
     xok(strcmpi('root', x(:)')) = true;
+
+    % print out failed types (code needs fixing!)
     if sum(xok) < numel(xok)
-        info = [info, char(10), ...
-            sprintf('xff(''new:*'') failed on:%s.', ...
-                sprintf(' %s', x{find(~xok)})), ...
-            char([10, 10])];
+        info = [info, char(10), sprintf('xff(''new:*'') failed on:%s.', ...
+                sprintf(' %s', x{find(~xok)})), char([10, 10])];
+
+    % or report full success
     else
         info = [info, char(10), ...
             'xff(''new:*'') working for all object types.', char([10, 10])];
@@ -309,11 +359,8 @@ try
     colin.ClearObject;
     colin = [];
 catch ne_eo;
-    warning( ...
-        'neuroelf:xffError', ...
-        'Error creating colin_brain.vmr: %s.', ...
-        ne_eo.message ...
-    );
+    warning('neuroelf:xffError:errorCreatingFile', ...
+        'Error creating colin_brain.vmr: %s.', ne_eo.message);
     colin = [];
 end
 
@@ -323,11 +370,7 @@ try
         0.9, 'Testing tdlocal2', splittocell);
     ne_methods.tdlocal2(2, 0, 0, 0);
 catch ne_eo;
-    warning( ...
-        'neuroelf:TDLocalError', ...
-        'Error using tdlocal2: %s.', ...
-        ne_eo.message ...
-    );
+    warning('neuroelf:TDLocalError', 'Error using tdlocal2: %s.', ne_eo.message);
 end
 
 % make sure dcm2nii binary is marked executable
@@ -339,16 +382,12 @@ try
             vtools.dcm2nii.(strrep(lower(mexext), 'mex', ''))]));
     end
 catch ne_eo;
-    warning( ...
-        'neuroelf:chmodError', ...
-        'Error changing (executable) permission of file(s): %s', ...
-        ne_eo.message ...
-    );
+    warning('neuroelf:chmodError', ...
+        'Error changing (executable) permission of file(s): %s', ne_eo.message);
 end
 
 % unload colin
-if numel(colin) == 1 && ...
-    isxff(colin, true)
+if numel(colin) == 1 && isxff(colin, true)
     try
         colin.ClearObject;
     catch ne_eo;
@@ -364,13 +403,11 @@ catch ne_eo;
     neuroelf_lasterr(ne_eo);
 end
 
-% stop splash
-if isfield(ne_ui, 'splash') && ...
-    isstruct(ne_ui.splash) && ...
-    isfield(ne_ui.splash, 'timer')
+% stop splash after another second of pause
+if isfield(ne_ui, 'splash') && isstruct(ne_ui.splash) && isfield(ne_ui.splash, 'timer')
     try
-        for xc = 1:50
-            pause(0.08);
+        for xc = 1:25
+            pause(0.04);
             drawnow;
         end
         stop(ne_ui.splash.timer);
@@ -391,7 +428,7 @@ catch ne_eo;
     neuroelf_lasterr(ne_eo);
 end
 
-% makefiles
+% call neuroelf_makefiles?
 try
     if ~isempty(hPrg)
         vui = questdlg('Create all files with neuroelf_makefiles?', ...
@@ -399,8 +436,7 @@ try
     else
         vui = input('Create all files with neuroelf_makefiles (Y)es/(N)o: ', 's');
     end
-    if ~isempty(vui) && ...
-        lower(vui(1)) == 'y'
+    if ~isempty(vui) && lower(vui(1)) == 'y'
         ne_methods.neuroelf_makefiles('all');
         xfigure(xfigure, 'DeleteAllFigures');
     end
@@ -426,8 +462,7 @@ function instprog(hedt, hbar, txt, p, ptxt, splittocell)
 if ~isempty(hedt)
     if ~isempty(txt)
         str = hedt.String;
-        if ischar(str) && ...
-            size(str, 1) > 1
+        if ischar(str) && size(str, 1) > 1
             str = cellstr(str);
         elseif ischar(str)
             str = splittocell(str, char(10));
@@ -438,8 +473,7 @@ if ~isempty(hedt)
         hedt.Value = numel(str);
         hedt.ListboxTop = max(1, numel(str) - 15);
     end
-    if nargin > 4 && ...
-       ~isempty(ptxt)
+    if nargin > 4 && ~isempty(ptxt)
         hbar.Progress(p, ptxt);
     elseif nargin > 3
         hbar.Progress(p);
