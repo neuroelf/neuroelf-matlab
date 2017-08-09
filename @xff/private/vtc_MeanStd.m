@@ -79,7 +79,7 @@ end
 % create output files
 bbox = aft_BoundingBox(xo);
 vmp = ne_methods.newnatresvmp(bbox.BBox, bc.Resolution);
-bc2 = xmp.C;
+bc2 = vmp.C;
 if isfield(bc.RunTimeVars, 'SPMsn')
     bc2.RunTimeVars.SPMsn = bc.RunTimeVars.SPMsn;
 end
