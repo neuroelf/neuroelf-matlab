@@ -437,11 +437,17 @@ for gc = 1:ngroups
         else
 
             % re-set names
+            pmap = [];
             opts.names = {};
 
             % iterate over covariates
             if ~allrs
                 for cvc = 1:size(covs, 1)
+                    
+                    % invalid covariate
+                    if sum(~isnan(covs{cvc, 2}(opts.subsel))) < 3
+                        continue;
+                    end
 
                     % compute rMap(s)
                     cp.Progress(numcalc / numcalcs, ...
@@ -471,7 +477,7 @@ for gc = 1:ngroups
                     end
 
                     % this one of add
-                    if cvc == 1
+                    if isempty(pmap)
                         pmap = ppmap;
                     else
                         pmap.Map(end+1:end+numel(ppmap.Map)) = ppmap.Map;
