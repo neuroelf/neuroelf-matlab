@@ -1,13 +1,13 @@
 % FUNCTION ne_tcmovie: create time-course movie
 function varargout = ne_tcmovie(varargin)
 
-% Version:  v0.9c
-% Build:    11071215
-% Date:     Jul-12 2011, 2:42 PM EST
+% Version:  v1.1
+% Build:    17081112
+% Date:     Aug-11 2017, 12:42 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2011, Jochen Weber
+% Copyright (c) 2011, 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -43,31 +43,26 @@ end
 
 % check slicevar
 slvar = cc.SliceVar;
-if numel(slvar) ~= 1 || ...
-   ~isxff(slvar, {'fmr', 'hdr', 'vtc'}) || ...
-    slvar.NrOfVolumes < 2
+if numel(slvar) ~= 1 || ~isxff(slvar, {'fmr', 'hdr', 'vtc'}) || slvar.NrOfVolumes < 2
     return;
 end
 vols = slvar.NrOfVolumes;
 
 % additional arguments given?
-if nargin > 2 && ...
-    ischar(varargin{3}) && ...
-   ~isempty(varargin{3})
+if nargin > 2 && ischar(varargin{3}) && ~isempty(varargin{3})
     outfile = varargin{3}(:)';
 else
-    [outfile, outpath] = uiputfile({'*.avi', 'AVI movie files (*.avi)'}, ...
+    [outfile, outpath] = uiputfile({'*.mp4', 'MP4 movie files (*.mp4)'}, ...
         'Save new movie as...');
-    if isequal(outfile, 0) || ...
-        isequal(outpath, 0) || ...
-        isempty(outfile)
+    if isequal(outfile, 0) || isequal(outpath, 0) || isempty(outfile)
         return;
     end
     outfile = [outpath '/' outfile];
 end
 
-% create AVI object
-aviobj = avifile(outfile);
+% create and object VideoWriter object
+mobj = VideoWriter(outfile, 'MPEG-4');
+open(mobj);
 
 % undock current view
 undocked = ne_undock;
@@ -101,19 +96,18 @@ for vc = 1:vols
 
     % patch data (to multiple of 16)
     ufd(ufc(1):ufc(1)+ufs(1)-1, ufc(2):ufc(2)+ufs(2)-1, :) = uf.cdata;
-    uf.cdata = ufd;
 
-    % grab frame
-    aviobj = addframe(aviobj, uf);
+    % write frame
+    writeVideo(mobj, ufd);
 end
 
-% save file
-aviobj = close(aviobj);
+% close VideoWriter object
+close(mobj);
 
 % close window
 ne_closesatwindow(0, 0, ut);
 
 % return
 if nargout > 0
-    varargout{1} = aviobj;
+    varargout{1} = mobj;
 end
