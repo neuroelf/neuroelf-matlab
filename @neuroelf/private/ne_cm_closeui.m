@@ -52,7 +52,7 @@ drawnow;
 cprog = ne_progress(0, 0, {true, 0, 'Saving GLM RunTimeVars...'});
 glms = ne_gcfg.fcfg.CM.GLMs;
 for gc = 1:numel(glms)
-    if ~glms{gc}.Handles.RunTimeVarsSaved
+    if ~glms{gc}.Handles.RunTimeVarsSaved && ~isempty(glms{gc}.FilenameOnDisk)
         glms{gc}.SaveRunTimeVars;
         ch.Progress.Progress(gc/numel(glms));
     end
