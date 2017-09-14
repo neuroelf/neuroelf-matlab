@@ -320,11 +320,19 @@ switch (ft)
             nd = numel(size(bc.GLMData.Subject(1).BetaMaps));
             ns = size(bc.GLMData.Subject);
             nsp = size(bc.GLMData.Subject(1).BetaMaps, nd);
-            if volnum > (ns * nsp)
+            if volnum > (ns * nsp + 1)
                 error('neuroelf:xff:indexOutOfBounds', 'Volume number out of bounds.');
             end
             snum = floor((volnum - 1) / nsp) + 1;
             pnum = volnum - (snum - 1) * nsp;
+            if snum > ns
+                if nd == 2
+                    y = bc.GLMData.RFXGlobalMap(:);
+                else
+                    y = bc.GLMData.RFXGlobalMap(:, :, :);
+                end
+                return;
+            end
             if nd == 2
                 if istransio(bc.GLMData.Subject(snum).BetaMaps) && ...
                     xffsngl.CONF.settings.Behavior.BufferGLMData

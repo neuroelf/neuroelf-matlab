@@ -264,6 +264,15 @@ switch (ft)
                 error('neuroelf:xff:illegalSetting', ...
                     'Illegal DataStorageFormat setting in DMR object.');
         end
+    case 'glm'
+        if bc.ProjectTypeRFX > 0
+            nvol = bc.NrOfPredictors + 1;
+        else
+            nvol = 2 * bc.NrOfPredictors + 3 + ...
+                size(bc.GLMData.ARLag, ndims(bc.GLMData.ARLag));
+        end
+        opts.mapvol = round(min(nvol, opts.mapvol));
+        odata = aft_GetVolume(xo, opts.mapvol);
     case 'hdr'
         if any(bc.ImgDim.DataType == [32, 128, 1536, 1792, 2048, 2304])
             switch (bc.ImgDim.DataType)

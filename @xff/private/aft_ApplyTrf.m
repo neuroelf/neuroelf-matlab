@@ -126,26 +126,61 @@ switch lower(xot)
         % iterate over maps
         for mc = 1:numel(xo2.C.Map)
             resmap = aft_SampleData3D(xo, 128 - xyz, struct('mapvol', mc, 'method', opts.method));
-            xo2.C.Map(mc).(mapfield) = permute(reshape(resmap, [nx, ny, nz]), [2, 3, 1]);
+            xo2.C.Map(mc).(mapfield) = single(permute(reshape(resmap, [nx, ny, nz]), [2, 3, 1]));
             xo2.C.Map(mc).([mapfield 'CT']) = [];
         end
 
     % GLM
     case {'glm'}
+
         % RFX
         if xo2.C.ProjectTypeRFX > 0
             nm = size(xo2.C.GLMData.Subject(1).BetaMaps, 4);
             for sc = 1:numel(xo2.C.GLMData.Subject)
                 xo2.C.GLMData.Subject.BetaMaps = single(zeros([ny, nz, nx, nm]));
             end
+            tnm = aft_NrOfMaps(xo);
+            sc = 1;
+            smc = 1;
+            for mc = 1:tnm
+                resmap = aft_SampleData3D(xo, 128 - xyz, struct('mapvol', mc, 'method', opts.method));
+                xo2.C.GLMData.Subject(sc).BetaMaps(:, :, :, smc) = ...
+                    single(permute(reshape(resmap, [nx, ny, nz]), [2, 3, 1]));
+                smc = smc + 1;
+                if smc > nm
+                    smc = 1;
+                    sc = sc + 1;
+                end
+            end
+            resmap = aft_SampleData3D(xo, 128 - xyz, struct('mapvol', tnm + 1, 'method', opts.method));
+            xo2.C.GLMData.RFXGlobalMap = single(permute(reshape(resmap, [nx, ny, nz]), [2, 3, 1]));
 
         % FFX
         else
+            emap = single(zeros([ny, nz, nx]));
+            tnm = size(xo.C.GLMData.BetaMaps, 4);
+            xo2.C.GLMData.MultipleRegressionR = emap;
+            xo2.C.GLMData.MCorrSS = emap;
+            xo2.C.GLMData.BetaMaps = repmat(emap, [1, 1, 1, tnm]);
+            xo2.C.GLMData.XY = repmat(emap, [1, 1, 1, tnm]);
         end
 
     % MSK
     case {'msk'}
+        if opts.method(1) ~= 'l' && opts.method(1) ~= 'n'
+            opts.method = 'linear';
+        end
+        resmap = aft_SampleData3D(xo, 128 - xyz, struct('mapvol', 1, 'method', opts.method));
+        xo2.C.MSKData = uint8(permute(reshape(resmap, [nx, ny, nz]), [2, 3, 1]) >= 0.5);
 
     % VTC
     case {'vtc'}
+        nvol = size(xo.C.VTCData, 1);
+        xo2.C.VTCData = xo.C.VTCData(1);
+        xo2.C.VTCData(:) = 0;
+        xo2.C.VTCData = repmat(xo2.C.VTCData, [nvol, ny, nz, nx]);
+        for vc = 1:nvol
+            resmap = aft_SampleData3D(xo, 128 - xyz, struct('mapvol', vc, 'method', opts.method));
+            xo2.C.VTCData(vc, :, :, :) = permute(reshape(resmap, [1, nx, ny, nz]), [1, 3, 4, 2]);
+        end
 end
