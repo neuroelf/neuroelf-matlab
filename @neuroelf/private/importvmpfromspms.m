@@ -16,12 +16,12 @@ function vmp = importvmpfromspms(maps, maptype, bbox, res, imeth)
 %       vmp         created VMP object
 
 % Version:  v1.1
-% Build:    16020111
-% Date:     Feb-01 2016, 11:22 AM EST
+% Build:    17091810
+% Date:     Sep-18 2017, 10:34 AM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2016, Jochen Weber
+% Copyright (c) 2010 - 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ if nargin < 1 || ...
     end
     vmp = [];
     [mapf, mapp] = uigetfile( ...
-        {'*.hdr;*.nii', 'SPM result map files (*.hdr, *.nii)'; ...
+        {'*.hdr;*.nii;*.nii.gz', 'SPM result map files (*.hdr, *.nii, *.nii.gz)'; ...
          '*.mat', 'SPM result file (*.mat)'; ...
          '*.head', 'AFNI head files (*.head)'}, ...
         'Please select the SPM map files or SPM.mat file to import...', '*.hdr', msargs{:});

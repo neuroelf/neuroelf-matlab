@@ -2,12 +2,12 @@
 function varargout = ne_importvmp(varargin)
 
 % Version:  v1.1
-% Build:    16072114
-% Date:     Jul-21 2016, 2:07 PM EST
+% Build:    17091810
+% Date:     Sep-18 2017, 10:27 AM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2016, Jochen Weber
+% Copyright (c) 2010 - 2017, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ try
             msargs = {};
         end
         [mapf, mapp] = uigetfile( ...
-            {'*.hdr;*.nii', 'SPM result map files (*.hdr, *.nii)'; ...
+            {'*.hdr;*.nii;*.nii.gz', 'SPM result map files (*.hdr, *.nii, *.nii.gz)'; ...
              '*.mat', 'SPM result file (*.mat)'}, ...
             'Please select the SPM map files or SPM.mat file to import...', '*.hdr', msargs{:});
         if isequal(mapf, 0) || isequal(mapp, 0)
