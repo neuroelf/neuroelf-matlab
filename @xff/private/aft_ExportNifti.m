@@ -148,6 +148,7 @@ switch (ftype)
             res = [bc.InplaneResolutionX, bc.InplaneResolutionY, ...
                 bc.SliceThickness + bc.SliceGap];
         end
+        tr = 0.001 * bc.TR;
     case {'head', 'mgh'}
         dclass = 'single';
         dtype = 16;
