@@ -680,7 +680,8 @@ delete(spm_figure('FindWin', 'Graphics'));
 delete(spm_figure('FindWin', 'Interactive'));
 
 % import t-maps
-pmap = importvmpfromspms(findfiles(opts.spmcfold, 'spmT*.img'), 't', glm.BoundingBox.BBox, glm.Resolution);
+pmap = importvmpfromspms(findfiles(opts.spmcfold, {'spmT*.img','spmT*.nii'}), ...
+    't', glm.BoundingBox.BBox, glm.Resolution);
 
 % remove negative tail maps
 pmap.Map(2:2:end) = [];
