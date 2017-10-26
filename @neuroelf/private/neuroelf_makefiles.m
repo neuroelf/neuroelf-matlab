@@ -2977,14 +2977,6 @@ catch ne_eo;
     );
 end
 
-% clear objects
-clearxffobjects(sph);
-clearxffobjects( ...
-    {chdr, colin, dtmp, flat, hemi, hcrv, icbm, pvmr, reco, recoi, res, skull, vmr});
-clearxffobjects(jhem);
-clearxffobjects(recos(:)');
-sph = {[], [], []};
-
 % head meshes
 try
 
@@ -3108,14 +3100,18 @@ catch ne_eo;
     );
 end
 
+% clear objects
+clearxffobjects(sph);
+clearxffobjects( ...
+    {chdr, colin, dtmp, flat, hemi, hcrv, icbm, pvmr, reco, recoi, res, skull, vmr});
+clearxffobjects(jhem);
+clearxffobjects(recos(:)');
+
 % NeuroElf GUI was used (for head-meshes, etc.)
 if hmc
     neuroelf_gui('closewindow', 'yes');
-    clear xff;
-else
-    clearxffobjects(sph);
-    clearxffobjects({colin});
 end
+clear xff;
 
 % sub-function
 function idisp(t)
