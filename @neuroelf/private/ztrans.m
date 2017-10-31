@@ -199,7 +199,7 @@ else
     % compute mean and 1/std factor over given dim(tp) first
     zsh = (1 / np) .* sum(tc(dref{:}), dim);
     ztc = tc - zsh(sref{:});
-    zf = 1 ./ sqrt(sum((1 / (np - 1)) .* (tc(dref{:}) .^ 2), dim));
+    zf = 1 ./ sqrt(sum((1 / (np - 1)) .* (ztc(dref{:}) .^ 2), dim));
 end
 
 % no illegal factors
