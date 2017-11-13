@@ -189,6 +189,24 @@ WRTLN!@FileVersion > 3   !!!!!!!  # empty line
 WRTLN!@FileVersion > 3   !!!!!!!  # empty line
 FIELD!@FileVersion > 3   !FirstDataSourceFile    !string  !"%s"   !1      !        !FirstDataSourceFile
 
+# Begin FV7++
+BLOOP!@FileVersion > 6   !HasFV7Plus             !!!1 !!HasFV7Plus
+
+# One more empty line
+WRTLN!                   !!!!!!!  # empty line
+
+# Multiband sequence info and slice acquisition times
+FLIST!                   !MultibandSequence      !double  !%d     !1      !        !MultibandSequence
+WRTLN!                   !!!!!!!  # empty line
+EXPRE!$TFFWRITE     !!!!!!@SliceTimingTableSize = numel(@SliceTimingTable); @SliceTimingTable = @SliceTimingTable(:);
+FLIST!                   !SliceTimingTableSize   !double  !%d     !1      !        !SliceTimingTableSize
+ARRAY!                   !SliceTimingTable       !double  !%d     !@SliceTimingTableSize, 1 !!SliceTimingTable
+WRTLN!                   !!!!!!!  # empty line
+FLIST!                   !AcqusitionTime         !double  !%d     !1      !        !AcquisitionTime
+
+# End of fields for FV7++
+ELOOP!                   !HasFV7Plus             !!!1 !!HasFV7Plus
+
 # End of fields for FV3++
 ELOOP!                   !HasFV3Plus             !!!1 !!HasFV3Plus
 
@@ -377,6 +395,10 @@ NewFileCode:!
     'AppliedToFile', 'NrOfTransformationValues', 'TrfMatrix'});
 @Convention = 'Radiological';
 @FirstDataSourceFile = '<none>';
+@MultibandSequence = 0;
+@SliceTimingTableSize = @NrOfSlices;
+@SliceTimingTable = round((@TR/@NrOfSlices) .* (0:(@NrOfSlices-1))');
+@AcquisitionTime = @TR * @NrOfVolumes;
 @Slice = [];
 @RunTimeVars = struct('Discard', [], 'TrfPlus', eye(4));
 EndNewFileCode
