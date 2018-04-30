@@ -569,13 +569,25 @@ if size(rps, 1) == vtc.NrOfVolumes
             reshape(vtc.VTCData, vtc.NrOfVolumes, prod(vts(2:end))), ...
             struct('tempdct', ceil(100000 / vtc.TR)))));
         rmaps = sum(rmaps .* rmaps);
-        rmsk = (rmaps >= 0.5);
-        nmsk = sum(rmsk);
-        rmaps = rmaps(rmsk);
-        spdiag = (1:nmsk)';
-        pcad = ztrans(vtc.VTCData(:, rmsk)) * sparse(spdiag, spdiag, rmaps, nmsk, nmsk, nmsk);
-        pcad = ne_fastica(double(pcad), struct('step', 'pca'));
-        vtc.RunTimeVars.MotionParametersPCA = pcad(:, end:-1:(end+1-opts.mppca));
+        rmskthresh = 0.5;
+        rmsk = (rmaps >= rmskthresh);
+        while sum(rmsk(:)) < (2 * opts.mppca)
+            rmskthresh = 0.75 * rmskthresh;
+            if rmskthresh < 0.1
+                opts.mppca = 0;
+                break;
+            end
+            rmsk = (rmaps >= rmskthresh);
+        end
+        if opts.mppca > 0
+            nmsk = sum(rmsk);
+            rmaps = rmaps(rmsk);
+            spdiag = (1:nmsk)';
+            pcad = ztrans(vtc.VTCData(:, rmsk)) * sparse(spdiag, spdiag, rmaps, nmsk, nmsk, nmsk);
+            pcad = ne_fastica(double(pcad), struct('step', 'pca'));
+            vtc.RunTimeVars.MotionParametersPCA = pcad(:, end:-1:(end+1-opts.mppca));
+            vtc.RunTimeVars.MotionParametersPCAThresh = rmskthresh;
+        end
     end
     vtc.RunTimeVars.MPFD = sum(abs(diff([rps(:, 1:3), 50 .* rps(:, 4:6)])), 2);
 end
