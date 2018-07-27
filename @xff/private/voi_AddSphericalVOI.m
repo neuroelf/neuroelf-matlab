@@ -1,12 +1,13 @@
-function xo = voi_AddSphericalVOI(xo, c, r)
+function xo = voi_AddSphericalVOI(xo, c, r, res)
 % VOI::AddSphericalVOI  - add a spherically shaped VOI to the object
 %
-% FORMAT:       [voi = ] voi.AddSphericalVOI(c, r);
+% FORMAT:       [voi = ] voi.AddSphericalVOI(c, r [, res]);
 %
 % Input fields:
 %
 %       c           1x3 coordinate (center)
 %       r           1x1 radius (must be > 0 and < 128)
+%       res         1x1 resolution (default: 1)
 %
 % Output fields:
 %
@@ -15,12 +16,12 @@ function xo = voi_AddSphericalVOI(xo, c, r)
 % Using: joinstructs.
 
 % Version:  v1.1
-% Build:    16021016
-% Date:     Feb-10 2016, 4:37 PM EST
+% Build:    18072713
+% Date:     Jul-27 2018, 1:37 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 %
-% Copyright (c) 2010, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2018, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -49,10 +50,15 @@ function xo = voi_AddSphericalVOI(xo, c, r)
 global ne_methods;
 
 % argument check
-if nargin ~= 3 || numel(xo) ~= 1 || ~xffisobject(xo, true, 'voi') || ...
+if nargin < 3 || numel(xo) ~= 1 || ~xffisobject(xo, true, 'voi') || ...
    ~isa(c, 'double') || numel(c) ~= 3 || any(isinf(c) | isnan(c) | c < -128 | c > 256) || ...
    ~isa(r, 'double') || numel(r) ~= 1 || isinf(r) || isnan(r) || r < 0 || r > 128
     error('neuroelf:xff:badArgument', 'Invalid call to %s.', mfilename);
+end
+if nargin < 4 || ~isa(res, 'double') || numel(res) ~= 1 || isinf(res) || isnan(res) || res < 1
+    res = 1;
+else
+    res = round(min(r, res));
 end
 bc = xo.C;
 
@@ -69,8 +75,8 @@ end
 
 % create grid
 rc = round(c);
-cr = ceil(r + 0.5);
-[xg, yg, zg] = ndgrid(rc(1)-cr:rc(1)+cr, rc(2)-cr:rc(2)+cr, rc(3)-cr:rc(3)+cr);
+cr = res * ceil(r / res + 0.5);
+[xg, yg, zg] = ndgrid(rc(1)-cr:res:rc(1)+cr, rc(2)-cr:res:rc(2)+cr, rc(3)-cr:res:rc(3)+cr);
 
 % fill with grid
 xg = [xg(:), yg(:), zg(:)];
