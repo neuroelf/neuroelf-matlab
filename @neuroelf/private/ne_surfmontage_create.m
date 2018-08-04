@@ -2,12 +2,12 @@
 function varargout = ne_surfmontage_create(varargin)
 
 % Version:  v1.1
-% Build:    16053010
-% Date:     May-30 2016, 10:27 AM EST
+% Build:    18080413
+% Date:     Aug-04 2016, 1:32 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2015, 2016, Jochen Weber
+% Copyright (c) 2015 - 2018, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -178,7 +178,7 @@ try
             [epath, ename, eext] = fileparts(sc{oc});
             rsc{oc} = [ename, eext];
         end
-        esidx = zeros(size(elems, 1));
+        esidx = zeros(size(elems, 1), 1);
         for oc = 1:size(elems, 1)
             [epath, ename, eext] = fileparts(elems{oc, 1});
             if isempty(epath)
@@ -281,6 +281,10 @@ try
         
         % select element
         if ~samplevmp
+            
+            % set in Scenery index
+            scenery.Value = esidx(oc);
+            doubleclick(scenery);
 
         % load SRF, sample VMP, configure SMP
         else
