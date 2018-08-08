@@ -89,6 +89,7 @@ else
 end
 
 % process text
+helptext(helptext == char(13)) = [];
 helptext = splittocellc(helptext, char(10));
 lc = 1;
 while numel(helptext) >= lc && ...

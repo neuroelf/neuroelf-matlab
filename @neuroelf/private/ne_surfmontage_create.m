@@ -1,5 +1,50 @@
-% FUNCTION ne_surfmontage_create: create surface-based montage image
 function varargout = ne_surfmontage_create(varargin)
+% ne_surfmontage_create  - create surface-based montage image
+%
+% FORMAT:       ne_surfmontage_create(SRC, EVT [, config])
+%
+% Input fields:
+%
+%       SRC, EVT    Matlab handle callback inputs (discarded)
+%       config      optional 1x1 struct with two fields
+%        .elems     Elements-by-15 cell specification of stitched images
+%                   - name of SRF (is looked up in the Scenery UI widget)
+%                   - number of srf.Smooth operations (after sampling)
+%                   - Smooth operation factor
+%                   - number of srf.Inflate operations (after Smoothing)
+%                   - Inflate operation factor
+%                   - X-translation for screenshot
+%                   - Y-translation for screenshot
+%                   - azimuth angle for screenshot
+%                   - zenith angle for screenshot
+%                   - zoom factor for screenshot
+%                   - time index for screenshot
+%                   - resize X before stitching
+%                   - resize Y before stitching
+%                   - stitched X offset (relative 0...1)
+%                   - stiched Y offset (relative 0...1)
+%        .output    1x10 cell with general output options
+%                   - image size (1x2 double, width and height)
+%                   - RGB background color
+%                   - copy stats bars flag
+%                   - write output (set to false/0 or true/1)
+%                   - output filename
+%                   - sample VMP flag (set to false/0 or true/1)
+%                   - restrict VMP flag (set to false/0 or true/1)
+%                   - multiply threshold flag (set to false/0 or true/1)
+%                   - threshold multiplication factor (set to [LowF, UppF])
+%                   - save smoothed/inflated SRF (set to false/0 or true/1)
+%
+% No output fields.
+%
+% Example:
+%
+%     ne_surfmontage_create(0, 0, struct('elems', {{ ...
+%         leftsrf.FilenameOnDisk('r'),  0, 0.5, 0, 0.5, -25, -22, 180, 0, 1.375, 0, 0.5, 0.5, 0, 0;
+%         leftsrf.FilenameOnDisk('r'),  0, 0.5, 0, 0.5,  25, -22,   0, 0, 1.375, 0, 0.5, 0.5, 0, 0.5;
+%         rightsrf.FilenameOnDisk('r'), 0, 0.5, 0, 0.5,  25, -22,   0, 0, 1.375, 0, 0.5, 0.5, 0.5, 0;
+%         rightsrf.FilenameOnDisk('r'), 0, 0.5, 0, 0.5, -25, -22, 180, 0, 1.375, 0, 0.5, 0.5, 0.5, 0.5}}, ...
+%         'output', {{[3074, 2304], [255, 255, 255], 0, 1, './surfmontage_out.png', 0, 0, 0, [1, 1], 0}}));
 
 % Version:  v1.1
 % Build:    18080413

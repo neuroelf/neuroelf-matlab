@@ -71,8 +71,11 @@ if nargin > 2 && ...
     ischar(varargin{3}) && ...
    ~isempty(varargin{3}) && ...
     exist(varargin{3}, 'file') > 0 && ...
-   ~isempty(regexpi(varargin{3}(:)', '\.(hdr|head|nii)$'))
+   ~isempty(regexpi(varargin{3}(:)', '\.(hdr|head|img|nii)$'))
     hname = varargin{3}(:)';
+    if regexpi(hname, '\.img$')
+        hname = regexprep(hname, '\.img$', '.hdr', 'preservecase');
+    end
 
 % object given and valid
 elseif nargin > 2 && ...
@@ -154,6 +157,9 @@ catch ne_eo;
     ch.MainFig.Pointer = mfp;
     ne_gcfg.c.incb = false;
     rethrow(ne_eo);
+end
+if nargout > 0
+    varargout{1} = hobj;
 end
 
 % ensure MapSelection

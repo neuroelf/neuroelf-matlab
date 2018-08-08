@@ -150,7 +150,7 @@ if nargin < 3
 elseif numel(cspec) == 1 && xffisobject(cspec, true, 'olt')
     cspec = cspec.C.Colors;
 elseif ischar(cspec)
-    if ~any(strcmpi(cspec(:)', {'', 'auto', 'hsv', 'hsv4rgb', 'rgb', 'xauto', 'xhsv', 'xhsv4rgb'}))
+    if ~any(strcmpi(cspec(:)', {'', 'auto', 'hsv', 'hsv4rgb', 'rgb', 'xauto', 'xhsv', 'xhsv4rgb', 'xrgb'}))
         try
             cspecf = cell(1, 1);
             cspecf{1} = xff(cspec(:)');

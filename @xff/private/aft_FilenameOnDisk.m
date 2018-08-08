@@ -61,4 +61,10 @@ if nargin > 1 && numel(source) == 1 && ((islogical(source) && source) || ...
 % get file name
 else
     fname = xo.F;
+    
+    % relative name
+    if nargin > 1 && ischar(source) && numel(source) == 1 && lower(source) == 'r'
+        [fpath, fname, fext] = fileparts(fname);
+        fname = [fname, fext];
+    end
 end
