@@ -17,13 +17,13 @@ Output fields:
       s           1xN cell array with split content
       ns          number of splits
 
-% Version:  v0.9a
-% Build:    11050511
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1
+% Build:    18101711
+% Date:     Ocyt-17 2018, 11:18 AM EST
+% Author:   Jochen Weber, ZMBBI, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2018, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* here comes the main function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	const int *dim;
+	const mwSize *dim;
     const mxChar *tosplit, *delim;
     mxChar *copy;
     mxChar delimval = 0, cval = 0, quotec = 63;
@@ -69,14 +69,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     bool multi = 0, anyd = 0, quotes = 0;
     signed long tosplitlen = 0, delimlen = 1, delimlenm = 0, lastfrom = 0;
 
-    int odim[2] = {1, 1};
-    int odim0[2] = {0, 0};
+    mwSize odim[2] = {1, 1};
+    mwSize odim0[2] = {0, 0};
     signed long *frompos, *topos;
     signed long cpos = 0, dpos = 0, spos = 0;
     unsigned long nrofsplits = 0, realnrofsplits = 0;
     bool inquote = 0, wbslash = 0;
     mxArray *split, *psplit;
     double *nsplit;
+    /* char vstr[256]; */
 
 
 
@@ -155,18 +156,33 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         } else if (!anyd) {
             for (; cpos < tosplitlen; ++cpos) {
                 if (tosplit[cpos] == delimval) {
-                    for (spos = cpos + delimlenm, dpos = delimlenm; dpos > 0; --dpos)
-                        if (tosplit[spos--] != delim[dpos])
-                            break;
-                    if (dpos == 0) {
-                        frompos[nrofsplits] = lastfrom;
-                        topos[nrofsplits++] = cpos - 1;
-                        lastfrom = cpos + delimlen;
+                    spos = cpos + delimlenm;
+                    if (spos < tosplitlen) {
+                        for (dpos = delimlenm; dpos > 0; --dpos)
+                            if (tosplit[spos--] != delim[dpos])
+                                break;
+                        if (dpos == 0) {
+                            frompos[nrofsplits] = lastfrom;
+                            topos[nrofsplits++] = cpos - 1;
+                            lastfrom = cpos + delimlen;
+                        }
                     }
                 }
             }
             --cpos;
             if (tosplit[cpos] != delim[delimlenm]) {
+                frompos[nrofsplits] = lastfrom;
+                topos[nrofsplits++] = cpos;
+            } else if (cpos > delimlenm) {
+                for (spos = cpos - delimlen, dpos = 0; dpos < delimlen; ++dpos) {
+                    if (tosplit[spos++] != delim[dpos])
+                        break;
+                }
+                if (dpos < delimlen) {
+                    frompos[nrofsplits] = lastfrom;
+                    topos[nrofsplits++] = cpos;
+                }
+            } else {
                 frompos[nrofsplits] = lastfrom;
                 topos[nrofsplits++] = cpos;
             }
@@ -344,6 +360,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             }
 
     *plhs = mxCreateCellMatrix(1, realnrofsplits);
+    if (realnrofsplits == 0) {
+        mxFree(frompos);
+        mxFree(topos);
+
+        /* second output ? */
+        if (nlhs > 1) {
+            plhs[1] = mxCreateDoubleMatrix(1, 1, mxREAL);
+            nsplit = (double *) mxGetData(plhs[1]);
+            *nsplit = (double) 0.0;
+        }
+        return;
+    }
     split = *plhs;
     spos = 0;
     for (cpos = 0; cpos <= nrofsplits; ++cpos) {
