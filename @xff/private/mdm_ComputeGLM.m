@@ -426,6 +426,11 @@ if ~isfield(opts, 'writeres') || ~ischar(opts.writeres) || isempty(opts.writeres
    ~any(opts.writeres(:) == '%')
     opts.writeres = '';
 end
+if isfield(opts, 'xconfound') && islogical(opts.xconfound) && numel(opts.xconfound) == 1 && ...
+    opts.xconfound && isfield(rtv, 'XConfounds') && iscell(rtv.XConfounds) && ...
+    numel(rtv.XConfounds) == size(bc.XTC_RTC, 1)
+    opts.xconfound = rtv.XConfounds;
+end
 
 % get and check subject IDs
 subjids = opts.subsel;

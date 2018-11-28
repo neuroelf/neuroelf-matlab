@@ -187,10 +187,17 @@ if ~isempty(opts.subsel)
     end
     mdm.XTC_RTC = mdm.XTC_RTC(ksubs, :);
     fsids = mdm.Subjects(true);
-elseif isfield(opts, 'motpars') && iscell(opts.motpars) && ...
-    numel(opts.motpars) == size(mdm.XTC_RTC, 1)
-    mdm.RunTimeVars.MotionParameters = opts.motpars(:);
-    opts.motpars = true;
+else
+    if isfield(opts, 'motpars') && iscell(opts.motpars) && ...
+        numel(opts.motpars) == size(mdm.XTC_RTC, 1)
+        mdm.RunTimeVars.MotionParameters = opts.motpars(:);
+        opts.motpars = true;
+    end
+    if isfield(opts, 'xconfound') && iscell(opts.xconfound) && ...
+        numel(opts.xconfound) == size(mdm.xconfound, 1)
+        mdm.RunTimeVars.XConfounds = opts.xconfound(:);
+        opts.xconfound = true;
+    end
 end
 
 % find subject IDs
@@ -264,8 +271,14 @@ for sc = 1:numel(sids)
         smdm.RunTimeVars.CovariatesData = mdm.RunTimeVars.CovariatesData(kidx, :);
     end
     if isfield(mdm.RunTimeVars, 'MotionParameters') && ...
-        numel(mdm.RunTimeVars.MotionParameters) == nstudy
+        numel(mdm.RunTimeVars.MotionParameters) == nstudy && ...
+        islogical(opts.motpars) && opts.motpars
         smdm.RunTimeVars.MotionParameters = mdm.RunTimeVars.MotionParameters(sidx);
+    end
+    if isfield(mdm.RunTimeVars, 'XConfounds') && ...
+        numel(mdm.RunTimeVars.XConfounds) == nstudy && ...
+        islogical(opts.xconfound) && opts.xconfound
+        smdm.RunTimeVars.XConfounds = mdm.RunTimeVars.XConfounds(sidx);
     end
     
     % use SPM?
@@ -371,7 +384,7 @@ if opts.cmbrfx
             'Predictors', [], 'iXX', [], 'DF1', -1, 'SEMap', [], 'ARLag', []), [1, nss]);
         prs = glms{1}.Predictor;
         pns = lsqueeze({prs(1:(glms{1}.NrOfPredictors - glms{1}.NrOfConfounds)).Name2});
-        pns = regexprep(pns, '^Subject\s+(\w+)\:\s*', '');
+        pns = regexprep(pns, '^Subject\s+(\S+)\:\s*', '');
         pnc = zeros(12, 0);
         for sc = 1:nss
             nrtp = nrtp + glms{sc}.NrOfTimePoints;
@@ -380,7 +393,7 @@ if opts.cmbrfx
             sts{sc} = glms{sc}.Study;
             prs = glms{sc}.Predictor;
             pnn = lsqueeze({prs(1:(glms{sc}.NrOfPredictors - glms{sc}.NrOfConfounds)).Name2});
-            pnn = regexprep(pnn, '^Subject\s+(\w+)\:\s*', '');
+            pnn = regexprep(pnn, '^Subject\s+(\S+)\:\s*', '');
             pns = uunion(pns, pnn);
             if size(pnc, 2) < numel(pns)
                 for pc = (size(pnc, 2)+1):numel(pns)
@@ -500,7 +513,7 @@ if opts.cmbrfx
             rfx.NrOfConfoundsPerStudy(ts:ts+nst-1) = glms{sc}.NrOfConfoundsPerStudy;
             prs = glms{sc}.Predictor;
             pnn = lsqueeze({prs([1:(glms{sc}.NrOfPredictors - glms{sc}.NrOfConfounds), end]).Name2});
-            pnn = regexprep(pnn, '^Subject\s+(\w+)\:\s*', '');
+            pnn = regexprep(pnn, '^Subject\s+(\S+)\:\s*', '');
             pni = multimatch(pns, pnn);
             rfxPredictor(tp:tp+numel(pns)-1) = preds;
             siXX = NaN(numel(pns) + 1);
