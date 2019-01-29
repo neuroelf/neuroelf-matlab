@@ -16,12 +16,12 @@ function niis = dcm2nii(source, target, opts)
 %       niis        cell array saved files
 
 % Version:  v1.0
-% Build:    15061110
-% Date:     Jun-11 2015, 10:40 AM EST
+% Build:    19012911
+% Date:     Jan-29 2019, 11:00 AM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2015, Jochen Weber
+% Copyright (c) 2010 - 2019, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -107,7 +107,7 @@ if ~isempty(d2nc.d2nbin)
 
     % try
     try
-        args = '-g n ';
+        args = '-z n ';
         if opts.format(1) == 'i'
             args = [args '-4 n '];
         else
