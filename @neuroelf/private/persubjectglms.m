@@ -194,7 +194,7 @@ else
         opts.motpars = true;
     end
     if isfield(opts, 'xconfound') && iscell(opts.xconfound) && ...
-        numel(opts.xconfound) == size(mdm.xconfound, 1)
+        numel(opts.xconfound) == size(mdm.XTC_RTC, 1)
         mdm.RunTimeVars.XConfounds = opts.xconfound(:);
         opts.xconfound = true;
     end
