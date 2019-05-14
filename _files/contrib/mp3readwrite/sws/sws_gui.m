@@ -1,4 +1,4 @@
-function SWS_gui(action)
+function sws_gui(action)
 
 %SWS_GUI  - SineWaveSynthesis Control window support
 
@@ -26,7 +26,7 @@ switch(action),
 		if strcmp(ext,'swi')|strcmp(ext,'SWI')|strcmp(ext,'swx')|strcmp(ext,'SWX')
 			cla; set(state.DATAWINDOW, 'string', []);			%clear inputwindow, sound buffer, clear axis
 			
-			[state.FREQ,state.MAG, state.TIMESLICES, state.NUM_OSCS]=SWIread(state.FILENAME);	%read in parameters
+			[state.FREQ,state.MAG, state.TIMESLICES, state.NUM_OSCS]=swiread(state.FILENAME);	%read in parameters
 			state.SOUND_OUT=synthtrax(state.FREQ,state.MAG,state.TIMESLICES,state.SRATE);	%prepare for PLAY
 					
 			set(state.FILEDISPLAY,'string',file);
@@ -123,9 +123,9 @@ switch(action),
 	
 	switch state.PARAMETER_FORMAT,
 		case '.swi',
-			SWIwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);
+			swiwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);
 		case '.swx',
-			SWXwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);	 	
+			swxwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);	 	
 	end;
 		
 %-----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ switch(action),
 	
 	case 'INPUTDATA',
 
-		[alldata, nOscs, timeslice]= SWIinput;
+		[alldata, nOscs, timeslice]= swiinput;
 		
 %-----------------------------------------------------------------------------
 	%UPDATEDATA: Freq,Amplitude,Timeslice Parameters update from Edit box
@@ -242,7 +242,7 @@ switch(action),
 	alldata = greps(alldata,',', ' ');
 	set(state.DATAWINDOW, 'string', alldata);
 	
-	[state.TIMESLICES,state.FREQ,state.MAG,state.NUM_OSCS,mat_error]=INPread(alldata);
+	[state.TIMESLICES,state.FREQ,state.MAG,state.NUM_OSCS,mat_error]=inpread(alldata);
 	if mat_error ~=1; return; end;
 		
 	%Check to see (on callback) if timeslice info error
@@ -324,7 +324,7 @@ switch(action),
 		state.COPY=state;
 		set(findobj('tag','undo'),'enable','on');
 		
-		[state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS]= SWImultiply(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS,state.SRATE);	
+		[state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS]= swimultiply(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS,state.SRATE);	
 		state.SOUND_OUT=synthtrax(state.FREQ,state.MAG,state.TIMESLICES,state.SRATE);
 		
 		set(state.SWS_FIG,'userdata',state);
@@ -342,7 +342,7 @@ switch(action),
 		state.COPY=state;
 		set(findobj('tag','undo'),'enable','on');
 		
-		[state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS]= SWIaddition(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS,state.SRATE);	
+		[state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS]= swiaddition(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS,state.SRATE);	
 		state.SOUND_OUT=synthtrax(state.FREQ,state.MAG,state.TIMESLICES,state.SRATE);
 		set(state.SWS_FIG,'userdata',state);
 	end;
@@ -359,7 +359,7 @@ switch(action),
 		state.COPY=state;
 		set(findobj('tag','undo'),'enable','on');
 		
-		state.FREQ= Setfreq(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS);
+		state.FREQ= setfreq(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS);
 		state.SOUND_OUT=synthtrax(state.FREQ,state.MAG,state.TIMESLICES,state.SRATE);
 		set(state.SWS_FIG,'userdata',state);
 	end
@@ -376,7 +376,7 @@ switch(action),
 		state.COPY=state;
 		set(findobj('tag','undo'),'enable','on');
 		
-		state.MAG= Setamp(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS);
+		state.MAG= setamp(state.FREQ,state.MAG,state.TIMESLICES,state.NUM_OSCS);
 		state.SOUND_OUT=synthtrax(state.FREQ,state.MAG,state.TIMESLICES,state.SRATE);
 		set(state.SWS_FIG,'userdata',state);
 	end	
@@ -679,6 +679,6 @@ createharmonic(swave,start_val,end_val,mode,value,ampmult,iterations);
 %	error
 
 	otherwise,
-		error(['SWS_gui:  unrecognized action (', action, ')']);
+		error(['sws_gui:  unrecognized action (', action, ')']);
 	
 end;

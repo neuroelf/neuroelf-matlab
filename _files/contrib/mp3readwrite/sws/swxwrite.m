@@ -1,4 +1,4 @@
-function SWXwrite(nOscs, timeslice, F, M);
+function swxwrite(nOscs, timeslice, F, M);
 
 % nOscs=2;
 % 

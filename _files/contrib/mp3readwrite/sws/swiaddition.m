@@ -1,4 +1,4 @@
-function [F,M,timeslice,nOscs]= SWIaddition(F,M,timeslice,nOscs,samprate);
+function [F,M,timeslice,nOscs]= swiaddition(F,M,timeslice,nOscs,samprate);
 
 
 prompts={'Add Scalar to Frequency(F), Amplitude(A), or Time(T):',...

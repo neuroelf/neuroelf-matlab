@@ -36,7 +36,7 @@ col = 0;
 
 fid = fopen(FILENAME, 'r');
 if (fid == -1)
-  fprintf(1, 'readswi: unable to read %s\n', FILENAME);
+  fprintf(1, 'swiread: unable to read %s\n', FILENAME);
 else
   nOscs = fscanf(fid, '%d', 1);
 % 	Increase the arrays in chunks of colchunk cols to avoid slow

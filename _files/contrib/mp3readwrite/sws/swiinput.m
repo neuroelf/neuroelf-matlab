@@ -1,4 +1,4 @@
-function [alldata, nOscs, timeslice]= SWIinput;
+function [alldata, nOscs, timeslice]= swiinput;
 
 state=get(gcf,'userdata');
 

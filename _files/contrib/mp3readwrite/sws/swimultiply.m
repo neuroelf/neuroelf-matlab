@@ -1,4 +1,4 @@
-function [F,M,timeslice,nOscs]= SWImultiply(F,M,timeslice,nOscs,samprate);
+function [F,M,timeslice,nOscs]= swimultiply(F,M,timeslice,nOscs,samprate);
 
 
 prompts={'Multiply Frequency(F), Amplitude(A), or Time(T):',...

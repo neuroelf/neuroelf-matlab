@@ -1,4 +1,4 @@
-function SWIwrite(nOscs, timeslice, F, M);
+function swiwrite(nOscs, timeslice, F, M);
 
 % nOscs=2;
 % 
