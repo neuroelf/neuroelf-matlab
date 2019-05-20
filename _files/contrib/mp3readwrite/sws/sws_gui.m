@@ -8,12 +8,12 @@ function sws_gui(action)
 
 %	branch by action...
 
-switch(action),
+switch(action)
 
 %-----------------------------------------------------------------------------
 %	OPEN:	open SWI or SWX file and prepare for synthrax
 
-	case 'OPEN',
+	case 'OPEN'
 
 	state=get(gcf,'userdata');
 		
@@ -23,7 +23,7 @@ switch(action),
 		[p,n,ext]=fileparts(state.FILENAME);
 		ext=lower(ext(2:end));
 		
-		if strcmp(ext,'swi')|strcmp(ext,'SWI')|strcmp(ext,'swx')|strcmp(ext,'SWX')
+		if strcmp(ext,'swi') || strcmp(ext,'swx')
 			cla; set(state.DATAWINDOW, 'string', []);			%clear inputwindow, sound buffer, clear axis
 			
 			[state.FREQ,state.MAG, state.TIMESLICES, state.NUM_OSCS]=swiread(state.FILENAME);	%read in parameters
@@ -50,7 +50,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 %	EXTRACT: 	extract Frequency,Magnitude, and Time paramters from WAV file
 
-	case 'EXTRACT',
+	case 'EXTRACT'
 
 	state=get(gcf,'userdata');
 	
@@ -60,11 +60,11 @@ switch(action),
 		[p,n,ext]=fileparts(AUDIONAME);
 		ext=lower(ext(2:end));
 		
-		if strcmp(ext,'wav')|strcmp(ext,'WAV')
+		if strcmp(ext,'wav')
 			cla; set(state.DATAWINDOW, 'string', []);			%clear inputwindow, sound buffer, clear axis
 			
 			%open wav file
-			[state.SOUND_OUT,state.SRATE] =wavread(AUDIONAME);
+			[state.SOUND_OUT,state.SRATE] = audioread(AUDIONAME);
 			
 			%dialog box for LPC analysis
 			prompts={'Enter the number of formants (default = 5)     ',...
@@ -116,22 +116,22 @@ switch(action),
 %-----------------------------------------------------------------------------
 %	SAVE:	save SWI file
 
-	case 'SAVE',
+	case 'SAVE'
 
 	state=get(gcf,'userdata');
 	if isempty(state.SOUND_OUT), return; end;	%make sure some data to save
 	
-	switch state.PARAMETER_FORMAT,
-		case '.swi',
+	switch state.PARAMETER_FORMAT
+		case '.swi'
 			swiwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);
-		case '.swx',
+		case '.swx'
 			swxwrite(state.NUM_OSCS,state.TIMESLICES,state.FREQ,state.MAG);	 	
 	end;
 		
 %-----------------------------------------------------------------------------
 %	PLAY ALL:	play synthtraxed formatted file
 
-	case 'PLAY',
+	case 'PLAY'
 
 		state=get(gcf,'userdata');
 		
@@ -167,7 +167,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 %	WAVEOPEN:	open sound file
 
-	case 'WAVEOPEN',
+	case 'WAVEOPEN'
 
 		state=get(gcf,'userdata');
 			
@@ -177,14 +177,14 @@ switch(action),
 		[p,n,ext]=fileparts(AUDIONAME);
 		ext=lower(ext(2:end));
 		
-		if strcmp(ext,'WAV')|strcmp(ext,'wav')
+		if strcmp(ext,'wav')
 			set(state.DATAWINDOW, 'string', []);	 cla;	set(state.LIST,'enable','off');%clear inputwindow, sound buffer, clear axis
 			
-			[state.SOUND_OUT, state.SRATE]=wavread(AUDIONAME);
+			[state.SOUND_OUT, state.SRATE]=audioread(AUDIONAME);
 			set(state.FILEDISPLAY,'string',file);
 			state.INPUT_FORMAT='WAV';
 			
-		elseif strcmp(ext,'AU')|strcmp(ext,'au')
+		elseif strcmp(ext,'au')
 			set(state.DATAWINDOW, 'string', []);	 cla; set(state.LIST,'enable','off');%clear inputwindow, sound buffer, clear axis
 
 			[state.SOUND_OUT, state.SRATE]=auread(AUDIONAME);
@@ -199,7 +199,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%AUDIOSAVE:	Save output of synthtrax in .AU or .WAV format
 	
-	case 'AUDIOSAVE',
+	case 'AUDIOSAVE'
 	
 		state=get(gcf,'userdata');
 		
@@ -215,7 +215,7 @@ switch(action),
 	
 		if isnumeric(fileName), return; end;
 
-		if strcmp( SOUND_FORMAT,'.WAV')|strcmp(SOUND_FORMAT,'.wav')
+		if strcmpi(SOUND_FORMAT,'.wav')
 			wavwrite2(state.SOUND_OUT, state.SRATE, fileName);
 		else
 			auwrite2(state.SOUND_OUT, state.SRATE, fileName);
@@ -225,7 +225,7 @@ switch(action),
 	%INPUTDATA:	interactive SWI matrix creation
 	%NOT USED IN THIS VERSION
 	
-	case 'INPUTDATA',
+	case 'INPUTDATA'
 
 		[alldata, nOscs, timeslice]= swiinput;
 		
@@ -233,7 +233,7 @@ switch(action),
 	%UPDATEDATA: Freq,Amplitude,Timeslice Parameters update from Edit box
 	%NOT USED IN THIS VERSION
 	
-	case 'UPDATEDATA',
+	case 'UPDATEDATA'
 
 	state=get(gcf,'userdata');
 
@@ -262,7 +262,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%MOVETHROUGHLIST:	   Move up/down in parameter list based on current value of slider 
 
-	case 'MOVETHRULIST',
+	case 'MOVETHRULIST'
 
 	state=get(gcf,'userdata');
 	
@@ -282,7 +282,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%LIST FUCTION:	List Parameter in Edit Box
 	
-	case 'LISTPARAMETERS',
+	case 'LISTPARAMETERS'
 	
 	state=get(gcf,'userdata');
 	if isempty(state.FREQ), return; end;
@@ -296,7 +296,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%DISPLAYDAT: Graphical display of Frequency x Time
 	
-	case 'DISPLAYDAT',
+	case 'DISPLAYDAT'
 	
 	state=get(gcf,'userdata');
 	
@@ -305,7 +305,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%UNDO: undo the last edit change
 	
-	case 'UNDOLAST',
+	case 'UNDOLAST'
 
 	state=get(gcf,'userdata');
 	set(gcf,'userdata',state.COPY);
@@ -315,7 +315,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%MULTDATA:	Multiply data values for Freq, Amp, or Time
 
-	case 'MULTDATA',
+	case 'MULTDATA'
 
 	state=get(gcf,'userdata');
 	
@@ -333,7 +333,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%ADDDATA:	Add data values for Freq, Amp, or Time
 
-	case 'ADDDATA',
+	case 'ADDDATA'
 	
 	state=get(gcf,'userdata');
 	
@@ -350,7 +350,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%SETFREQ;	Set Freq of selected sinewaves to fixed value
 	
-	case 'SETFREQ',
+	case 'SETFREQ'
 	
 	state=get(gcf,'userdata');
 	
@@ -367,7 +367,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%SETAMP;	Set Amplitude of selected sinewaves to fixed value
 	
-	case 'SETAMP',
+	case 'SETAMP'
 	
 	state=get(gcf,'userdata');
 	
@@ -384,7 +384,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%WAVEFRM:	Waveform display
 	
-	case 'WAVEFORM',
+	case 'WAVEFORM'
 
 	state=get(gcf,'userdata');
 	
@@ -409,7 +409,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%AUDIOFORMAT:	Select Audio File Format for Saving Audio
 	
-	case 'AUDIOFORMAT',
+	case 'AUDIOFORMAT'
 
 	state=get(gcf,'userdata');	
 	outputvalue=get(gcbo,'userdata');
@@ -428,7 +428,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%PARAMETERFORMAT:	Select Output Format (SWI or SWX)
 	
-	case 'PARAMETERFORMAT',
+	case 'PARAMETERFORMAT'
 
 	state=get(gcf,'userdata');
 	parametervalue=get(gcbo,'userdata');
@@ -450,7 +450,7 @@ switch(action),
 
 	%SAMPLERATE:	Select Sampling Rate for Saving Audio
 	
-	case 'SAMPLERATE',
+	case 'SAMPLERATE'
 
 	state=get(gcf,'userdata');	
 	samplingratevalue=get(gcbo,'userdata');
@@ -485,7 +485,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%WAVEFORMSCALE:	set preference for amplitude scaling of waveform
 	
-	case 'WAVEFORMSCALE',
+	case 'WAVEFORMSCALE'
 	
 	state=get(gcf,'userdata');
 	amplitudescalevalue=get(gcbo,'userdata');
@@ -510,7 +510,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%OPENSETTINGS:	set preference for list and display on opening .SWI and .SWX files
 	
-	case 'OPENSETTINGS',
+	case 'OPENSETTINGS'
 	
 	state=get(gcf,'userdata');
 	
@@ -553,7 +553,7 @@ switch(action),
 	
 	% wait for input	
 	uiwait(config_dialog);
-	if get(config_dialog, 'userdata'),
+	if get(config_dialog, 'userdata')
 		state.OPENSETTINGS(2) = get(display_box1, 'value');
 		state.OPENSETTINGS(1)=get(display_box2, 'value');
 		set(state.SWS_FIG, 'userdata', state);
@@ -563,7 +563,7 @@ switch(action),
 %-----------------------------------------------------------------------------
 	%CREATE HARMONICS
 	
-	case 'HARMONIC',
+	case 'HARMONIC'
 	
 	state=get(gcf,'userdata');
 	
@@ -600,7 +600,7 @@ switch(action),
 	iterations=str2num(harmonics{7});
 	
 %checks
-if swave==0 | swave>size(state.FREQ,1)
+if swave==0 || swave>size(state.FREQ,1)
 	errordlg('Sinewave not in range',' '); return;
 end;
 
@@ -614,7 +614,7 @@ createharmonic(swave,start_val,end_val,mode,value,ampmult,iterations);
 %-----------------------------------------------------------------------------
 	%DELETE SINEWAVE
 	
-	case 'SINEWAVEDELETE',
+	case 'SINEWAVEDELETE'
 		
 	state=get(gcf,'userdata');
 	
@@ -647,7 +647,7 @@ createharmonic(swave,start_val,end_val,mode,value,ampmult,iterations);
 %-----------------------------------------------------------------------------
 	%AVERAGE:	report average freq and amplitude for all sinewaves between START and END
 	
-	case 'AVERAGE',
+	case 'AVERAGE'
 	
 	state=get(gcf,'userdata');
 	
@@ -658,12 +658,12 @@ createharmonic(swave,start_val,end_val,mode,value,ampmult,iterations);
 
 	%ZOOM: Zoom view on display
 	
-	case 'ZOOMVIEW',
+	case 'ZOOMVIEW'
 	zoomstate=get(gcbo,'userdata');
 	if isequal(zoomstate, 0)
 		zoom on;
 		set(gcbo, 'userdata', 1);
-	elseif isequal(zoomstate, 1);
+	elseif isequal(zoomstate, 1)
 		zoom off;
 		set(gcbo, 'userdata', 0);
 
@@ -672,13 +672,13 @@ createharmonic(swave,start_val,end_val,mode,value,ampmult,iterations);
 %-----------------------------------------------------------------------------
 	%QUIT
 	
-	case 'BYEBYE',
+	case 'BYEBYE'
 	close all;return
 
 %-----------------------------------------------------------------------------
 %	error
 
-	otherwise,
+    otherwise
 		error(['sws_gui:  unrecognized action (', action, ')']);
 	
 end;

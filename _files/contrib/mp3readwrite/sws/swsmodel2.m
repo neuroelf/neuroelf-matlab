@@ -23,7 +23,8 @@ MyR = P*1000;
 
 % Resample to P kHz, so LPC only picks main formants
 if R ~= MyR
-  D = resample(D, round(MyR/1000) ,round(R/1000));
+  % D = resample(D, round(MyR/1000) ,round(R/1000));
+  D = interp1((1:numel(D))', D, (1:(R/MyR):numel(D))');
 end
 
 % Step size in units of my sampling rate
