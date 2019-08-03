@@ -1,13 +1,13 @@
 % FUNCTION ne_remote: handle remote configuration
 function varargout = ne_remote(varargin)
 
-% Version:  v0.9d
-% Build:    14072516
-% Date:     Jul-25 2014, 4:29 PM EST
+% Version:  v1.1
+% Build:    19080317
+% Date:     Aug-03 2019, 5:03 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2012, 2014, Jochen Weber
+% Copyright (c) 2012 - 2019, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -536,7 +536,10 @@ tf = fieldnames(ch);
 for fc = 1:numel(tf)
     if isxfigure(ch.(tf{fc}))
         try
-            ch.(tf{fc}) = ts.(ch.(tf{fc}).Tag);
+            ftag = ch.(tf{fc}).Tag;
+            if ~isempty(ftag) && isfield(ts, ftag)
+                ch.(tf{fc}) = ts.(ch.(tf{fc}).Tag);
+            end
         catch ne_eo;
             ne_gcfg.c.lasterr = ne_eo;
             ch.(tf{fc}) = struct;
@@ -547,7 +550,10 @@ for fc = 1:numel(tf)
         for sfc = 1:numel(stf)
             if isxfigure(ch.(tf{fc}).(stf{sfc}))
                 try
-                    ch.(tf{fc}).(stf{fc}) = ts.(ch.(tf{fc}).(stf{fc}).Tag);
+                    ftag = ch.(tf{fc}).(stf{sfc}).Tag;
+                    if ~isempty(ftag) && isfield(ts, ftag)
+                        ch.(tf{fc}).(stf{sfc}) = ts.(ftag);
+                    end
                 catch ne_eo;
                     ne_gcfg.c.lasterr = ne_eo;
                 end
@@ -555,7 +561,6 @@ for fc = 1:numel(tf)
         end
     end
 end
-disp(ch);
 
 % create session struct
 ne_gcfg.c.remotecfg.session.(['S' sess]) = struct( ...
@@ -929,25 +934,31 @@ switch lower(cmd{2})
     % coronal slice
     case {'corslice'}
         im = tio.imCor.Rendered;
-        cp = round(min(256, max(1, 128 - ne_gcfg.fcfg.cpos)));
-        im(cp(3), :, :) = min(255, double(im(cp(3), :, :)) + 64);
-        im(:, 257 - cp(1), :) = min(255, double(im(:, 257 - cp(1), :)) + 64);
+        imsz = size(im);
+        imfc = imsz(1:2) ./ 256;
+        cp = round(min(imsz(1:2), max(1, imfc .* (128 - ne_gcfg.fcfg.cpos([3, 1])))));
+        im(cp(1), :, :) = min(255, double(im(cp(1), :, :)) + 64);
+        im(:, imsz(2) + 1 - cp(2), :) = min(255, double(im(:, imsz(2) + 1 - cp(2), :)) + 64);
         imwrite(im, outfile, imf, imq{:});
 
     % saggital slice
     case {'sagslice'}
         im = tio.imSag.Rendered;
-        cp = round(min(256, max(1, 128 - ne_gcfg.fcfg.cpos)));
-        im(cp(3), :, :) = min(255, double(im(cp(3), :, :)) + 64);
+        imsz = size(im);
+        imfc = imsz(1:2) ./ 256;
+        cp = round(min(imsz(1:2), max(1, imfc .* (128 - ne_gcfg.fcfg.cpos([3, 2])))));
+        im(cp(1), :, :) = min(255, double(im(cp(1), :, :)) + 64);
         im(:, cp(2), :) = min(255, double(im(:, cp(2), :)) + 64);
         imwrite(im, outfile, imf, imq{:});
 
     % transversal slice
     case {'traslice'}
         im = tio.imTra.Rendered;
-        cp = round(min(256, max(1, 128 - ne_gcfg.fcfg.cpos)));
-        im(cp(2), :, :) = min(255, double(im(cp(2), :, :)) + 64);
-        im(:, 257 - cp(1), :) = min(255, double(im(:, 257 - cp(1), :)) + 64);
+        imsz = size(im);
+        imfc = imsz(1:2) ./ 256;
+        cp = round(min(imsz(1:2), max(1, imfc .* (128 - ne_gcfg.fcfg.cpos([2, 1])))));
+        im(cp(1), :, :) = min(255, double(im(cp(1), :, :)) + 64);
+        im(:, imsz(2) + 1 - cp(2), :) = min(255, double(im(:, imsz(2) + 1 - cp(2), :)) + 64);
         imwrite(im, outfile, imf, imq{:});
 
     % zoomed slice
