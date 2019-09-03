@@ -190,7 +190,9 @@ switch (fext)
         if opts.sort == 's' && numel(msks) > 1
             [msks, msksi] = sort(msks(:), 'descend');
             mskcrdc = mskcrdc(msksi);
-            msku = msku(msksi);
+            if max(msksi) <= numel(msku)
+                msku = msku(msksi);
+            end
         end
         if isempty(mskcrdc)
             return;
@@ -232,6 +234,9 @@ switch (fext)
         else
             lfnum = msku;
             cnames = cell(numel(mskcrdc), 1);
+            if numel(lfnum) < numel(cnames)
+                lfnum = lfnum(ones(size(cnames)));
+            end
             for cc = 1:numel(cnames)
                 cnames{cc} = sprintf('Cluster %04d (value %d) from %s', cc, lfnum(cc), file);
             end
