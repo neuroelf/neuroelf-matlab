@@ -184,7 +184,7 @@ if ~isfield(opts, 'tsmooth') || ...
     any(isinf(opts.tsmooth) | isnan(opts.tsmooth) | opts.tsmooth < 0)
     opts.tsmooth = opts.smooth;
 else
-    opts.tsmooth = max(20, opts.tsmooth(:)');
+    opts.tsmooth = min(20, opts.tsmooth(:)');
 end
 if any(opts.smpl < 0)
     sm = sqrt(sum(opts.trfv1(1:3,1:3) .^ 2));
@@ -367,6 +367,7 @@ for ic = fi:nvol
 
     % get smoothed version of data
 	v2sm = smoothdata3(double(v2(:, :, :, ic)), opts.smooth);
+    v2smm = uint8(v2sm >= 0.5);
     maxiter = 101;
     ss = Inf * ones(1, maxiter);
 	pss = Inf;
@@ -386,6 +387,7 @@ for ic = fi:nvol
                 'Overlap too small.' ...
             );
         end
+        msk = msk & flexinterpn_method(v2sm, dxyz, 0, 'linear') >= 0.5;
         f = flexinterpn_method(v2sm, dxyz(msk, :), 0, opts.interpe);
         cm1 = v1c(msk, :);
         dm1 = d(msk);
