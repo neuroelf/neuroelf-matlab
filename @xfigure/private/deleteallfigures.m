@@ -9,9 +9,14 @@ set(0, 'ShowHiddenHandles', 'on');
 
 % find figures and delete them
 figs = findobj;
+figtype = get(figs, 'Type');
+dfigs = false(size(figtype));
+for ft = {'figure', 'axes', 'uicontrol', 'uimenu', 'image'}
+    dfigs = dfigs | strcmpi(figtype, ft{1});
+end
 
 % delete all but root
-set(figs(figs ~= 0), 'DeleteFcn', '');
+set(figs(dfigs), 'DeleteFcn', '');
 delete(findobj('type', 'figure'));
 
 % re-init arrays
