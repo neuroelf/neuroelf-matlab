@@ -235,13 +235,17 @@ try
         v = xini([neuroelf_path('config') '/xff.ini'], 'convert');
 
         % correctly request new temporary folder name (needs fix for 2017b+)
+        tdir = tempdir;
+        if numel(tdir) > 8 && strcmpi(tdir(1:8), '/private') && exist('/tmp')
+            tdir = '/tmp';
+        end
         if ~isempty(hPrg)
             vui = inputdlg({'Use the following folder as temporary disk space:'}, ...
-                'NeuroElf - temp folder config', 1, {['  ' tempdir]});
+                'NeuroElf - temp folder config', 1, {['  ' tdir]});
         else
             vui = {input(sprintf( ...
                 'Please enter the folder used for temporary disk space (%s): ', ...
-                tempdir), 's')};
+                tdir), 's')};
         end
 
         % with new temp dir entry
