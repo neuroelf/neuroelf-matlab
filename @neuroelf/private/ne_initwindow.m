@@ -256,7 +256,7 @@ set(0, 'ShowHiddenHandles', 'off');
 
 % make sure to remove uimenu objects
 fctype = get(fcfg.fullsizexh, 'Type');
-fcfg.fullsizexh(strcmpi(fctype, 'uimenu')) = [];
+fcfg.fullsizexh(strcmpi(fctype, 'uimenu') | strcmpi(fctype, 'annotationpane')) = [];
 
 % prepare sizes array with settings
 fcfg.fullsizex = zeros(numel(fcfg.fullsizexh), 10);
