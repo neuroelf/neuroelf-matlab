@@ -234,23 +234,27 @@ else
     pmatch = ne_methods.multimatch(prds, prds1);
     pmatchm = find(pmatch > 0);
     for sc1 = 1:numel(id1)
+        bm = bc1.GLMData.Subject(sc1).BetaMaps;
+        if istransio(bm)
+            bm = resolve(bm);
+        end
         if m2d
-            bc3.GLMData.Subject(sc1).BetaMaps(:, pmatchm) = ...
-                bc1.GLMData.Subject(sc1).BetaMaps(:, pmatch(pmatchm));
+            bc3.GLMData.Subject(sc1).BetaMaps(:, pmatchm) = bm(:, pmatch(pmatchm));
         else
-            bc3.GLMData.Subject(sc1).BetaMaps(:, :, :, pmatchm) = ...
-                bc1.GLMData.Subject(sc1).BetaMaps(:, :, :, pmatch(pmatchm));
+            bc3.GLMData.Subject(sc1).BetaMaps(:, :, :, pmatchm) = bm(:, :, :, pmatch(pmatchm));
         end
     end
     pmatch = ne_methods.multimatch(prds, prds2);
     pmatchm = find(pmatch > 0);
     for sc2 = 1:numel(id2)
+        bm = bc2.GLMData.Subject(sc2).BetaMaps;
+        if istransio(bm)
+            bm = resolve(bm);
+        end
         if m2d
-            bc3.GLMData.Subject(sc1+sc2).BetaMaps(:, pmatchm) = ...
-                bc2.GLMData.Subject(sc2).BetaMaps(:, pmatch(pmatchm));
+            bc3.GLMData.Subject(sc1+sc2).BetaMaps(:, pmatchm) = bm(:, pmatch(pmatchm));
         else
-            bc3.GLMData.Subject(sc1+sc2).BetaMaps(:, :, :, pmatchm) = ...
-                bc2.GLMData.Subject(sc2).BetaMaps(:, :, :, pmatch(pmatchm));
+            bc3.GLMData.Subject(sc1+sc2).BetaMaps(:, :, :, pmatchm) = bm(:, :, :, pmatch(pmatchm));
         end
     end
 end
