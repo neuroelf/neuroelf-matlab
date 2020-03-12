@@ -13,6 +13,7 @@ function map = glm_RFX_tMap(xo, c, opts)
 %        .brange    acceptible beta-value range (default: [-Inf, Inf])
 %        .covs      SxC covariates
 %        .estfwhm   estimate smoothness and store in Map.RunTimeVars (true)
+%        .estfxsize store effect size in separate map (false)
 %        .estsmap   store estimated smoothness in separate map (false)
 %        .groups    Gx2 cell array with group names and subject IDs
 %        .imeth     interpolation method if necessary (default: 'cubic')
@@ -41,12 +42,12 @@ function map = glm_RFX_tMap(xo, c, opts)
 %        robustnsamplet_img, robustt, sdist, smoothdata3, varc, ztrans.
 
 % Version:  v1.1
-% Build:    16101016
-% Date:     Oct-10 2016, 4:29 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    20031214
+% Date:     Mar-12 2020, 2:25 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 %
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -162,6 +163,9 @@ if ~isfield(opts, 'covs') || ~isa(opts.covs, 'double') || ndims(opts.covs) ~= 2 
 end
 if ~isfield(opts, 'estfwhm') || ~islogical(opts.estfwhm) || numel(opts.estfwhm) ~= 1
     opts.estfwhm = true;
+end
+if ~isfield(opts, 'estfxsize') || ~islogical(opts.estfxsize) || numel(opts.estfxsize) ~= 1
+    opts.estfxsize = false;
 end
 if ~isfield(opts, 'estsmap') || ~islogical(opts.estsmap) || numel(opts.estsmap) ~= 1
     opts.estsmap = false;
@@ -315,7 +319,7 @@ end
 nmf = 1 + 3 * double(opts.meanr) + (1 + double(opts.meanr)) .* ...
     (2 * double(opts.robwmaps) * double(opts.robust) + ...
     numsubs * double(opts.swmaps) * double(opts.robust)) + ...
-    double(opts.estsmap) * (1 + double(opts.meanr));
+    double(opts.estsmap) * (1 + double(opts.meanr)) + double(opts.estfxsize);
 
 % collect 1st level SEmaps for non-robust non-rfx stast
 if ~opts.robust && opts.rfxtype == 'w'
@@ -715,9 +719,19 @@ for cc = 1:size(c, 2)
                 else
                     mmap = sum(semapw .* tmpmp, mdim) ./ semapwn;
                 end
+                if opts.estfxsize
+                    fsmap = mmap;
+                end
             else
                 x = [ones(goodsubs, 1), opts.covs(keepsubs, :)];
                 [bmaps, ixx, ptc, se] = calcbetas(x, tmpmp, mdim);
+                if opts.estfxsize
+                    if mtype == 'v'
+                        fsmap = bmaps(:, :, :, 1);
+                    else
+                        fsmap = bmaps(:, 1);
+                    end
+                end
                 tmap = glmtstat([1, zeros(1, numcovs)], bmaps, ixx, se);
             end
             if opts.estfwhm && mdim == 4
@@ -739,6 +753,13 @@ for cc = 1:size(c, 2)
         else
             x = [ones(goodsubs, 1), opts.covs(keepsubs, :)];
             [bmaps, wmaps] = ne_methods.fitrobustbisquare_img(x, tmpmp);
+            if opts.estfxsize
+                if mtype == 'v'
+                    fsmap = bmaps(:, :, :, 1);
+                else
+                    fsmap = bmaps(:, 1);
+                end
+            end
             tmap = robustt(x, tmpmp, bmaps, wmaps, [1, zeros(1, numcovs)]);
             if opts.estfwhm || opts.resvtc
                 ptc = zeros(size(tmpmp));
@@ -794,6 +815,19 @@ for cc = 1:size(c, 2)
             mapc.Map(occ).RunTimeVars.AlphaSimMaxDist = amax;
         end
         occ = occ + 1;
+        
+        % store effect size map
+        if opts.estfxsize
+            mapc.Map(occ).Name = sprintf('%s%s (fx size)', opts.names{cc}, tmapr);
+            mapc.Map(occ).Type = 11;
+            mapc.Map(occ).(mfld) = single(fsmap);
+            fsmed = median(abs(fsmap(~isnan(fsmap) & ~isinf(fsmap) & fsmap ~= 0)));
+            fsmed = median(abs(fsmap(~isnan(fsmap) & ~isinf(fsmap) & abs(fsmap) > fsmed)));
+            mapc.Map(occ).LowerThreshold = 1.5 * fsmed;
+            mapc.Map(occ).UpperThreshold = 3 * fsmed;
+            mapc.Map(occ).RunTimeVars = artv;
+            occ = occ + 1;
+        end
 
         % add smoothness estimate map
         if opts.estsmap
@@ -1081,6 +1115,9 @@ for cc = 1:size(c, 2)
                         s2 = (1 / numel(ga2)) .* var(tmpmp(:, ga2), [], mdim);
                     end
                     t12 = (m1 - m2) ./ sqrt(s1 + s2);
+                    if opts.estfxsize
+                        fsmap = m1 - m2;
+                    end
                     df12 = ((s1 + s2) .^ 2) ./ ...
                         ((1 / (numel(ga1) - 1)) .* s1 .* s1 + ...
                          (1 / (numel(ga2) - 1)) .* s2 .* s2);
@@ -1119,6 +1156,20 @@ for cc = 1:size(c, 2)
                     end
                     occ = occ + 1;
 
+                    % store effect size map
+                    if opts.estfxsize
+                        mapc.Map(occ).Name = sprintf('%s (%s > %s) (fx size)', ...
+                            opts.names{cc}, opts.groups{gc1, 1}, ...
+                            opts.groups{gc2, 1});
+                        mapc.Map(occ).Type = 11;
+                        mapc.Map(occ).(mfld) = single(fsmap);
+                        fsmed = median(abs(fsmap(~isnan(fsmap) & ~isinf(fsmap) & fsmap ~= 0)));
+                        mapc.Map(occ).LowerThreshold = 1.5 * fsmed;
+                        mapc.Map(occ).UpperThreshold = 3 * fsmed;
+                        mapc.Map(occ).RunTimeVars = artv;
+                        occ = occ + 1;
+                    end
+                    
                     % remove residual and re-create maps as well
                     if opts.meanr
                         tmin = -sdist('tinv', 0.25, rdf12);
@@ -1229,8 +1280,14 @@ for cc = 1:size(c, 2)
                     opts.groups{g2, 1});
                 if mdim == 4
                     mapc.Map(occ).(mfld) = single(tmap(:, :, :, gmc));
+                    if opts.estfxsize
+                        fsmap = bmaps(:, :, :, g1) - bmaps(:, :, :, g2);
+                    end
                 else
                     mapc.Map(occ).(mfld) = single(tmap(:, gmc));
+                    if opts.estfxsize
+                        fsmap = bmaps(:, g1) - bmaps(:, g2);
+                    end
                 end
                 mapc.Map(occ).DF1 = sum(ga == g1 | ga == g2) - 2;
                 mapc.Map(occ).RunTimeVars = artv;
@@ -1245,6 +1302,20 @@ for cc = 1:size(c, 2)
                      ne_methods.resestsmoothsrf(tmpmp - ptc, opts.srf);
                 end
                 occ = occ + 1;
+
+                % store effect size map
+                if opts.estfxsize
+                    mapc.Map(occ).Name = sprintf('%s%s (%s > %s) (fx size)', ...
+                        opts.names{cc}, tmapr, opts.groups{g1, 1}, ...
+                        opts.groups{g2, 1});
+                    mapc.Map(occ).Type = 11;
+                    mapc.Map(occ).(mfld) = single(fsmap);
+                    fsmed = median(abs(fsmap(~isnan(fsmap) & ~isinf(fsmap) & fsmap ~= 0)));
+                    mapc.Map(occ).LowerThreshold = 1.5 * fsmed;
+                    mapc.Map(occ).UpperThreshold = 3 * fsmed;
+                    mapc.Map(occ).RunTimeVars = artv;
+                    occ = occ + 1;
+                end
 
                 % leave one map empty for the mean-removed maps
                 if opts.meanr

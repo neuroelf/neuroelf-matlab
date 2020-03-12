@@ -2,12 +2,12 @@
 function varargout = ne_cm_open(varargin)
 
 % Version:  v1.1
-% Build:    16081009
-% Date:     Aug-10 2016, 9:53 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    20031214
+% Date:     Mar-12 2020, 2:36 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -130,6 +130,7 @@ try
     ch.PredWeights = tags.LB_NeuroElf_CM_pweights;
     ch.StatType = tags.DD_NeuroElf_CM_stattype;
     ch.RFXstats = tags.CB_NeuroElf_CM_RFXstats;
+    ch.StoreFXSize = tags.CB_NeuroElf_CM_sfxsize;
     ch.StoreResVTC = tags.CB_NeuroElf_CM_sresvtc;
     ch.StoreSmoothEst = tags.CB_NeuroElf_CM_ssmooest;
     ch.RobWMaps = tags.CB_NeuroElf_CM_srobinfo;

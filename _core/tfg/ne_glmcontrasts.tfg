@@ -3,13 +3,13 @@
 NeuroElf - contrast manager GUI
 
 Version:  1.1
-Build:    16081009
-Date:     Aug-10 2016, 9:52 AM EST
+Build:    20031214
+Date:     Mar-12 2020, 2:36 PM EST
 Figure:   NeuroElf GUI - GLM contrast manager
 Author:   Jochen Weber
 Info:     Figure created for NeuroElf GUI - GLM contrast manager
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -38,14 +38,14 @@ Info:     Figure created for NeuroElf GUI - GLM contrast manager
 
 ---   BEGIN_FIGURE   ---
 Comment |Units |Visible|Position               |Title                                 |Tag                        |CallbackClReq
-        |pixels|off    |$   -1   -1  720  510  |NeuroElf GUI - GLM configure contrasts|Wnd_NeuroElf_contrasts     |
+        |pixels|off    |$   -1   -1  720  538  |NeuroElf GUI - GLM configure contrasts|Wnd_NeuroElf_contrasts     |
 ---    END_FIGURE    ---
 
 
 --- BEGIN_UICONTROLS ---
 Comment |Type       |Position              |Caption                                   |Tag                |FontSize|HAlign|VAlign|Enabled|EGroups|RGroup|Value|MinMaxTop|ColorFG|ToolTip
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
-        |Label      |$   12  480   36   18 |GLM:                                      |                       |    |left  |      |       |       |      |     |         ||
+        |Label      |$   12  508   36   18 |GLM:                                      |                       |    |left  |      |       |       |      |     |         ||
         |DropDown   |$   40   -4  204  -24 |<no GLM loaded>                           |DD_NeuroElf_CM_GLMs    |$ 9 |left  |      |       |       |      |     |         ||
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
         |Label      |$  -40  -26   56  -18 |Groups:                                   |                       |    |left  |      |       |       |      |     |         ||
@@ -61,20 +61,20 @@ Comment |Type       |Position              |Caption                             
         |DropDown   |$  104   -4   98  -24 |default                                   |DD_NeuroElf_CM_subsels |$ 9 |left  |      |off    |NoGroup|      |     |         ||
         |XImage     |$   98    4   20  -20 |]neuroelf_file('i', 'plus')               |BT_NeuroElf_CM_addssel |    |center|      |off    |NoGroup|      |     |         |$ 0.6 0.6 0.6|
         |XImage     |$   22    0    0    0 |]neuroelf_file('i', 'minus')              |BT_NeuroElf_CM_delssel |    |center|      |off    |NoGroup|      |     |         |$ 0.6 0.6 0.6|
-        |ListBox    |$ -226 -198  244 -196 |empty                                     |LB_NeuroElf_CM_subjects|$ 9 |      |      |       |HasSubs|      |     |$ 0 2 1  ||
+        |ListBox    |$ -226 -212  244 -210 |empty                                     |LB_NeuroElf_CM_subjects|$ 9 |      |      |       |HasSubs|      |     |$ 0 2 1  ||
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
         |Label      |$    0  -26    0  -18 |Available covariates:                     |                       |    |left  |      |       |       |      |     |         ||
-        |ListBox    |$    0 -130  220 -130 |empty                                     |LB_NeuroElf_CM_covariates|$9|      |      |       |RFXGLM |      |     |$ 0 2 1  ||
-        |XImage     |$  224  110   20  -20 |]neuroelf_file('i', 'folder')             |BT_NeuroElf_CM_covload |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Load covariate(s)...
+        |ListBox    |$    0 -144  220 -144 |empty                                     |LB_NeuroElf_CM_covariates|$9|      |      |       |RFXGLM |      |     |$ 0 2 1  ||
+        |XImage     |$  224  124   20  -20 |]neuroelf_file('i', 'folder')             |BT_NeuroElf_CM_covload |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Load covariate(s)...
         |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'mroi')               |BT_NeuroElf_CM_covroi  |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Extract covariate from current contrast and selected VOI(s)
         |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'f')                  |BT_NeuroElf_CM_coveval |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Compute expression (re-code variables)
         |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'props')              |BT_NeuroElf_CM_covprops|    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Covariate properties...
         |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'plus')               |BT_NeuroElf_CM_covadd  |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Add covariate(s)...
         |XImage     |$    0  -22    0    0 |]neuroelf_file('i', 'minus')              |BT_NeuroElf_CM_covdel  |    |center|      |       |RFXGLM |      |     |         |$ 0.6 0.6 0.6|Remove selected covariate(s)
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
-        |Frame      |$  260    4    1  502 |                                          |                       |    |      |      |       |       |      |     |         ||
+        |Frame      |$  260    4    1  530 |                                          |                       |    |      |      |       |       |      |     |         ||
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
-        |Label      |$    8  476   68  -18 |Contrasts:                                |                       |    |left  |      |       |       |      |     |         ||
+        |Label      |$    8  504   68  -18 |Contrasts:                                |                       |    |left  |      |       |       |      |     |         ||
         |DropDown   |$   72   -4  240  -24 |<as currently configured>                 |DD_NeuroElf_CM_contrast|$ 9 |left  |      |off    |HasCons|      |     |         ||
         |XImage     |$  246    3   20  -20 |]neuroelf_file('i', 'plus')               |BT_NeuroElf_CM_addcon  |    |center|      |       |       |      |     |         |$ 0.6 0.6 0.6|
         |XImage     |$   26    0    0    0 |]neuroelf_file('i', 'minus')              |BT_NeuroElf_CM_delcon  |    |center|      |off    |HasCons|      |     |         |$ 0.6 0.6 0.6|
@@ -102,8 +102,11 @@ Comment |Type       |Position              |Caption                             
         |Label      |$  284    4  -36  -18 |]['RFX ']                                 |                       |$ 9 |right |      |       |       |      |     |         ||
         |CheckBox   |$   40    4  -18    0 |                                          |CB_NeuroElf_CM_RFXstats|    |center|      |off    |RFXGLM |      |$ 1  |         ||
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
-        |Label      |$ -428  -32  204  -18 |Store and visualize residuals as VTC      |                       |    |left  |      |       |VTCGLM |      |     |         ||
-        |CheckBox   |$  208    4  -18    0 |                                          |CB_NeuroElf_CM_sresvtc |    |center|      |       |       |      |$ 0  |         ||
+        |Label      |$ -428  -32  204  -18 |Store effect size estimate map            |                       |    |left  |      |       |RFXGLM |      |     |         ||
+        |CheckBox   |$  208    4  -18    0 |                                          |CB_NeuroElf_CM_sfxsize |    |center|      |       |RFXGLM |      |$ 0  |         ||
+        |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
+        |Label      |$ -208  -32  204  -18 |Store and visualize residuals as VTC      |                       |    |left  |      |       |VTCGLM |      |     |         ||
+        |CheckBox   |$  208    4  -18    0 |                                          |CB_NeuroElf_CM_sresvtc |    |center|      |       |VTCGLM |      |$ 0  |         ||
         |Label      |$   34   -4 -180    0 |Store estimated smoothness map            |                       |    |left  |      |       |       |      |     |         ||
         |CheckBox   |$  186    4  -18    0 |                                          |CB_NeuroElf_CM_ssmooest|    |center|      |       |       |      |$ 0  |         ||
         |           |                      |                                          |                       |    |      |      |       |       |      |     |         ||
