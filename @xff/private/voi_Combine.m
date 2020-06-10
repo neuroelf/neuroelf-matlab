@@ -8,6 +8,8 @@ function [xo, res] = voi_Combine(xo, vspec, cmdname, cmdspec)
 %       vspec       VOI region selection, 1xN list or regexp pattern
 %       cmdname     either of
 %                   - 'intersect'  (BrainVoyager QX's "a AND b")
+%                   - 'mapavg'     (map average value in cluster)
+%                   - 'mappeak'    (map max abs. value in cluster)
 %                   - 'overlap'    (probabilistic overlap between VOIs)
 %                   - 'restrict'   (restrict VOI to shape)
 %                   - 'setdiff'    (voxels in a NOT b)
@@ -16,13 +18,16 @@ function [xo, res] = voi_Combine(xo, vspec, cmdname, cmdspec)
 %        .bbox      2x3 mask/bounding box (in BVSystem coordinates)
 %        .bothdirs  combine in both dirs (where useful, default false)
 %        .cmbsubj   boolean flag, over-subject combination (default true)
+%        .map       map object
+%        .mapindex  map index (to extract values from)
+%        .mapvalue  map value (to restrict on)
 %        .nostore   boolean flag, do not store combined VOIs into object,
 %                   only return the VOI struct (*as first output*)
 %        .rcenter   restriction center, if not given, use first coordinate
 %        .rinplace  restrict in place, default: true
 %        .rshape    restriction shape, one of 'box', {'sphere'}
 %        .rsize     restriction size, default 8mm (radius)
-%        .thresh    relative value, when e.g. overlap is set (default 0.5)
+%        .thresh    relative value, when e.g. overlap is set (default 0.5)   
 %
 % Output fields:
 %
@@ -30,12 +35,12 @@ function [xo, res] = voi_Combine(xo, vspec, cmdname, cmdspec)
 %       res         resulting VOI structures (1xN struct)
 
 % Version:  v1.1
-% Build:    16012718
-% Date:     Jan-27 2016, 6:18 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    20031217
+% Date:     Mar-12 2020, 5:28 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 %
-% Copyright (c) 2010, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -65,8 +70,8 @@ if nargin < 3 || numel(xo) ~= 1 || ~xffisobject(xo, true, 'voi') || ...
    ((~isa(vspec, 'double') || isempty(vspec) || ...
      any(isinf(vspec(:)) | isnan(vspec(:)) | vspec(:) < 0 | vspec(:) ~= fix(vspec(:)))) && ...
     (~ischar(vspec) || isempty(vspec) || ~any(vspec(:) == '+' | vspec(:) == '*'))) || ...
-   ~ischar(cmdname) || isempty(cmdname) || ...
-   ~any(strcmpi(cmdname(:)', {'intersect', 'overlap', 'restrict', 'setdiff', 'union'}))
+   ~ischar(cmdname) || isempty(cmdname) || ~any(strcmpi(cmdname(:)', ...
+    {'intersect', 'mapavg', 'mappeak', 'overlap', 'restrict', 'setdiff', 'union'}))
     error('neuroelf:xff:badArgument', 'Invalid call to %s.', mfilename);
 end
 bc = xo.C;
@@ -75,7 +80,7 @@ if isa(vspec, 'double') && any(vspec > numel(bc.VOI))
     error('neuroelf:xff:badArgument', 'Selected VOI(s) out of bounds.');
 end
 cmdname = lower(cmdname(:)');
-if isempty(vspec) && strcmp(cmdname, 'restrict')
+if isempty(vspec) && any(strcmp(cmdname, {'mapavg', 'mappeak', 'restrict'}))
     vspec = 1:numel(bc.VOI);
 end
 if nargin < 4 || ~isstruct(cmdspec) || numel(cmdspec) ~= 1
@@ -94,6 +99,18 @@ if ~isfield(cmdspec, 'bothdirs') || ~islogical(cmdspec.bothdirs) || numel(cmdspe
 end
 if ~isfield(cmdspec, 'cmbsubj') || ~islogical(cmdspec.cmbsubj) || numel(cmdspec.cmbsubj) ~= 1
     cmdspec.cmbsubj = true;
+end
+if cmdname(1) == 'm'
+    if ~isfield(cmdspec, 'map') || numel(cmdspec.vmp) ~= 1 || ~isxff(cmdspec.map, 'vmp') || ...
+       ~isfield(cmdspec, 'mapindex') || numel(cmdspec.mapindex) ~= 1 || ...
+       ~isa(cmdspec.mapindex, 'double') || isinf(cmdspec.mapindex) || ...
+        isnan(cmdspec.mapindex) || cmdspec.mapindex < 1 || ...
+        cmdspec.mapindex > numel(cmdspec.vmp.Map) || ...
+       ~isfield(cmdspec, 'mapvalue') || numel(cmdspec.mapvalue) ~= 1 || ...
+       ~isa(cmdspec.mapvalue, 'double') || isinf(cmdspec.mapvalue) || ...
+        isnan(cmdspec.mapvalue) || cmdspec.mapvalue < 0
+        error('neuroelf:xff:badArgument', 'Invalid call to %s.', mfilename);
+    end
 end
 if ~isfield(cmdspec, 'nostore') || ~islogical(cmdspec.nostore) || numel(cmdspec.nostore) ~= 1
     cmdspec.nostore = false;
@@ -140,7 +157,7 @@ else
     vspecname = '';
 end
 nsel = numel(vspec);
-if nsel < 1 || (~strcmpi(cmdname, 'restrict') && nsel < 2)
+if nsel < 1 || (any(strcmp(cmdname, {'intersect', 'overlap', 'setdiff', 'union'})) && nsel < 2)
     error('neuroelf:xff:badArgument', 'VOI selection too small');
 end
 
@@ -252,6 +269,44 @@ if strcmp(cmdname, 'restrict')
     end
 
     % set back to content array and return
+    xo.C = bc;
+    return;
+
+% similarly for mapavg and mappeak
+elseif strcmp(cmdname(1:3), 'map')
+
+    % get valid vspec
+    vspec = sort(intersect(1:numel(bc.VOI), vspec));
+    nsel = numel(vspec);
+    vmp = cmdspec.map;
+    vmpidx = cmdspec.mapindex;
+    vmpval = cmdspec.mapvalue;
+
+    % iterate from end to beginning
+    for vc = nsel:-1:1
+
+        % get coordinates
+        c = bc.VOI(vspec(vc)).Voxels;
+
+        % get statistics
+        cs = vmp_VoxelStats(vmp, vmpidx, c, bc.ReferenceSpace);
+        
+        % average
+        if cmdname(4) == 'a'
+            cs = mean(abs(cs));
+        % peak
+        else
+            cs = max(abs(cs));
+        end
+        
+        % remove VOI?
+        if cs < vmpval
+            bc.VOI(vspec(vc)) = [];
+        end
+    end
+    
+    % return early
+    bc.NrOfVOIs = numel(bc.VOI);
     xo.C = bc;
     return;
 end
