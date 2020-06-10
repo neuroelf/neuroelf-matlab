@@ -2,12 +2,12 @@
 function varargout = ne_limitclusters(varargin)
 
 % Version:  v1.1
-% Build:    16021715
-% Date:     Feb-17 2016, 3:15 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    20031215
+% Date:     Mar-12 2020, 3:06 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -115,9 +115,9 @@ if nargin < 3 || ~iscell(varargin{3}) || numel(varargin{3}) ~= 2 || ...
    ~isa(varargin{3}{1}, 'double') || numel(varargin{3}{1}) ~= 1 || ...
     isinf(varargin{3}{1}) || isnan(varargin{3}{1}) || varargin{3}{1} < 1 || ...
    ~ischar(varargin{3}{2}) || numel(varargin{3}{2}) ~= 1 || ...
-   ~any(lower(varargin{3}{2}) == 'bis')
-    clim = inputdlg({'Radius:', 'Shape: (b)ox or (s)phere; (i)ntersect or (u)nion'}, ...
-        'NeuroElf GUI - limit clusters around peak', 1, ...
+   ~any(lower(varargin{3}{2}) == 'bimsu')
+    clim = inputdlg({'Radius:', 'Shape: (b)ox or (s)phere; Function: (i)ntersect, (u)nion, or (m)ap value'}, ...
+        'NeuroElf GUI - restrict clusters', 1, ...
         {sprintf('  %d', cc.clim), '  s'});
     if numel(clim) ~= 2 || ~iscell(clim) || isempty(clim{1}) || ~ischar(clim{1}) || ...
         isempty(clim{2}) || ~ischar(clim{2})
@@ -125,10 +125,15 @@ if nargin < 3 || ~iscell(varargin{3}) || numel(varargin{3}) ~= 2 || ...
     end
     clim{1}(clim{1} == ' ') = [];
     clim{2}(clim{2} == ' ') = [];
-    if isempty(clim{2}) || ~any(lower(clim{2}(1)) == 'bisu')
+    if isempty(clim{2}) || ~any(lower(clim{2}(1)) == 'bimsu')
         return;
     end
     try
+        if clim{1}(1) == '+' || clim{1}(1) == '-'
+            climsign = clim{1}(1);
+        else
+            climsign = ' ';
+        end
         clim{1} = str2double(clim{1});
     catch ne_eo;
         ne_gcfg.c.lasterr = ne_eo;
