@@ -22,12 +22,14 @@ function [im, ima] = image_font(text, font, fsize, opts)
 %      .gcolor2     1x3 double (default: half-way towards [255, 255, 255])     
 %      .glow        1x3 double (smoothing strength, sharpness threshold,
 %                   default: [0, 0, 0] = no glow)
+%      .halign      horizontal alignment one of {'center'}, 'left', 'right'
 %      .invert      invert the output of font setting
 %      .outsize     1x2 size of output image (default: determined by TEXT)
 %      .padding     1x1 double (only used if outsize not given, default: 0)
 %      .scolor      1x3 double for shadow color (default: [0, 0, 0])
 %      .shadow      1x4 double with x/y distance, smoothing kernel and
 %                   strength (e.g. [8, 4, 12, 0.5], default: [0, 0, 0, 0])
+%      .tablines    table-based lines either of {'all'}, 'inner', or 'none'
 %
 %   Example:
 %
@@ -35,12 +37,12 @@ function [im, ima] = image_font(text, font, fsize, opts)
 %   image(im);
 
 % Version:  v1.1
-% Build:    16122313
-% Date:     Dec-23 2016, 1:15 PM EST
+% Build:    20061213
+% Date:     Jun-12 2020, 1:15 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2016, Jochen Weber
+% Copyright (c) 2016, 2020, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -105,6 +107,7 @@ end
 if nargin < 1 || ~iscell(text) || ~all(cellfun(@ischar, text(:)))
     error('neuroelf:general:badArgument', 'Invalid text argument.');
 end
+tabsize = size(text);
 text = text(:);
 ntext = numel(text);
 if nargin < 2 || isempty(font)
@@ -197,15 +200,24 @@ if ~isfield(opts, 'glow') || ~isa(opts.glow, 'double') || numel(opts.glow) ~= 3 
 else
     opts.glow = opts.glow(:)';
 end
+if ~isfield(opts, 'halign') || ~ischar(opts.halign) || isempty(opts.halign)
+    opts.halign = 'center';
+else
+    opts.halign = lower(opts.halign(:)');
+    if ~any(strcmp(opts.halign, {'center', 'left', 'right'}))
+        opts.halign = 'center';
+    end
+end
 if ~isfield(opts, 'invert') || ~islogical(opts.invert) || numel(opts.invert) ~= 1
     opts.invert = false;
 end
 if ~isfield(opts, 'outsize') || ~isa(opts.outsize, 'double') || numel(opts.outsize) ~= 2 || ...
     any(isinf(opts.outsize) | opts.outsize < 0)
-    opts.outsize = [NaN, NaN];
+    opts.ooutsize = [];
 else
-    opts.outsize = round(opts.outsize(:)');
+    opts.ooutsize = round(opts.outsize(:)');
 end
+opts.outsize = [NaN, NaN];
 if ~isfield(opts, 'padding') || ~isa(opts.padding, 'double') || numel(opts.padding) ~= 1 || ...
     isinf(opts.padding) || isnan(opts.padding) || opts.padding < 0
     opts.padding = 0;
@@ -233,6 +245,17 @@ if ~isfield(opts, 'spkern') || ~isa(opts.spkern, 'double') || numel(opts.spkern)
 else
     opts.spkern = round(opts.spkern);
 end
+if ~isfield(opts, 'tablines') || ~ischar(opts.tablines) || isempty(opts.tablines)
+    opts.tablines = 'all';
+else
+    opts.tablines = lower(opts.tablines(:)');
+    if ~any(strcmp(opts.tablines, {'all', 'cols', 'icols', 'inner', 'irows', 'none', 'rows'}))
+        opts.tablines = 'all';
+    end
+end
+if ~strcmp(opts.tablines, 'none') && any(tabsize > 1)
+    opts.padding = max(1, opts.padding);
+end
 if ~isfield(opts, 'xkern') || ~isa(opts.xkern, 'double') || numel(opts.xkern) ~= 1 || ...
     isinf(opts.xkern) || isnan(opts.xkern)
     opts.xkern = 0;
@@ -246,17 +269,31 @@ end
 
 % set each line with current settings
 lines = fontsetlines(text, font, fsize);
+
+% get sizes
 fsize = cellfun('size', lines, 1);
+fsize(cellfun('isempty', lines)) = 0;
+fwid = cellfun('size', lines, 2);
+fwid(cellfun('isempty', lines)) = 0;
+
+% tabular option
+if tabsize(2) > 1
+    lines = reshape(lines, tabsize);
+    fsize = reshape(fsize, tabsize);
+    fwid = reshape(fwid, tabsize);
+end
+mfsize = max(fsize, [], 2);
+mfwid = max(fwid, [], 1);
 
 % outsize needs to be determined
 if isnan(opts.outsize(1))
-    opts.outsize(1) = sum(fsize) + round(2 * opts.padding) + abs(opts.shadow(2));
+    opts.outsize(1) = sum(mfsize) + tabsize(1) * round(2 * opts.padding) + abs(opts.shadow(2));
     xpad = opts.padding;
 else
     xpad = 0;
 end
 if isnan(opts.outsize(2))
-    opts.outsize(2) = max(cellfun('size', lines, 2)) + round(2 * opts.padding) + abs(opts.shadow(1));
+    opts.outsize(2) = sum(mfwid) + tabsize(2) * (round(2 * opts.padding) + abs(opts.shadow(1)));
     ypad = opts.padding;
 else
     ypad = 0;
@@ -299,35 +336,128 @@ else
 end
 
 % store font pieces into
-yfrom = ypad + 1;
-for lc = 1:numel(lines)
-    lim = (1 / 255) .* double(lines{lc});
-    if size(lim, 2) > opts.outsize(2)
-        lim = lim(:, 1:opts.outsize(2));
-    end
-    if opts.invert
-        lim = 1 - lim;
-    end
-    tsize = size(lim, 2);
-    ima(yfrom:yfrom+fsize(lc)-1, xpad+1:xpad+tsize) = lim;
-    lim = double(lim > 0);
-    if isempty(cg)
-        cgim = [];
-    else
-        cgim = cg(yfrom:yfrom+fsize(lc)-1, xpad+1:xpad+tsize);
-        cgimn = 1 - cgim;
-    end
-    for pc = 1:3
-        cim = double(im(yfrom:yfrom+fsize(lc)-1, xpad+1:xpad+tsize, pc));
-        if isempty(cgim)
-            im(yfrom:yfrom+fsize(lc)-1, xpad+1:xpad+tsize, pc) = ...
-                round((1 - lim) .* cim + lim .* opts.color(pc));
+for cc = 1:tabsize(2)
+    xfrom = (2 * (cc - 1) + 1) * xpad + sum(mfwid(1:cc-1));
+    yfrom = ypad + 1;
+    for lc = 1:tabsize(1)
+        lim = (1 / 255) .* double(lines{lc, cc});
+        if size(lim, 2) > opts.outsize(2)
+            lim = lim(:, 1:opts.outsize(2));
+        end
+        xafrom = xfrom;
+        tsize = size(lim, 2);
+        if tsize < mfwid(cc)
+            if opts.halign(1) == 'c'
+                xafrom = xafrom + floor(0.5 * (mfwid(cc) - tsize));
+            elseif opts.halign(1) == 'r'
+                xafrom = xafrom + mfwid(cc) - tsize;
+            end
+        end
+        if opts.invert
+            lim = 1 - lim;
+        end
+        ima(yfrom:yfrom+mfsize(lc)-1, xafrom+1:xafrom+tsize) = lim;
+        lim = double(lim > 0);
+        if isempty(cg)
+            cgim = [];
         else
-            im(yfrom:yfrom+fsize(lc)-1, xpad+1:xpad+tsize, pc) = round((1 - lim) .* cim + ...
-                lim .* (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            cgim = cg(yfrom:yfrom+mfsize(lc)-1, xafrom+1:xafrom+tsize);
+            cgimn = 1 - cgim;
+        end
+        for pc = 1:3
+            cim = double(im(yfrom:yfrom+mfsize(lc)-1, xafrom+1:xafrom+tsize, pc));
+            if isempty(cgim) && ~isempty(cim)
+                im(yfrom:yfrom+mfsize(lc)-1, xafrom+1:xafrom+tsize, pc) = ...
+                    round((1 - lim) .* cim + lim .* opts.color(pc));
+            elseif ~isempty(cgim) && ~isempty(cim)
+                im(yfrom:yfrom+mfsize(lc)-1, xafrom+1:xafrom+tsize, pc) = round((1 - lim) .* cim + ...
+                    lim .* (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            end
+        end
+        yfrom = yfrom + mfsize(lc) + 2 * ypad;
+    end
+end
+
+% table lines
+if tabsize(2) > 1 && any(strcmp(opts.tablines, {'all', 'cols', 'icols', 'inner'}))
+    for cc = 1:tabsize(2)
+        if cc == 1 && opts.tablines(1) == 'i'
+            continue;
+        end
+        xfrom = 1 + (2 * (cc - 1)) * xpad + sum(mfwid(1:cc-1));
+        ima(:, xfrom) = 1;
+        if isempty(cg)
+            cgim = [];
+        else
+            cgim = cg(:, xfrom);
+            cgimn = 1 - cgim;
+        end
+        for pc = 1:3
+            if isempty(cgim)
+                im(:, xfrom, pc) = round(opts.color(pc));
+            else
+                im(:, xfrom, pc) = round(...
+                    (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            end
         end
     end
-    yfrom = yfrom + fsize(lc);
+    if opts.tablines(1) ~= 'i'
+        ima(:, end) = 1;
+        if isempty(cg)
+            cgim = [];
+        else
+            cgim = cg(:, end);
+            cgimn = 1 - cgim;
+        end
+        for pc = 1:3
+            if isempty(cgim)
+                im(:, end, pc) = round(opts.color(pc));
+            else
+                im(:, end, pc) = round(...
+                    (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            end
+        end
+    end
+end
+if tabsize(1) > 1 && any(strcmp(opts.tablines, {'all', 'irows', 'inner', 'rows'}))
+    for lc = 1:tabsize(1)
+        if lc == 1 && opts.tablines(1) == 'i'
+            continue;
+        end
+        yfrom = 1 + (2 * (lc - 1)) * ypad + sum(mfsize(1:lc-1));
+        ima(yfrom, :) = 1;
+        if isempty(cg)
+            cgim = [];
+        else
+            cgim = cg(yfrom, :);
+            cgimn = 1 - cgim;
+        end
+        for pc = 1:3
+            if isempty(cgim)
+                im(yfrom, :, pc) = round(opts.color(pc));
+            else
+                im(yfrom, :, pc) = round(...
+                    (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            end
+        end
+    end
+    if opts.tablines(1) ~= 'i'
+        ima(end, :) = 1;
+        if isempty(cg)
+            cgim = [];
+        else
+            cgim = cg(end, :);
+            cgimn = 1 - cgim;
+        end
+        for pc = 1:3
+            if isempty(cgim)
+                im(end, :, pc) = round(opts.color(pc));
+            else
+                im(end, :, pc) = round(...
+                    (cgimn .* opts.color(pc) + cgim .* opts.color2(pc)));
+            end
+        end
+    end
 end
 
 % build output image
