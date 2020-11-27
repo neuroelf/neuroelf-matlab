@@ -1,7 +1,7 @@
 function ne_screenshot(varargin)
 % ne_screenshot  - create a screenshot file
 %
-% FORMAT:       ne_screenshot(SRC, EVT, [, object [, filename [, hq]]])
+% FORMAT:       ne_screenshot(SRC, EVT, [, object [, filename [, hq [, us]]]])
 %
 % Input fields:
 %
@@ -9,6 +9,7 @@ function ne_screenshot(varargin)
 %       object      can be empty, 0 (main fig), or figure/axes handle
 %       filename    optional filename (otherwise requested)
 %       hq          high-quality flag (set to 'high-q' for oversampling)
+%       us          flag if ne_gcfg.c.ini.Surface.SatelliteUpsampling unset
 %
 % No output fields.
 %
@@ -146,7 +147,7 @@ end
 if isempty(savepath)
     savepath = pwd;
 end
-if any(strcmpi(saveext, {'.jpg', '.jpeg'}));
+if any(strcmpi(saveext, {'.jpg', '.jpeg'}))
     jpgo = {'Quality', 90};
     saveext = '.jpg';
 else
