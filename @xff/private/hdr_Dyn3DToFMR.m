@@ -110,7 +110,7 @@ fmrc.FoVRows = dimX * resX;
 fmrc.FoVCols = dimY * resY;
 fmrc.GapThickness = 0;
 fmrc.Convention = 'Neurological';
-fmrc.FirstDataSourceFile = hdrs.F;
+fmrc.FirstDataSourceFile = xo.F;
 fmrc.Slice = struct('STCData', single(0));
 fmrc.Slice.STCData(dimX, dimY, numel(vols), dimZ) = 0;
 
