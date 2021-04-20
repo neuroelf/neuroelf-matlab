@@ -331,7 +331,13 @@ for vc = 1:numvol
     try
         vcont = double(aft_GetVolume(xo, range(vc)));
         if talorder
-            tio(:, :, :, vc) = permute(vcont(end:-1:1, end:-1:1, end:-1:1), [3, 1, 2]);
+            if fslorder
+                tio(:, :, :, vc) = ...
+                    permute(vcont(end:-1:1, end:-1:1, :), [3, 1, 2]);
+            else
+                tio(:, :, :, vc) = ...
+                    permute(vcont(end:-1:1, end:-1:1, end:-1:1), [3, 1, 2]);
+            end
         else
             tio(:, :, :, vc) = vcont;
         end
