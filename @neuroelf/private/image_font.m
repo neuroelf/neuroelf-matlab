@@ -103,6 +103,7 @@ if nargin > 0 && ischar(text)
     else
         text = splittocellc(text, char([10, 13]), false, true);
     end
+    text = text(:);
 end
 if nargin < 1 || ~iscell(text) || ~all(cellfun(@ischar, text(:)))
     error('neuroelf:general:badArgument', 'Invalid text argument.');
