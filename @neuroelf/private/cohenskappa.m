@@ -1,4 +1,4 @@
-function [k, p, vs] = cohenskappa(v1, v2)
+function [k, p, vs] = cohenskappa(v1, v2, ignorenans)
 %COHENSKAPPA  Compute Cohen's kappa coefficient of reliability.
 %   KAPPA = COHENSKAPPA(V1, V2) computes the kappa between (binary) vectors
 %   V1 and V2. Both must have the same number of elements and only 0 or 1
@@ -19,12 +19,12 @@ function [k, p, vs] = cohenskappa(v1, v2)
 %   See: https://en.wikipedia.org/wiki/Cohen%27s_kappa
 
 % Version:  v1.1
-% Build:    20061018
-% Date:     Jun-10 2020, 6:08 PM EST
+% Build:    21031215
+% Date:     Mar-12 2021, 3:08 PM EST
 % Author:   Jochen Weber, Memorial Sloan Kettering Cancer Center, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2020, Jochen Weber
+% Copyright (c) 2020, 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -53,21 +53,27 @@ function [k, p, vs] = cohenskappa(v1, v2)
 if nargin < 2 && numel(v1) == length(v1)
     error('neuroelf:cohenskappa:badArgument', 'Missing second variable.');
 end
+if nargin < 3 || ~islogical(ignorenans) || numel(ignorenans) ~= 1
+    ignorenans = false;
+end
 
 % multiple variables in a matrix
-if nargin < 2 || (numel(v2) == 1 && isa(v2, double) && ~isinf(v2) && ~isnan(v2) && v2 >= 1 && v2 <= size(v1, 2))
+if nargin < 2 || isempty(v2) || (numel(v2) == 1 && isa(v2, double) && ~isinf(v2) && ~isnan(v2) && v2 >= 1 && v2 <= size(v1, 2))
     
     % with single column reference
     nv = size(v1, 2);
-    if nargin > 1
+    if nargin > 1 && numel(v2) == 1
         ks = zeros(nv, 1);
         for c1 = 1:nv
             if c1 ~= v2
-                ks(c1) = cohenskappa(v1(:, v2), v1(:, c1));
+                ks(c1) = cohenskappa(v1(:, v2), v1(:, c1), ignorenans);
             end
         end
         ks(v2) = [];
         k = mean(ks);
+        if nargout > 1
+            p = ks;
+        end
         return;
     end
     
@@ -76,11 +82,18 @@ if nargin < 2 || (numel(v2) == 1 && isa(v2, double) && ~isinf(v2) && ~isnan(v2) 
     ki = 1;
     for c1 = 1:nv-1
         for c2 = c1+1:nv
-            ks(ki) = cohenskappa(v1(:,c1), v1(:,c2));
+            ks(ki) = cohenskappa(v1(:,c1), v1(:,c2), ignorenans);
             ki = ki + 1;
         end
     end
-    k = mean(ks);
+    if ignorenans
+        k = mean(ks(~isnan(ks)));
+    else
+        k = mean(ks);
+    end
+    if nargout > 1
+        p = ks;
+    end
     return
 end
 
@@ -90,9 +103,16 @@ v1 = double(v1(:));
 if nv == size(v2, 1) && size(v2, 2) > 1
     ks = zeros(size(v2, 2), 1);
     for c2 = 1:numel(ks)
-        ks(c2) = cohenskappa(v1, v2(:, c2));
+        ks(c2) = cohenskappa(v1, v2(:, c2), ignorenans);
     end
-    k = mean(ks);
+    if ignorenans
+        k = mean(ks(~isnan(ks)));
+    else
+        k = mean(ks);
+    end
+    if nargout > 1
+        p = ks;
+    end
     return;
 end
 
@@ -101,6 +121,15 @@ if nv ~= numel(v2)
     error('neuroelf:cohenskappa:badArgument', 'Vector length mismatch.');
 end
 v2 = double(v2(:));
+
+if ignorenans
+    isn = (isnan(v1) | isnan(v2));
+    if any(isn)
+        v1 = v1(~isn);
+        v2 = v2(~isn);
+        nv = numel(v1);
+    end
+end
 
 % values
 if any(v1 ~= 0 & v1 ~= 1) || any(v2 ~= 0 & v2 ~= 1)
