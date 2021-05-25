@@ -198,9 +198,11 @@ end
 smkmm = uinput{1};
 try
     smkmm = str2double(smkmm);
+    if any((smkmm([1, 1, 1]) ./ res) < 1.0)
+        error('neuroelf:alphasim:badKernelSize', 'Kernel too small.');
+    end
 catch ne_eo;
-    warning('neuroelf:general:badInput', ...
-        'Invalid user input (kernel size): %s.', ne_eo.message);
+    uiwait(warndlg(['Invalid user input (kernel size): ', ne_eo.message]));
     ne_gcfg.c.blockcb(strcmp('alphasim', ne_gcfg.c.blockcb)) = [];
     return;
 end
