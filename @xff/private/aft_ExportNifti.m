@@ -60,6 +60,11 @@ if nargin < 2 || numel(xo) ~= 1 || ~xffisobject(xo, true, {'ava', 'cmp', 'ddt', 
 end
 niifile = niifile(:)';
 ftype = lower(xo.S.Extensions{1});
+fslorder = false;
+if nargin > 2 && ischar(talorder) && strcmpi(talorder(:)', 'fsl')
+    talorder = true;
+    fslorder = true;
+end
 if nargin < 3 || ~islogical(talorder) || numel(talorder) ~= 1 || ...
     any(strcmpi(ftype, {'dmr', 'fmr', 'head'}))
     talorder = false;
@@ -207,6 +212,10 @@ if talorder
     trf(1:3, 4) = newoffset(1:3);
     res = res(1, [3, 1, 2]);
     vsz = vsz(1, [3, 1, 2]);
+    if fslorder
+        trf(1, 4) = trf(1, 4) + (vsz(1) + 1) * trf(1, 1);
+        trf(1, 1) = -trf(1, 1);
+    end
 end
 
 % compute offset
@@ -224,15 +233,20 @@ tnic.NIIFileType = niitype;
 tnic.ImgDim.Dim(1:5) = [3 + double(numvol > 1), vsz, numvol];
 tnic.ImgDim.DataType = dtype;
 tnic.ImgDim.BitsPerPixel = bpv;
-if talorder
+if talorder && ~fslorder
     tnic.ImgDim.PixSpacing(1:5) = [1, res, tr];
 else
     tnic.ImgDim.PixSpacing(1:5) = [-1, res, tr];
 end
 tnic.ImgDim.VoxOffset = niioff;
 tnic.DataHist.Description = fname;
-tnic.DataHist.NIftI1.QFormCode = 2;
-tnic.DataHist.NIftI1.SFormCode = 3;
+if fslorder
+    tnic.DataHist.NIftI1.QFormCode = 4;
+    tnic.DataHist.NIftI1.SFormCode = 4;
+else
+    tnic.DataHist.NIftI1.QFormCode = 2;
+    tnic.DataHist.NIftI1.SFormCode = 3;
+end
 tnic.DataHist.NIftI1.QuaternionB = Q(1);
 tnic.DataHist.NIftI1.QuaternionC = Q(2);
 tnic.DataHist.NIftI1.QuaternionD = Q(3);
@@ -317,7 +331,13 @@ for vc = 1:numvol
     try
         vcont = double(aft_GetVolume(xo, range(vc)));
         if talorder
-            tio(:, :, :, vc) = permute(vcont(end:-1:1, end:-1:1, end:-1:1), [3, 1, 2]);
+            if fslorder
+                tio(:, :, :, vc) = ...
+                    permute(vcont(end:-1:1, end:-1:1, :), [3, 1, 2]);
+            else
+                tio(:, :, :, vc) = ...
+                    permute(vcont(end:-1:1, end:-1:1, end:-1:1), [3, 1, 2]);
+            end
         else
             tio(:, :, :, vc) = vcont;
         end
