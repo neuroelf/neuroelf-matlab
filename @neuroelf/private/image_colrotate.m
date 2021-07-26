@@ -10,6 +10,8 @@ function rim = image_colrotate(im, r, opts)
 %       opts        optional settings
 %        .grayout   gray out the non-used portion (default: false)
 %        .hsv       boolean flag, input/output HSV (default: false)
+%        .satthresh saturation threshold (default: 0.0)
+%        .whiteout  set value to 1 in the non-used portion (default: false)
 %
 % Output fields:
 %
@@ -67,6 +69,13 @@ if ~isfield(opts, 'grayout') || ~islogical(opts.grayout) || numel(opts.grayout) 
 end
 if ~isfield(opts, 'hsv') || ~islogical(opts.hsv) || numel(opts.hsv) ~= 1
     opts.hsv = false;
+end
+if ~isfield(opts, 'satthresh') || ~isa(opts.satthresh, 'double') || numel(opts.satthresh) ~= 1 || ...
+    isinf(opts.satthresh) || isnan(opts.satthresh) || opts.satthresh < 0 || opts.satthresh > 1
+    opts.satthresh = 0;
+end
+if ~isfield(opts, 'whiteout') || ~islogical(opts.whiteout) || numel(opts.whiteout) ~= 1
+    opts.whiteout = false;
 end
 
 % loop required?
@@ -131,11 +140,19 @@ hue = hue - r(1);
 r = r - r(1);
 
 % gray out saturation if hue > threshold
-if opts.grayout
+if opts.grayout || opts.whiteout
     msk = hue > r(2);
     sat = im(:, :, 2);
+    if opts.satthresh > 0
+        msk = msk | sat <= opts.satthresh;
+    end
     sat(msk) = 0;
     im(:, :, 2) = sat;
+    if opts.whiteout
+        sat = im(:, :, 3);
+        sat(msk) = 1;
+        im(:, :, 3) = sat;
+    end
 end
 
 % apply rotation
@@ -150,7 +167,7 @@ end
 hue = r(3) + (hd2 / hd1) .* hue;
 
 % if not grayed out, rotate inverse portion
-if ~opts.grayout
+if ~opts.grayout && ~opts.whiteout
     hd1r = 1 - hd1;
     hd2r = 1 - hd2;
     if hd2r == 0
