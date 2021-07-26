@@ -560,6 +560,7 @@ end
 % compute range values
 cpos = floor(0.5 .* (btpos(1:end-1) + btpos(2:end)));
 cdif = diff(cpos);
+cdif(cdif < 1) = 1;
 
 % create list of periods and centers to sample from
 [cdfm, w] = robustmean(cdif);
