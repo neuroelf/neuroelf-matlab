@@ -136,8 +136,9 @@ end
 % make sure all hue is above cutoff
 msk = hue < r(1);
 hue(msk) = hue(msk) + 1;
-hue = hue - r(1);
-r = r - r(1);
+r1 = r(1);
+hue = hue - r1;
+r = r - r1;
 
 % gray out saturation if hue > threshold
 if opts.grayout || opts.whiteout
@@ -174,11 +175,11 @@ if ~opts.grayout && ~opts.whiteout
         hd2r = 1e-9;
     end
     msk = hue > r(4);
-    hue(msk) = r(4) + (hd2r / hd1r) .* hue(msk);
+    hue(msk) = r(4) + ((hd2r / hd1r) * (hd1 / hd2)) .* (hue(msk) - r(4));
 end
 
 % fix hue back into [0..1] range
-hue = mod(hue, 1);
+hue = mod(hue + r1, 1);
 
 % replace hue
 im(:, :, 1) = hue;
