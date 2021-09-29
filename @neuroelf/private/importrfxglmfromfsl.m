@@ -123,17 +123,17 @@ if ~all(condnums == numsubs)
     );
 end
 pathparts = condfolds{maxp};
-for sc = 1:maxp
+for sc = 1:numsubs
     pathparts{sc} = splittocellc(pathparts{sc}, filesep);
 end
 maxparts = min(cellfun('prodofsize', pathparts));
 partidx = 0;
 for pc = 1:maxparts
-    subparts = cell(maxp, 1);
-    for sc = 1:maxp
+    subparts = cell(numsubs, 1);
+    for sc = 1:numsubs
         subparts{sc} = pathparts{sc}{pc};
     end
-    if numel(unique(subparts)) == maxp
+    if numel(unique(subparts)) == numsubs
         partidx = pc;
         break;
     end
@@ -145,17 +145,17 @@ if partidx < 1
     );
 end
 subsparts = subparts;
-for sc = 1:maxp
+for sc = 1:numsubs
     subsparts{sc} = splittocellc(subparts{sc}, ' -_', true, true);
 end
 maxsparts = min(cellfun('prodofsize', subsparts));
 spartidx = 0;
 for pc = 1:maxsparts
-    subssparts = cell(maxp, 1);
-    for sc = 1:maxp
+    subssparts = cell(numsubs, 1);
+    for sc = 1:numsubs
         subssparts{sc} = subsparts{sc}{pc};
     end
-    if numel(unique(subssparts)) == maxp
+    if numel(unique(subssparts)) == numsubs
         spartidx = pc;
         break;
     end
@@ -202,10 +202,10 @@ else
 end
 
 % try to locate FSL stats files and store essential information
-condfiles = cell(maxp, numconds);
+condfiles = cell(numsubs, numconds);
 for cc = 1:numconds
-    for sc = 1:maxp
-        sci = find(~isempty(cellfun(regexpi(condfolds, opts.subjids{sc}))));
+    for sc = 1:numsubs
+        sci = find(multimatch(condfolds{cc}, opts.subjids(sc), true));
         if numel(sci) > 1
             error( ...
                 'neuroelf:importrfxglmfromfsl:invalidSubjectId', ...
@@ -216,7 +216,7 @@ for cc = 1:numconds
         if isempty(sci)
             continue;
         end
-        scondfile = findfiles(condfolds{sci}, opts.statspath, '-d1');
+        scondfile = findfiles(condfolds{cc}{sci}, opts.statspath, '-d1');
         if numel(scondfile) ~= 1
             error( ...
                 'neuroelf:importrfxglmfromfsl:missingStatsFile', ...
@@ -231,7 +231,7 @@ ucondfiles = (cellfun('prodofsize', condfiles) > 0);
 fcondfile = findfirst(ucondfiles(:));
 
 % time points
-nroftotaltimepoints = maxp * opts.trspersub;
+nroftotaltimepoints = numsubs * opts.trspersub;
 
 % check spatial layout/dimension
 Vbetaobj = {[]};
@@ -245,12 +245,8 @@ catch ne_eo;
         condfiles{fcondfile}, ne_eo.message ...
     );
 end
-VResDims = [lsqueeze(Vbetaobj{sc}.CoordinateFrame.Trf(:))', ...
-    Vbetaobj{sc}.CoordinateFrame.Dimensions(1:3)];
 
-% get spm condition names
-glmcn = {opts.cond(:).bvname};
-glmcc = cat(1, opts.cond(:).color);
+% add constant condition
 opts.cond(end + 1).bvname = 'Constant';
 opts.cond(end).color = [255, 255, 255];
 
@@ -267,25 +263,20 @@ glm = xff('new:glm');
 % make some initial settings
 glm.ProjectType = 1;
 glm.ProjectTypeRFX = 1;
-glm.NrOfSubjects = maxp;
+glm.NrOfSubjects = numsubs;
 glm.NrOfSubjectPredictors = numel(opts.cond);
 glm.NrOfTimePoints = nroftotaltimepoints;
-glm.NrOfPredictors = maxp * glm.NrOfSubjectPredictors;
-glm.NrOfConfounds = maxp;
-glm.NrOfStudies = maxp;
-glm.NrOfStudiesWithConfounds = maxp;
-glm.NrOfConfoundsPerStudy = maxp;
+glm.NrOfPredictors = numsubs * glm.NrOfSubjectPredictors;
+glm.NrOfConfounds = numsubs;
+glm.NrOfStudies = numsubs;
+glm.NrOfStudiesWithConfounds = numsubs;
+glm.NrOfConfoundsPerStudy = numsubs;
 glm.SeparatePredictors = 2;
 glm.Resolution = opts.res;
 glm.SerialCorrelation = 0;
-glm.Study(maxp).NrOfTimePoints = 0;
+glm.Study(numsubs).NrOfTimePoints = 0;
 glm.Predictor(glm.NrOfPredictors).Name1 = '';
 prc = 1;
-studyxtcs = {};
-studyprts = {};
-studysdms = {};
-studysdmc = [];
-studysdmn = [];
 
 % initialize progress bar
 if isempty(opts.pbar)
@@ -293,7 +284,7 @@ if isempty(opts.pbar)
         pbar = xprogress;
         xprogress(pbar, 'setposition', [80, 264, 640, 36]);
         xprogress(pbar, 'settitle', ...
-            sprintf('Importing %d subjects'' FSL stats to RFX-GLM...', numel(spmc)));
+            sprintf('Importing %d subjects'' FSL stats to RFX-GLM...', numsubs));
         xprogress(pbar, 0, 'Importing subject ...', 'visible', 0, 1);
         pbarn = '';
     catch ne_eo;
@@ -306,23 +297,23 @@ else
     end
     pbar = opts.pbar;
     pbar.Progress(0, ...
-        sprintf('importrfxglmfromfsl: Importing subject 1/%d...', numel(spmc)));
+        sprintf('importrfxglmfromfsl: Importing subject 1/%d...', numsubs));
     pbarn = 'importrfxglmfromfsl: ';
 end
 
 % iterate over subjects
-for sc = 1:maxp
+for sc = 1:numsubs
 
     % update progress bar
     if ~isempty(pbar)
-        pbar.Progress((sc - 1) / maxp, ...
+        pbar.Progress((sc - 1) / numsubs, ...
             sprintf('%sImporting subject ''%s'' (%d/%d)...', pbarn, ...
-            opts.subjids{sc}, sc, maxp));
+            opts.subjids{sc}, sc, numsubs));
     end
 
     % temporarily import beta maps into VMP
     umaps = find(ucondfiles(sc, :));
-    bvmp = importvmpfromspms(ucondfiles(sc, umaps)', 'b', ...
+    bvmp = importvmpfromspms(condfiles(sc, umaps)', 'b', ...
         opts.bbox, opts.res, opts.imeth);
 
     % GLM settings
@@ -342,9 +333,8 @@ for sc = 1:maxp
         glm.GLMData.RFXGlobalMap = single(zeros(size(bvmp.Map(1).VMPData)));
         glm.GLMData.Subject(1).BetaMaps = ...
             single(zeros([size(bvmp.Map(1).VMPData), glm.NrOfSubjectPredictors]));
-        glm.GLMData.Subject(2:maxp) = glm.GLMData.Subject(1);
+        glm.GLMData.Subject(2:numsubs) = glm.GLMData.Subject(1);
         omask = zeros(size(bvmp.Map(1).VMPData));
-        odsz = size(omask);
     end
 
     % set study & predictors
@@ -374,19 +364,18 @@ for sc = 1:maxp
     % combine beta maps (plain average for now)
     bmaps = glm.GLMData.Subject(sc).BetaMaps;
     for pc = 1:numel(umaps)
-        bmaps(:, :, :, umaps(pc)) = ...
-            (1 / numel(bmci)) .* sum(vmpd(:, :, :, pc), 4);
+        bmaps(:, :, :, umaps(pc)) = vmpd(:, :, :, pc);
     end
     glm.GLMData.Subject(sc).BetaMaps = bmaps;
 end
 
 % apply final masking
-glm.GLMData.RFXGlobalMap = single(omask >= (0.75 * numel(spmc)));
+glm.GLMData.RFXGlobalMap = single(omask >= (0.75 * numsubs));
 glm.NrOfVoxelsForBonfCorrection = ...
     double(sum(glm.GLMData.RFXGlobalMap(:)));
 
 % add last predictors
-for sc = 1:numel(spmc)
+for sc = 1:numsubs
     glm.Predictor(prc).Name1 = sprintf('Predictor: %d', prc);
     glm.Predictor(prc).Name2 = ...
         sprintf('Subject %s: constant', opts.subjids{sc});
