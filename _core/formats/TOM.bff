@@ -1,0 +1,92 @@
+# BinaryFileFormat (leave this tag as its own magic token!)
+
+# Vectra file format for *.TOM files (Triangular XXX Mapping)
+# TOM FileVersions supported: 1
+#
+# Version:  v1.1
+# Build:    21101913
+# Date:     Oct-19 2021, 1:02 PM EST
+# Author:   Jochen Weber, Memorial Sloan Kettering Cancer Center, NYC, USA
+# URL/Info: http://neuroelf.net/
+
+# Copyright (c) 2021, Jochen Weber
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Columbia University nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# FILE FORMAT
+Description:TOM files
+EncodingSyntax:ieee-le
+Extensions:tom
+
+# FIELDS
+ListOfFields:!
+type  !cond                   !disktype!datatype!dim                      !default !varname
+BLOOP !$BFFREAD               ! ! !1   ! !Reading
+FIELD !                       !uint8   !double  !1, 8                     !        !FileMarker
+BLOOP !                       ! ! !999 ! !FieldNo
+FIELD !                       !uint64  !double  !1, 1                     !        !Field($FieldNo).ContentLength
+FIELD !                       !uint8   !char    !1, 16                    !        !Field($FieldNo).ContentName
+EXPRE !                   !!!!!$readlength = @Field($FieldNo).ContentLength; @Field($FieldNo).ContentName = strrep(@Field($FieldNo).ContentName, '.', '');
+FIELD !                       !uint8   !uint8   !1, $readlength           !        !Field($FieldNo).Content
+FIELD !                       !uint32  !double  !1, 1                     !        !Field($FieldNo).Delimiter
+EXPRE !                   !!!!!$RemSize = $FILESIZE - ftell(fid); if $RemSize < 24, $FieldNo = 999; end
+ELOOP !                       ! ! !  ! !FieldNo
+EXPRE !                   !!!!! ...
+    $u8t32 = [1, 256, 65536, 16777216]; ...
+    $fieldnames = {@Field.ContentName}; ...
+    $headerfield = find(strcmpi($fieldnames, 'Header__')); ...
+    @NrOfVertices = sum($u8t32 .* double(@Field($headerfield).Content(9:12))); ...
+    @NrOfTriangles = sum($u8t32 .* double(@Field($headerfield).Content(13:16))); ...
+    $vertfield = find(strcmpi($fieldnames, 'Vertices')); ...
+    @Vertices = reshape(typecast(@Field($vertfield).Content(1:12*@NrOfVertices), 'single'), 3, @NrOfVertices)'; ...
+    $trisfield = find(strcmpi($fieldnames, 'Tris____tz')); ...
+    @Triangles = 1 + double(dunzip(@Field($trisfield).Content, 'int32', [6, @NrOfTriangles]))'; ...
+    @Triangles(:, 2:2:end) = []; ...
+    $texvafield = find(strcmpi($fieldnames, 'TexVertAz')); ...
+    @TexVertACoord = dunzip(@Field($texvafield).Content, 'single', [1, Inf]); ...
+    @TexVertACoord = reshape(@TexVertACoord, 3, numel(@TexVertACoord) / 3)'; ...
+    @TexVertACoord(:, 3) = []; ...
+    @TexVertAMap = dunzip(@Field($texvafield).Content, 'int32', [1, Inf]); ...
+    @TexVertAMap = reshape(@TexVertAMap, 3, numel(@TexVertAMap) / 3)'; ...
+    @TexVertAMap(:, 1:2) = []; ...
+    $metafield = find(strcmpi($fieldnames, 'Metadata')); ...
+    $mdc = double(@Field($metafield).Content); ...
+    $mdp = 1; ...
+    $mdn = sum($u8t32 .* $mdc($mdp:$mdp+3)); ...
+    $mdp = $mdp + 4; ...
+    @NrOfMetadataFields = $mdn; ...
+    @MetaData = cell(@NrOfMetadataFields, 1);
+ELOOP !                       ! ! !  ! !Reading
+
+# Read rest of File into REMAININGCONTENT
+EXPRE !$BFFREAD           !!!!!$RemSize = $FILESIZE - ftell(fid);
+EXPRE !$BFFWRITE          !!!!!$RemSize = 0; try, if isfield(@@, 'REMAININGCONTENT'), $RemSize = prod(size(@REMAININGCONTENT)); end, end
+FIELD !$RemSize > 0           !uint8   !uint8   !1, $RemSize              !        !REMAININGCONTENT
+
+EndListOfFields
+
+NewFileCode:!
+@FileMarker = [232, 84, 79, 77, 13, 10, 32, 10];
+@Field = emptystruct({'ContentLength', 'ContentName', 'Content', 'Delimiter'});
+EndNewFileCode
