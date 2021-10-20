@@ -40,6 +40,7 @@ ch = ne_gcfg.h.CM.h;
 % request file
 [cvfile, cvpath] = uigetfile( ...
     {'*.cov',       'COVariate files (*.cov)'; ...
+     '*.csv',       'Comma-separated-values files (*.csv)'; ...
      '*.rtc;*.sdm', 'Design matrix files (*.rtc, *.sdm)'; ...
      '*.mat',       'MAT-files (*.mat)'; ...
      '*.txt',       'Text files (*.txt)'; ...
@@ -78,6 +79,39 @@ try
                 cvname{cvc} = sprintf('%s - Covariate %d', cvfile, cvc);
             end
 
+        % for CSV files
+        case {'csv'}
+            
+            % attempt to load CSV file
+            csvcont = asciiread(cvfull);
+            csvhead = splittocellc(csvcont, char([10, 13]), true, true);
+            if isempty(csvhead) || isempty(csvhead{1})
+                error('Unsupported CSV file content.');
+            end
+            if any(csvhead{1} == char(9))
+                sep = char(9);
+            elseif any(csvhead{1} == ';')
+                sep = ';';
+            elseif any(csvhead{1} == ',')
+                sep = ',';
+            else
+                error('Unsupported CSV file content.');
+            end
+            csvdata = acsvread(cvfull, sep, struct('asmatrix', 1, 'convert', 1));
+            
+            % get covariate names and split off
+            cvname = csvdata(1, :);
+            csvdata(1, :) = [];
+            cvcont = zeros(size(csvdata, 1), numel(cvname));
+            for cvc = numel(cvname):-1:1
+                if all(cellfun(@isnumeric, csvdata(:, cvc)) & (cellfun('prodofsize', csvdata(:, cvc)) == 1))
+                    cvcont(:, cvc) = [csvdata{:, cvc}];
+                else
+                    cvcont(:, cvc) = [];
+                    cvname(cvc) = [];
+                end
+            end
+            
         % for RTC/SDM files
         case {'rtc', 'sdm'}
 
