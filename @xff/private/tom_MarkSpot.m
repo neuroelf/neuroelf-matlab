@@ -1,16 +1,17 @@
-function [m, cut, im] = tom_MarkSpot(xo, crd, csz)
+function [m, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
 % TOM::MarkSpot  - mark and extract a spot around a coordinate
 %
 % FORMAT:       [mspec, cut, im] = tom.MarkSpot(coord [, cutsize]);
 %
 % Input fields:
 %
-%       coord       3-element coordinate around which to cut
+%       coord       3-element coordinate around which to cut (x, y, z)
 %       cutsize     optional cut size (default: 256 pixels)
+%       marksize    optional mark size (default: 0 = no marking)
 %
 % Output fields:
 %
-%       mspec       texture map specification (index, x, y)
+%       mspec       texture map specification (tnum, cx, cy)
 %       cut         cut-out piece
 %       im          full texture image
 %
@@ -51,13 +52,21 @@ function [m, cut, im] = tom_MarkSpot(xo, crd, csz)
 global ne_methods;
 
 % check arguments
-if nargin < 2 || ~isa(crd, 'double') || numel(crd) ~= 3
+if nargin < 2 || numel(xo) ~= 1 || ~xffisobject(xo, true, 'tom')
+    error('neuroelf:xff:badArgument', 'Invalid call to %s.', mfilename);
+end
+if ~isa(crd, 'double') || numel(crd) ~= 3 || any(isinf(crd) | isnan(crd))
     error('neuroelf:xff:badArgument', 'Bad or missing COORD argument.');
 end
 if nargin < 3 || ~isa(csz, 'double') || numel(csz) ~= 1 || isinf(csz) || isnan(csz)
     csz = 256;
 else
     csz = max(40, abs(round(csz)));
+end
+if nargin < 4 || ~isa(msz, 'double') || numel(msz) ~= 1 || isinf(msz) || isnan(msz)
+    msz = 0;
+else
+    msz = min(round(0.8 * csz), abs(round(msz)));
 end
 
 % extract from object
@@ -69,7 +78,7 @@ tm = t.CornerTexVtxMap;
 % find closest vertex (dist in mm)
 d = sqrt(sum((v - ones(size(v, 1), 1) * crd(:)') .^ 2, 2));
 [mv, mpos] = min(d);
-if mv > 5
+if mv > 7.5
     error('neuroelf:xff:noMatchFound', 'No such coordinate in dataset.')
 end
 
@@ -97,42 +106,10 @@ end
 
 % find "central" coordinate
 mcrd = mean(mcrd);
+mcrd(2) = 1 - mcrd(2);
 m = [msel, mcrd];
 
-% read corresponding image
-f = t.Field;
-fn = {f.ContentName};
-txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));
-txc = t.Field(txs(msel));
-tname = tempname;
-fid = fopen(tname, 'wb');
-if fid < 1
-    error('Cannot write temp file.');
+% pass on to secondary function
+if nargout > 1
+    [cut, im] = tom_ExtractSpot(xo, m, csz, msz);
 end
-fwrite(fid, txc.Content, 'uint8');
-fclose(fid);
-im = imread(tname);
-delete(tname);
-
-% mark and cut spot
-isz = size(im);
-row = 1 + floor(isz(1) * (1 - mcrd(2)));
-col = 1 + floor(isz(2) * mcrd(1));
-chalf = ceil(0.5 * csz);
-if mcrd(1) < 0.5
-    fcol = max(1, col - chalf);
-    tcol = fcol + csz - 1;
-else
-    tcol = min(isz(2), col + chalf);
-    fcol = tcol + 1 - csz;
-end
-if mcrd(2) < 0.5
-    trow = min(isz(1), row + chalf);
-    frow = trow + 1 - csz;
-else
-    frow = max(1, row - chalf);
-    trow = frow + csz - 1;
-end
-cut = im(frow:trow, fcol:tcol, :);
-im([frow:frow+3, trow-3:trow], fcol:tcol, :) = 255;
-im(frow:trow, [fcol:fcol+3, tcol-3:tcol], :) = 255;
