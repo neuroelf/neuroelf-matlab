@@ -79,12 +79,22 @@ if strcmpi(S(1).subs, 'help')
     
     % invalid call to help
     if ~iscell(S(2).subs) || numel(S(2).subs) ~= 1 || ...
-       ~ischar(S(2).subs{1}) || isempty(S(2).subs{1}) || ...
-       ~isfield(neos.meth, S(2).subs{1})
+       (~ischar(S(2).subs{1}) && ~isa(S(2).subs{1}, 'function_handle')) || ...
+        isempty(S(2).subs{1})
+        error('neuroelf:general:badArgument', ...
+            'Invalid help topic argument.');
+    end
+    if isa(S(2).subs{1}, 'function_handle')
+        hname = char(S(2).subs{1});
+    else
+        hname = S(2).subs{1}(:)';
+    end
+    if ~isfield(neos.meth, hname)
         warning('neuroelf:general:badArgument', ...
             'Invalid help topic requested or topic not found.');
+        return;
     end
-    h = neos.meth.(S(2).subs{1}){end};
+    h = neos.meth.(hname){end};
     if nargout == 0
         disp(h);
     else

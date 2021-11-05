@@ -1,7 +1,7 @@
 function [ir, ira] = image_rotate(im, r, opts)
-% image_resize  - resize a HxWxD numeric image to new measures
+% image_rotate  - rotate a HxWxD numeric image to new measures
 %
-% FORMAT:       [ir, ira] = image_resize(im, r [, opts])
+% FORMAT:       [ir, ira] = image_rotate(im, r [, opts])
 %
 % Input fields:
 %
@@ -77,11 +77,13 @@ if ischar(im)
     catch ne_eo;
         rethrow(ne_eo);
     end
+    oclass = class(im);
     im = single(im);
     if ~isempty(ima)
         im(:, :, end + 1) = ima;
     end
 else
+    oclass = class(im);
     im = single(im);
 end
 ims = size(im);
@@ -285,7 +287,9 @@ if any(imp == [2, 4])
     ir = uint8(round(ir(:, :, 1:end-1)));
 else
     ira = [];
-    ir = uint8(round(ir));
+    if strcmp(oclass, 'uint8')
+        ir = uint8(round(ir));
+    end
 end
 
 % save data
