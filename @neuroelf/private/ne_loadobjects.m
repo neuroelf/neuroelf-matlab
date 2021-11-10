@@ -2,12 +2,12 @@
 function varargout = ne_loadobjects(varargin)
 
 % Version:  v1.1
-% Build:    16052922
-% Date:     Feb 2012, 10:15 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -88,7 +88,7 @@ if ~hasvmr
 end
 
 % try putting all other supported objects in NeuroElf's workspace
-for xc = {'vmp', 'cmp', 'glm', 'hdr', 'head', 'mgh', 'vtc', 'fmr', 'dmr', 'msk', 'smp', 'fsmf', 'srf', 'fsbf'}
+for xc = {'vmp', 'cmp', 'glm', 'hdr', 'head', 'mgh', 'vtc', 'fmr', 'dmr', 'msk', 'smp', 'fsmf', 'srf', 'fsbf', 'tom'}
     for oc = 1:numel(nelfo)
         if strcmpi(nelfot{oc}, xc{1})
             ne_openfile(0, 0, nelfo(oc), false, false);

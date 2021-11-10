@@ -21,12 +21,12 @@ function varargout = ne_setcsrfstatmap(varargin)
 %       after settings the maps.
 
 % Version:  v1.1
-% Build:    16052716
-% Date:     May-27 2016, 4:01 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ end
 % check again
 ch.MainFig.SetGroupVisible('SMPMenu', 'off');
 vtype = 'none';
-if ~isxff(cc.SurfVar, {'fsbf', 'srf'}) || ~isxff(cc.SurfStatsVar, true) || ...
+if ~isxff(cc.SurfVar, {'fsbf', 'srf', 'tom'}) || ~isxff(cc.SurfStatsVar, true) || ...
    ~any(strcmpi(cc.SurfStatsVar.FileType, {'fsmf', 'glm', 'mtc', 'smp'})) || ...
     cc.SurfVar.NrOfVertices ~= cc.SurfStatsVar.NrOfVertices
     ch.SurfStatsVarMaps.Value = [];

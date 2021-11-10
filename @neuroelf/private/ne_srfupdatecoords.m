@@ -61,7 +61,7 @@ if nargout > 0
 end
 
 % no input SRF
-if nargin < 3 || numel(varargin{3}) ~= 1 || ~isxff(varargin{3}, {'fsbf', 'srf'})
+if nargin < 3 || numel(varargin{3}) ~= 1 || ~isxff(varargin{3}, {'fsbf', 'srf', 'tom'})
 
     % do for all
     srfs = ne_gcfg.h.Scenery.UserData(:, 4);

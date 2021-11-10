@@ -148,12 +148,12 @@ function varargout = ne_srf_tools(varargin)
 %       syntax:     ne_srf_tools(0, 0, 'undomorph')
 
 % Version:  v1.1
-% Build:    16060813
-% Date:     Jun-08 2016, 1:11 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -192,7 +192,7 @@ end
 % active SRF loaded
 srf = cc.SurfVar;
 if (numel(srf) ~= 1 || ...
-   ~isxff(srf, {'fsbf', 'srf'})) && ...
+   ~isxff(srf, {'fsbf', 'srf', 'tom'})) && ...
    (nargin < 3 || ...
     ~ischar(varargin{3}) || ...
     isempty(varargin{3}) || ...
@@ -201,7 +201,7 @@ if (numel(srf) ~= 1 || ...
       'loadsubcort', 'recosmsph'})))
     return;
 end
-if isxff(srf, {'fsbf', 'srf'})
+if isxff(srf, {'fsbf', 'srf', 'tom'})
     srfh = handles(srf);
 else
     srfh = struct( ...

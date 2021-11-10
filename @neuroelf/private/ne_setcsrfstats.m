@@ -2,12 +2,12 @@
 function varargout = ne_setcsrfstats(varargin)
 
 % Version:  v1.1
-% Build:    16032218
-% Date:     Mar-22 2016, 6:23 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, 2015, 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,7 @@ ch.STCPlot.Visible = 'off';
 srf = ne_gcfg.fcfg.SurfVar;
 
 % for no surface
-if ~isxff(srf, {'fsbf', 'srf'})
+if ~isxff(srf, {'fsbf', 'srf', 'tom'})
 
     % return already
     return;

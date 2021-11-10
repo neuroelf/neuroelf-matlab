@@ -19,12 +19,12 @@ function varargout = ne_openfile(varargin)
 %    ne_openfile(0, 0, srf_object, false);
 
 % Version:  v1.1
-% Build:    17061113
-% Date:     Jun-11 2017, 1:07 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -671,7 +671,7 @@ switch (ftype)
         end
 
     % for surface files
-    case {'fsbf', 'srf'}
+    case {'fsbf', 'srf', 'tom'}
 
         % empty?
         if isempty(f.VertexCoordinate)

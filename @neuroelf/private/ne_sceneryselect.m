@@ -17,12 +17,12 @@ function varargout = ne_sceneryselect(varargin)
 %     ne_sceneryselect(0, 0, {SRF}, 'BS123456'); % select SRF in BS123456
 
 % Version:  v1.1
-% Build:    16060912
-% Date:     Jun-09 2016, 12:30 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ if nargin < 3 || isempty(varargin{3}) || (~iscell(varargin{3}) && ~isa(varargin{
 elseif iscell(varargin{3})
     sci = zeros(numel(varargin{3}), 1);
     for sc = 1:numel(sci)
-        if numel(varargin{3}{sc}) ~= 1 || ~isxff(varargin{3}{sc}, {'fsbf', 'srf'})
+        if numel(varargin{3}{sc}) ~= 1 || ~isxff(varargin{3}{sc}, {'fsbf', 'srf', 'tom'})
             fprintf('Requested element not a valid surface.\n');
             return;
         end

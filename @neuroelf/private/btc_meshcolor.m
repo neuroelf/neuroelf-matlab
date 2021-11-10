@@ -36,7 +36,7 @@ function btc_meshcolor(srf, recolor, source, target, varargin)
 global ne_gcfg;
 
 % if invalid SRF, return
-if ~isxff(srf, {'fsbf', 'srf'})
+if ~isxff(srf, {'fsbf', 'srf', 'tom'})
     return;
 end
 rerender = (nargin < 5);

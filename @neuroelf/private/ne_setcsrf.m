@@ -2,12 +2,12 @@
 function varargout = ne_setcsrf(varargin)
 
 % Version:  v1.1
-% Build:    16031521
-% Date:     Mar-15 2016, 9:51 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ if nargin > 2
 
     % xff
     elseif numel(varargin{3}) == 1 && ...
-        isxff(varargin{3}, {'fsbf', 'srf'})
+        isxff(varargin{3}, {'fsbf', 'srf', 'tom'})
 
         % in list
         for ic = 1:size(hu, 1)

@@ -21,12 +21,12 @@ function varargout = ne_setsceneprops(varargin)
 %       % fow = faces ('f') or wireframe ('w') mode
 
 % Version:  v1.1
-% Build:    16052716
-% Date:     May-27 2016, 4:11 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Build:    21111013
+% Date:     Nov-10 2021, 1:15 PM EST
+% Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2016, Jochen Weber
+% Copyright (c) 2010 - 2021, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@ end
 % scenery selection
 ch = ne_gcfg.h;
 scu = ch.Scenery.UserData;
-if nargin < 3 || numel(varargin{3}) ~= 1 || ~isxff(varargin{3}, {'fsbf', 'srf'})
+if nargin < 3 || numel(varargin{3}) ~= 1 || ~isxff(varargin{3}, {'fsbf', 'srf', 'tom'})
     sci = ch.Scenery.Value;
 else
     scif = false;
@@ -77,7 +77,7 @@ else
         return;
     end
 end
-if numel(sci) ~= 1 || ~isxff(scu{sci, 4}, {'fsbf', 'srf'})
+if numel(sci) ~= 1 || ~isxff(scu{sci, 4}, {'fsbf', 'srf', 'tom'})
     return;
 end
 sco = scu{sci, 4};
