@@ -14,8 +14,6 @@ function [m, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
 %       mspec       texture map specification (tnum, cx, cy)
 %       cut         cut-out piece
 %       im          full texture image
-%
-% Using: catstruct.
 
 % Version:  v1.1
 % Build:    21102012
@@ -48,9 +46,6 @@ function [m, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
 % (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-% neuroelf library
-global ne_methods;
-
 % check arguments
 if nargin < 2 || numel(xo) ~= 1 || ~xffisobject(xo, true, 'tom')
     error('neuroelf:xff:badArgument', 'Invalid call to %s.', mfilename);
@@ -71,8 +66,8 @@ end
 
 % extract from object
 t = xo.C;
-v = double(t.Vertices);
-tr = t.Triangles;
+v = t.VertexCoordinate;
+tr = t.TriangleVertex;
 tm = t.CornerTexVtxMap;
 
 % find closest vertex (dist in mm)
@@ -82,31 +77,71 @@ if mv > 7.5
     error('neuroelf:xff:noMatchFound', 'No such coordinate in dataset.')
 end
 
-% find relevant triangles
+% find relevant triangles, precompute vectors
+vpos = v(mpos, :);
+vcrd = crd - vpos;
 tc = find(any(tr == mpos, 2));
+nt = numel(tc);
+tcs = tr(tc, :);
+tc2 = (tcs(:, 2) == mpos);
+tc3 = (tcs(:, 3) == mpos);
+tcs(tc2, :) = tcs(tc2, [2, 3, 1]);
+tcs(tc3, :) = tcs(tc3, [3, 1, 2]);
 
-% and seek corresponding texture vertices
-ti = false(numel(t.TexVertAMap), 1);
-for c = 1:numel(tc)
-    trow = (tm(:, 1) == tc(c));
-    ti(unique(tm(trow, 3))) = true;
-end
-
-% extract corresponding maps and coordinates
-maps = t.TexVertAMap(ti);
-mcrd = double(t.TexVertACoord(ti, :));
-
-% remove irrelevant maps
-if any(maps ~= maps(1))
-    msel = mode(maps);
-    mcrd = mcrd(maps == msel, :);
+% which triangle does the point fall into
+if mv > 0
+    v2 = v(tcs(:, 2), :) - v(tcs(:, 1), :);
+    l2 = v2 ./ (sqrt(sum(v2 .* v2, 2)) * [1, 1, 1]);
+    v3 = v(tcs(:, 3), :) - v(tcs(:, 1), :);
+    l3 = v3 ./ (sqrt(sum(v3 .* v3, 2)) * [1, 1, 1]);
+    vn = cross(l2, l3, 2);
+    vd = sqrt(sum(vn .* vn, 2));
+    vn = vn ./ (vd * [1, 1, 1]);
+    vcd = sum(vn .* vcrd(ones(nt, 1), :), 2);
+    pcrd = crd(ones(nt, 1), :) - (vcd * [1, 1, 1]) .* vn;
+    pdst = pcrd - vpos(ones(nt, 1), :);
+    insidx = -ones(nt, 1);
+    ins1 = zeros(nt, 1);
+    ins2 = zeros(nt, 1);
+    for tcc = 1:nt
+        tv = [v2(tcc, :)', v3(tcc, :)'] \ pdst(tcc, :)';
+        if all(tv >= -1e-5)
+            insidx(tcc) = min(tv);
+            ins1(tcc) = tv(1);
+            ins2(tcc) = tv(2);
+        end
+    end
+    [insmax, insidx] = max(insidx);
+    if insmax == -1
+        error('neuroelf:xff:triangleMismatch', 'Could not locate point in triangles.');
+    end
+    ins1 = ins1(insidx);
+    ins2 = ins2(insidx);
 else
-    msel = maps(1);
+    insidx = 1;
+    ins1 = 0;
+    ins2 = 0;
 end
+tr = tc(insidx);
+ttr = t.CornerTexVtxMap(tm(:, 1) == tr, [2, 3]);
+[~, tti] = sort(ttr(:, 1));
+ttr = ttr(tti, :);
+tvc = double(t.TexVertACoord(ttr(:, 2), :));
+tvm = t.TexVertAMap(ttr(:, 2));
+msel = tvm(1);
+if ~all(tvm == msel)
+    error('neuroelf:xff:triangleMismatch', 'Texture map mismatch between vertices.');
+end
+if tc2(insidx)
+    tvc = tvc([2, 3, 1], :);
+elseif tc3(insidx)
+    tvc = tvc([3, 1, 2], :);
+end
+tv1 = tvc(2, :) - tvc(1, :);
+tv2 = tvc(3, :) - tvc(1, :);
+mcrd = tvc(1, :) + ins1 * tv1 + ins2 * tv2;
 
-% find "central" coordinate
-mcrd = mean(mcrd);
-mcrd(2) = 1 - mcrd(2);
+% combine
 m = [msel, mcrd];
 
 % pass on to secondary function

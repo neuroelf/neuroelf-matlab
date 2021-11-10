@@ -80,7 +80,38 @@ catch ne_eo;
     rethrow(ne_eo);
 end
 cc = coords.root.children;
-return;
+cf = fieldnames(cc);
+
+% check options
+if nargin < 3 || ~isstruct(opts) || numel(opts) ~= 1
+    opts = struct;
+end
+if ~isfield(opts, 'cutsize') || ~isa(opts.cutsize, 'double') || numel(opts.cutsize) ~= 1 || ...
+    isinf(opts.cutsize) || isnan(opts.cutsize) || opts.cutsize < 0
+    opts.cutsize = 256;
+else
+    opts.cutsize = min(2048, max(64, round(opts.cutsize)));
+end
+if ~isfield(opts, 'filter') || ~ischar(opts.filter)
+    opts.filter = '$status==0';
+else
+    opts.filter = opts.filter(:)';
+end
+if ~isfield(opts, 'marksize') || ~isa(opts.marksize, 'double') || numel(opts.marksize) ~= 1 || ...
+    isinf(opts.marksize) || isnan(opts.marksize) || opts.marksize < 0
+    opts.marksize = 128;
+else
+    opts.marksize = min(ceil(0.5 * opts.cutsize), max(32, round(opts.marksize)));
+end
+if ~isfield(opts, 'source') || ~ischar(opts.source) || isempty(opts.source) || ...
+   ~any(opts.source(1) == '23')
+    opts.source = '3';
+else
+    opts.source = opts.source(1);
+end
+
+% parse filter expression
+
 f = t.Field;
 fn = {f.ContentName};
 txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));

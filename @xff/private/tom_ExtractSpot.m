@@ -94,22 +94,9 @@ end
 
 % image/texture
 msel = abs(round(crd(1)));
-mcrd = crd(2:3);
+mcrd = [crd(2), 1 - crd(3)];
 if msel > numel(txs)
     error('Invalid texture number.');
-end
-txc = t.Field(txs(msel));
-imfile = sprintf('%s/%s.jpg', td, modelnames{msel});
-try
-    iminfo = imfinfo(imfile);
-catch
-    imfile = sprintf('%s/%s.CR2', td, modelnames{msel});
-    try
-        iminfo = imfinfo(imfile);
-        iminfo = iminfo(1);
-    catch
-        error('neuroelf:xff:missingFile', 'Missing image file %s.', modelnames{msel});
-    end
 end
 txfolder = sprintf('%s/textures', td);
 if exist(txfolder, 'dir') ~= 7
@@ -126,51 +113,12 @@ if exist(tname, 'file') ~= 2
     fwrite(fid, txc.Content, 'uint8');
     fclose(fid);
 end
-txinfo = imfinfo(tname);
 im = imread(tname);
 isz = size(im);
-hsz = ceil(0.5 .* isz(1:2));
-xoff = 0;
-yoff = 0;
-if any(mcrd > 1) && (txinfo.Width ~= iminfo.Width || txinfo.Height ~= iminfo.Height)
-    oim = imread(imfile);
-    imm = mean(im, 3);
-    oimm = mean(oim, 3);
-    if txinfo.Width == iminfo.Width
-        trow = imm(hsz(1), :)';
-        trow = (trow - mean(trow)) ./ std(trow);
-        frow = (oimm - mean(oimm, 2) * ones(1, txinfo.Width))';
-        frow = frow ./ (ones(size(frow, 1), 1) * std(frow, [], 1));
-        cc = sum(trow(:, ones(1, size(frow, 2))) .* frow) / (numel(trow) - 1);
-        [mc, mcp] = max(cc);
-        if mc < 0.7
-            im = oim; % unresolved for now
-            isz = size(im);
-        else
-            yoff = max(0, mcp - hsz(1));
-        end
-    elseif txinfo.Height == iminfo.Height
-        tcol = imm(:, hsz(2));
-        tcol = (tcol - mean(tcol)) ./ std(tcol);
-        fcol = oimm - ones(txinfo.Height, 1) * mean(oimm, 1);
-        fcol = fcol ./ (std(fcol, [], 2) * ones(1, size(fcol, 2)));
-        cc = sum(tcol(:, ones(1, size(fcol, 2))) .* fcol) / (numel(tcol) - 1);
-        [mc, mcp] = max(cc);
-        if mc < 0.7
-            im = oim; % unresolved for now
-            isz = size(im);
-        else
-            xoff = max(0, mcp - hsz(2));
-        end
-    else
-        im = oim; % unresolved for now
-        isz = size(im);
-    end
-end
 
 % mark and cut spot
 if any(mcrd > 1)
-    mcrd = (mcrd - [xoff, yoff]) ./ isz([2, 1]);
+    mcrd = mcrd ./ isz([2, 1]);
 end
 row = 1 + floor(isz(1) * mcrd(2));
 col = 1 + floor(isz(2) * mcrd(1));
