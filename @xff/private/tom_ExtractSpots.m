@@ -7,12 +7,14 @@ function xo = tom_ExtractSpots(xo, coordfile, opts)
 %
 %       coordfile   JSON filename with coordinates
 %       opts        1x1 struct with optional settings
-%       .cutsize    optional cut size (default: 256 pixels)
+%       .cutsize    optional cut size (default: 512 pixels)
 %       .filter     filter expression, default: '$status==0'
+%       .jpgqual    JPG quality (default: 90)
 %       .marksize   optional mark size (default: 0 = no marking)
-%       .source     either '2d' or {'3d'}
 %
 % No output fields.
+%
+% Using ddeblank.
 
 % Version:  v1.1
 % Build:    21102012
@@ -69,6 +71,19 @@ if nargin < 2 || ~ischar(coordfile) || isempty(coordfile) || exist(coordfile(:)'
     end
 end
 
+% spots folder
+sf = [td filesep 'spots'];
+if exist(sf, 'dir') ~= 7
+    try
+        ne_methods.mkadir(sf);
+        if exist(sf, 'dir') ~= 7
+            error('neuroelf:xff:mkadirError', 'Could not create spots folder.');
+        end
+    catch ne_eo;
+        rethrow(ne_eo);
+    end
+end
+
 % try loading coordfile
 try
     coords = jsondecode(ne_methods.asciiread(coordfile(:)'));
@@ -88,7 +103,7 @@ if nargin < 3 || ~isstruct(opts) || numel(opts) ~= 1
 end
 if ~isfield(opts, 'cutsize') || ~isa(opts.cutsize, 'double') || numel(opts.cutsize) ~= 1 || ...
     isinf(opts.cutsize) || isnan(opts.cutsize) || opts.cutsize < 0
-    opts.cutsize = 256;
+    opts.cutsize = 512;
 else
     opts.cutsize = min(2048, max(64, round(opts.cutsize)));
 end
@@ -97,164 +112,87 @@ if ~isfield(opts, 'filter') || ~ischar(opts.filter)
 else
     opts.filter = opts.filter(:)';
 end
+if ~isfield(opts, 'jpgqual') || ~isa(opts.jpgqual, 'double') || numel(opts.jpgqual) ~= 1 || ...
+    isinf(opts.jpgqual) || isnan(opts.jpgqual)
+    opts.jpgqual = 90;
+else
+    opts.jpgqual = min(100, max(25, round(opts.jpgqual)));
+end
 if ~isfield(opts, 'marksize') || ~isa(opts.marksize, 'double') || numel(opts.marksize) ~= 1 || ...
     isinf(opts.marksize) || isnan(opts.marksize) || opts.marksize < 0
-    opts.marksize = 128;
-else
+    opts.marksize = 0;
+elseif opts.marksize > 0
     opts.marksize = min(ceil(0.5 * opts.cutsize), max(32, round(opts.marksize)));
-end
-if ~isfield(opts, 'source') || ~ischar(opts.source) || isempty(opts.source) || ...
-   ~any(opts.source(1) == '23')
-    opts.source = '3';
-else
-    opts.source = opts.source(1);
 end
 
 % parse filter expression
+cond = ne_methods.ddeblank(opts.filter);
 
-f = t.Field;
-fn = {f.ContentName};
-txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));
-mn = {t.MetaData.Name};
-mi = find(strcmpi(mn(:), 'texcameramodelnames'));
-modelnames = ne_methods.splittocellc(t.MetaData(mi).Content, char(0));
-if numel(mi) ~= 1
-    error('neuroelf:xff:badArgument', 'Cannot resolve camera/image names.');
-end
-if iscell(crd) && numel(crd) > 1
-    modelindex = find(strcmpi(modelnames(:), crd{1}));
-    if numel(modelindex) ~= 1
-        error('neuroelf:xff:badArgument', 'Cannot resolve camera/image names.');
-    end
-    if numel(crd) == 2 && isa(crd{2}, 'double')
-        crd = [modelindex, crd{2}(:)'];
-    elseif numel(crd) > 2 && isa(crd{2}, 'double') && numel(crd{2}) == 1 && ...
-        isa(crd{3}, 'double') && numel(crd{3}) == 1
-        crd = [modelindex, crd{2}, crd{3}];
-    end
-end
-if ~isa(crd, 'double') || numel(crd) ~= 3 || any(isinf(crd) | isnan(crd))
-    error('neuroelf:xff:badArgument', 'Bad or missing COORD argument.');
-end
-if nargin < 3 || ~isa(csz, 'double') || numel(csz) ~= 1 || isinf(csz) || isnan(csz)
-    csz = 256;
+% no condition, use full selection
+if isempty(cond)
+    sel = true(numel(cc), 1);
+    
+% otherwise
 else
-    csz = max(40, abs(round(csz)));
-end
-if nargin < 4 || ~isa(msz, 'double') || numel(msz) ~= 1 || isinf(msz) || isnan(msz)
-    msz = 0;
-else
-    msz = min(round(0.8 * csz), abs(round(msz)));
-end
 
-% image/texture
-msel = abs(round(crd(1)));
-mcrd = crd(2:3);
-if msel > numel(txs)
-    error('Invalid texture number.');
-end
-txc = t.Field(txs(msel));
-imfile = sprintf('%s/%s.jpg', td, modelnames{msel});
-try
-    iminfo = imfinfo(imfile);
-catch
-    imfile = sprintf('%s/%s.CR2', td, modelnames{msel});
+    % format cond as expression
+    cond = ['(' cond ')'];
+
+    % replace column names (==)
+    cregx = regexp(cond, '(\$[a-zA-Z][a-zA-Z_0-9]*\s*==\s*''[^'']+'')', 'tokens');
+    while ~isempty(cregx) && ~isempty(cregx{1})
+        cregp = regexp(cregx{1}{1}, '^\$([a-zA-Z][a-zA-Z_0-9]*)\s*==\s*''([^'']+)''$', 'tokens');
+        if ~iscell(cregp) || numel(cregp) ~= 1 || ~iscell(cregp{1}) || numel(cregp{1}) ~= 2
+            error('neuroelf:xff:badArgument', 'Invalid conditional statement.');
+        end
+        if any(cregp{1}{2} == '*')
+            cond = strrep(cond, cregx{1}{1}, sprintf( ...
+                '~cellfun(''isempty'', regexpi({cc.%s}, ''%s''))', cregp{1}{:}));
+        else
+            cond = strrep(cond, cregx{1}{1}, sprintf( ...
+                'strcmpi({cc.%s}, ''%s'')', cregp{1}{:}));
+        end
+        cregx = regexp(cond, '(\$[a-zA-Z][a-zA-Z_0-9]*\s*==\s*''[^'']+'')', 'tokens');
+    end
+    cregx = regexp(cond, '(\$[a-zA-Z][a-zA-Z_0-9]*\s*~=\s*''[^'']+'')', 'tokens');
+    while ~isempty(cregx) && ~isempty(cregx{1})
+        cregp = regexp(cregx{1}{1}, '^\$([a-zA-Z][a-zA-Z_0-9]*)\s*~=\s*''([^'']+)''$', 'tokens');
+        if ~iscell(cregp) || numel(cregp) ~= 1 || ~iscell(cregp{1}) || numel(cregp{1}) ~= 2
+            error('neuroelf:xff:badArgument', 'Invalid conditional statement.');
+        end
+        if any(cregp{1}{2} == '*')
+            cond = strrep(cond, cregx{1}{1}, sprintf( ...
+                'cellfun(''isempty'', regexpi({cc.%s}, ''%s''))', cregp{1}{:}));
+        else
+            cond = strrep(cond, cregx{1}{1}, sprintf( ...
+                '~strcmpi({cc.%s}, ''%s'')', cregp{1}{:}));
+        end
+        cregx = regexp(cond, '(\$[a-zA-Z][a-zA-Z_0-9]*\s*~=\s*''[^'']+'')', 'tokens');
+    end
+    for op = {'==', '>=', '<=', '~=', '>', '<'}
+        cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*[0-9\.\+\-eE]+)'], 'tokens');
+        while ~isempty(cregx) && ~isempty(cregx{1})
+            cregp = regexp(cregx{1}{1}, ['^\$([a-zA-Z][a-zA-Z_0-9]*)\s*' op{1} '\s*([0-9\.\+\-eE]+)$'], 'tokens');
+            if ~iscell(cregp) || numel(cregp) ~= 1 || ~iscell(cregp{1}) || numel(cregp{1}) ~= 2
+                error('neuroelf:xff:badArgument', 'Invalid conditional statement.');
+            end
+            cond = strrep(cond, cregx{1}{1}, sprintf(['[cc.%s] ' op{1} ' %s'], cregp{1}{:}));
+            cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*[0-9\.\+\-eE]+)'], 'tokens');
+        end
+    end
+
+    % then parse condition
     try
-        iminfo = imfinfo(imfile);
-        iminfo = iminfo(1);
-    catch
-        error('neuroelf:xff:missingFile', 'Missing image file %s.', modelnames{msel});
+        sel = eval(cond);
+    catch xfferror
+        error('neuroelf:xff:badArgument', 'Bad condition given: %s.', xfferror.message);
     end
 end
-txfolder = sprintf('%s/textures', td);
-if exist(txfolder, 'dir') ~= 7
-    mkdir(td, 'textures');
-end
+cc = cc(sel);
 
-% read corresponding image
-tname = sprintf('%s/%s.jpg', txfolder, modelnames{msel});
-if exist(tname, 'file') ~= 2
-    fid = fopen(tname, 'wb');
-    if fid < 1
-        error('Cannot write temp file.');
-    end
-    fwrite(fid, txc.Content, 'uint8');
-    fclose(fid);
+% iterate over selected spots
+for c = 1:numel(cc)
+    msel = tom_MarkSpot(xo, [cc(c).x, cc(c).y, cc(c).z]);
+    cut = tom_ExtractSpot(xo, msel, opts.cutsize, opts.marksize);
+    imwrite(cut, sprintf('%s/%s.jpg', sf, cc(c).id), 'Quality', opts.jpgqual);
 end
-txinfo = imfinfo(tname);
-im = imread(tname);
-isz = size(im);
-hsz = ceil(0.5 .* isz(1:2));
-xoff = 0;
-yoff = 0;
-if any(mcrd > 1) && (txinfo.Width ~= iminfo.Width || txinfo.Height ~= iminfo.Height)
-    oim = imread(imfile);
-    imm = mean(im, 3);
-    oimm = mean(oim, 3);
-    if txinfo.Width == iminfo.Width
-        trow = imm(hsz(1), :)';
-        trow = (trow - mean(trow)) ./ std(trow);
-        frow = (oimm - mean(oimm, 2) * ones(1, txinfo.Width))';
-        frow = frow ./ (ones(size(frow, 1), 1) * std(frow, [], 1));
-        cc = sum(trow(:, ones(1, size(frow, 2))) .* frow) / (numel(trow) - 1);
-        [mc, mcp] = max(cc);
-        if mc < 0.7
-            im = oim; % unresolved for now
-            isz = size(im);
-        else
-            yoff = max(0, mcp - hsz(1));
-        end
-    elseif txinfo.Height == iminfo.Height
-        tcol = imm(:, hsz(2));
-        tcol = (tcol - mean(tcol)) ./ std(tcol);
-        fcol = oimm - ones(txinfo.Height, 1) * mean(oimm, 1);
-        fcol = fcol ./ (std(fcol, [], 2) * ones(1, size(fcol, 2)));
-        cc = sum(tcol(:, ones(1, size(fcol, 2))) .* fcol) / (numel(tcol) - 1);
-        [mc, mcp] = max(cc);
-        if mc < 0.7
-            im = oim; % unresolved for now
-            isz = size(im);
-        else
-            xoff = max(0, mcp - hsz(2));
-        end
-    else
-        im = oim; % unresolved for now
-        isz = size(im);
-    end
-end
-
-% mark and cut spot
-if any(mcrd > 1)
-    mcrd = (mcrd - [xoff, yoff]) ./ isz([2, 1]);
-end
-row = 1 + floor(isz(1) * mcrd(2));
-col = 1 + floor(isz(2) * mcrd(1));
-chalf = ceil(0.5 * csz);
-if mcrd(1) < 0.5
-    fcol = max(1, col - chalf);
-    tcol = fcol + csz - 1;
-else
-    tcol = min(isz(2), col + chalf);
-    fcol = tcol + 1 - csz;
-end
-if mcrd(2) < 0.5
-    frow = max(1, row - chalf);
-    trow = frow + csz - 1;
-else
-    trow = min(isz(1), row + chalf);
-    frow = trow + 1 - csz;
-end
-cut = im(frow:trow, fcol:tcol, :);
-if msz > 0
-    mh = ceil(0.5 * msz);
-    crow = row - frow + 1;
-    ccol = col - fcol + 1;
-    mfrow = max(1, crow - mh);
-    mtrow = min(size(cut, 1), crow + mh);
-    mfcol = max(1, ccol - mh);
-    mtcol = min(size(cut, 2), ccol + mh);
-    cut([mfrow, mtrow], mfcol:mtcol, :) = 255;
-    cut(mfrow:mtrow, [mfcol, mtcol], :) = 255;
-end
-im([frow:frow+3, trow-3:trow], fcol:tcol, :) = 255;
-im(frow:trow, [fcol:fcol+3, tcol-3:tcol], :) = 255;

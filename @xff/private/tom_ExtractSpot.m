@@ -62,9 +62,14 @@ fn = {f.ContentName};
 txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));
 mn = {t.MetaData.Name};
 mi = find(strcmpi(mn(:), 'texcameramodelnames'));
-modelnames = ne_methods.splittocellc(t.MetaData(mi).Content, char(0));
 if numel(mi) ~= 1
-    error('neuroelf:xff:badArgument', 'Cannot resolve camera/image names.');
+    warning('neuroelf:xff:missingContent', 'Cannot guarantee camera/image names.');
+    modelnames = cell(numel(txs), 1);
+    for tc = 1:numel(txs)
+        modelnames{tc} = sprintf('texture%d', tc-1);
+    end
+else
+    modelnames = ne_methods.splittocellc(t.MetaData(mi).Content, char(0));
 end
 if iscell(crd) && numel(crd) > 1
     modelindex = find(strcmpi(modelnames(:), crd{1}));
@@ -110,7 +115,7 @@ if exist(tname, 'file') ~= 2
     if fid < 1
         error('Cannot write temp file.');
     end
-    fwrite(fid, txc.Content, 'uint8');
+    fwrite(fid, f(txs(msel)).Content, 'uint8');
     fclose(fid);
 end
 im = imread(tname);
@@ -149,5 +154,7 @@ if msz > 0
     cut([mfrow, mtrow], mfcol:mtcol, :) = 255;
     cut(mfrow:mtrow, [mfcol, mtcol], :) = 255;
 end
-im([frow:frow+3, trow-3:trow], fcol:tcol, :) = 255;
-im(frow:trow, [fcol:fcol+3, tcol-3:tcol], :) = 255;
+if nargout > 1
+    im([frow:frow+3, trow-3:trow], fcol:tcol, :) = 255;
+    im(frow:trow, [fcol:fcol+3, tcol-3:tcol], :) = 255;
+end
