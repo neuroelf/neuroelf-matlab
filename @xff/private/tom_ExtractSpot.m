@@ -1,5 +1,5 @@
 function [cut, im] = tom_ExtractSpot(xo, crd, csz, msz)
-% TOM::MarkSpot  - mark and extract a spot around a coordinate
+% TOM::ExtractSpot  - mark and extract a spot around a coordinate
 %
 % FORMAT:       [cut, im] = tom.ExtractSpot(coord [, cutsize]);
 %
@@ -14,11 +14,11 @@ function [cut, im] = tom_ExtractSpot(xo, crd, csz, msz)
 %       cut         cut-out piece
 %       im          full texture image
 %
-% Using: catstruct.
+% Using: splittocellc.
 
 % Version:  v1.1
-% Build:    21102012
-% Date:     Oct-20 2021, 12:50 PM EST
+% Build:    21120216
+% Date:     Dec-02 2021, 4:32 PM EST
 % Author:   Jochen Weber, NeuroElf.net, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 %

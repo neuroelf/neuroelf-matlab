@@ -11,6 +11,7 @@ function xo = tom_ExtractSpots(xo, coordfile, opts)
 %       .filter     filter expression, default: '$status==0'
 %       .jpgqual    JPG quality (default: 90)
 %       .marksize   optional mark size (default: 0 = no marking)
+%       .outdir     output folder (default: 'spots' in TOM folder)
 %
 % No output fields.
 %
@@ -71,19 +72,6 @@ if nargin < 2 || ~ischar(coordfile) || isempty(coordfile) || exist(coordfile(:)'
     end
 end
 
-% spots folder
-sf = [td filesep 'spots'];
-if exist(sf, 'dir') ~= 7
-    try
-        ne_methods.mkadir(sf);
-        if exist(sf, 'dir') ~= 7
-            error('neuroelf:xff:mkadirError', 'Could not create spots folder.');
-        end
-    catch ne_eo;
-        rethrow(ne_eo);
-    end
-end
-
 % try loading coordfile
 try
     coords = jsondecode(ne_methods.asciiread(coordfile(:)'));
@@ -123,6 +111,25 @@ if ~isfield(opts, 'marksize') || ~isa(opts.marksize, 'double') || numel(opts.mar
     opts.marksize = 0;
 elseif opts.marksize > 0
     opts.marksize = min(ceil(0.5 * opts.cutsize), max(32, round(opts.marksize)));
+end
+if ~isfield(opts, 'outdir') || ~ischar(opts.outdir) || isempty(opts.outdir)
+    opts.outdir = [td filesep 'spots'];
+else
+    opts.outdir = opts.outdir(:)';
+    if opts.outdir(1) ~= filesep
+        opts.outdir = ['./' opts.outdir];
+    end
+end
+sf = opts.outdir;
+if exist(sf, 'dir') ~= 7
+    try
+        ne_methods.mkadir(sf);
+        if exist(sf, 'dir') ~= 7
+            error('neuroelf:xff:mkadirError', 'Could not create spots folder.');
+        end
+    catch ne_eo;
+        rethrow(ne_eo);
+    end
 end
 
 % parse filter expression
@@ -170,14 +177,14 @@ else
         cregx = regexp(cond, '(\$[a-zA-Z][a-zA-Z_0-9]*\s*~=\s*''[^'']+'')', 'tokens');
     end
     for op = {'==', '>=', '<=', '~=', '>', '<'}
-        cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*[0-9\.\+\-eE]+)'], 'tokens');
+        cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*\-?[0-9\.\+\-eE]+)'], 'tokens');
         while ~isempty(cregx) && ~isempty(cregx{1})
-            cregp = regexp(cregx{1}{1}, ['^\$([a-zA-Z][a-zA-Z_0-9]*)\s*' op{1} '\s*([0-9\.\+\-eE]+)$'], 'tokens');
+            cregp = regexp(cregx{1}{1}, ['^\$([a-zA-Z][a-zA-Z_0-9]*)\s*' op{1} '\s*(\-?[0-9\.\+\-eE]+)$'], 'tokens');
             if ~iscell(cregp) || numel(cregp) ~= 1 || ~iscell(cregp{1}) || numel(cregp{1}) ~= 2
                 error('neuroelf:xff:badArgument', 'Invalid conditional statement.');
             end
             cond = strrep(cond, cregx{1}{1}, sprintf(['[cc.%s] ' op{1} ' %s'], cregp{1}{:}));
-            cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*[0-9\.\+\-eE]+)'], 'tokens');
+            cregx = regexp(cond, ['(\$[a-zA-Z][a-zA-Z_0-9]*\s*' op{1} '\s*\-?[0-9\.\+\-eE]+)'], 'tokens');
         end
     end
 
