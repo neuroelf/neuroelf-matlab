@@ -81,7 +81,7 @@ else
     opts.output = ne_methods.ddeblank(outs.output);
 end
 fo = {'json_index'; 'texture_id'; 'texture_width'; 'texture_height'; ...
-    't_x1'; 't_x2'; 't_y1'; 't_y2'};
+    't_xc'; 't_yc'; 't_x1'; 't_x2'; 't_y1'; 't_y2'};
 nf = numel(fo);
 bc = xo.C;
 
@@ -270,7 +270,7 @@ for c = 1:nc
     
     % fill row
     lr = l(c, :);
-    lr(1:nf) = {[msm '.jpg'], sel(c), imsz(2), imsz(1), x1, x2, y1, y2};
+    lr(1:nf) = {sel(c), [msm '.jpg'], imsz(2), imsz(1), col, row, x1, x2, y1, y2};
     for fc = 1:no
         lr{nf + fc} = icc.(opts.output{fc});
     end
