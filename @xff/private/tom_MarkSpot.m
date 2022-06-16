@@ -1,7 +1,7 @@
-function [m, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
+function [m, vs, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
 % TOM::MarkSpot  - mark and extract a spot around a coordinate
 %
-% FORMAT:       [mspec, cut, im] = tom.MarkSpot(coord [, cutsize]);
+% FORMAT:       [mspec, vspec, cut, im] = tom.MarkSpot(coord [, cutsize]);
 %
 % Input fields:
 %
@@ -12,6 +12,7 @@ function [m, cut, im] = tom_MarkSpot(xo, crd, csz, msz)
 % Output fields:
 %
 %       mspec       texture map specification (tnum, cx, cy)
+%       vspec       vertex specification (vnum, 
 %       cut         cut-out piece
 %       im          full texture image
 
@@ -146,5 +147,8 @@ m = [msel, mcrd];
 
 % pass on to secondary function
 if nargout > 1
-    [cut, im] = tom_ExtractSpot(xo, m, csz, msz);
+    vs = [mpos, tr, tvc(1, :), ins1, tv1, ins2, tv2];
+    if nargout > 2
+        [cut, im] = tom_ExtractSpot(xo, m, csz, msz);
+    end
 end
