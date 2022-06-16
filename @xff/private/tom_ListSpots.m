@@ -7,6 +7,7 @@ function l = tom_ListSpots(xo, opts)
 %
 %       opts        1x1 struct with optional settings
 %       .boxwidth   1x1 factor for box width (default: 1.25)
+%       .delempty   1x1 boolean flag, remove empty/failed entries (true)
 %       .filter     filter expression, default: '$status==0'
 %       .outputs    list of fields to list, default:
 %                   {'majorAxisMM', 'minorAxisMM', 'deltaLBnorm', ...
@@ -63,6 +64,9 @@ if ~isfield(opts, 'boxwidth') || ~isa(opts.boxwidth, 'double') || numel(opts.box
 elseif opts.boxwidth > 2.5
     opts.boxwidth = 2.5;
 end
+if ~isfield(opts, 'delempty') || ~islogical(opts.delempty) || numel(opts.delempty) ~= 1
+    opts.delempty = true;
+end
 if ~isfield(opts, 'filter') || ~ischar(opts.filter)
     opts.filter = '$status==0';
 else
@@ -76,6 +80,8 @@ else
     opts.output(~cellfun(@ischar, opts.output)) = [];
     opts.output = ne_methods.ddeblank(outs.output);
 end
+fo = {'image_id'; 'index'; 'image_x'; 'image_y'; 'x1'; 'x2'; 'y1'; 'y2'};
+nf = numel(fo);
 
 % try to read JSON file
 tom_folder = fileparts(xo.F);
@@ -90,7 +96,7 @@ end
 afiles = sort(ne_methods.findfiles(a_folder, 'lesion_data*.json', '-d1'));
 if numel(afiles) < 1
     fprintf('No analysis folder/data found.');
-    l = [];
+    l = [fo', opts.output'];
     return
 end
 try
@@ -169,8 +175,6 @@ if ~isempty(opts.output)
     ofm = ne_methods.multimatch(lower(opts.output), lower(ofn));
     opts.output = ofn(ofm(ofm > 0));
 end
-fo = {'image_id'; 'index'; 'image_x'; 'image_y'; 'x1'; 'x2'; 'y1'; 'y2'};
-nf = numel(fo);
 no = numel(opts.output);
 l = cell(nc, nf + no);
 
@@ -188,7 +192,7 @@ mn = {md.Name};
 mi = find(strcmpi(mn(:), 'texcameramodelnames'));
 if numel(mi) ~= 1
     warning('Cannot guarantee camera/image names.');
-    l = [];
+    l = [fo', opts.output'];
     return
 else
     modelnames = ne_methods.splittocellc(md(mi).Content, char(0));
@@ -272,8 +276,14 @@ for c = 1:nc
     l(c, :) = format_values(lr);
 end
 
+% remove empty?
+if opts.delempty
+    l(cellfun(@isempty, l(:,1)), :) = [];
+end
+
 % add header
 l = [[fo', opts.output']; l];
+
 
 % sub function for value formating
 function r = format_values(r)
