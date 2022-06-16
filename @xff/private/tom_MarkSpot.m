@@ -74,7 +74,7 @@ tm = t.CornerTexVtxMap;
 % find closest vertex (dist in mm)
 d = sqrt(sum((v - ones(size(v, 1), 1) * crd(:)') .^ 2, 2));
 [mv, mpos] = min(d);
-if mv > 7.5
+if mv > 10
     error('neuroelf:xff:noMatchFound', 'No such coordinate in dataset.')
 end
 
