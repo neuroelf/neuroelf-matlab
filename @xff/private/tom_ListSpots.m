@@ -12,7 +12,8 @@ function l = tom_ListSpots(xo, opts)
 %       .outputs    list of fields to list, default:
 %                   {'cx', 'cy', 'majorAxisMM', 'minorAxisMM', ...
 %                    'deltaLBnorm', 'norm_border', 'norm_color', 'H', ...
-%                    'nevi_confidence', 'location_simple'}
+%                    'nevi_confidence', 'dnn_lesion_confidence', ...
+%                    'location_simple'}
 %
 % Output fields:
 %
@@ -74,7 +75,8 @@ else
 end
 if ~isfield(opts, 'output') || ~iscell(opts.output)
     opts.output = {'cx'; 'cy'; 'majorAxisMM'; 'minorAxisMM'; 'deltaLBnorm'; ...
-        'norm_border'; 'norm_color'; 'H'; 'nevi_confidence'; 'location_simple'};
+        'norm_border'; 'norm_color'; 'H'; ...
+        'dnn_lesion_confidence'; 'nevi_confidence'; 'location_simple'};
 else
     opts.output = opts.output(:);
     opts.output(~cellfun(@ischar, opts.output)) = [];
