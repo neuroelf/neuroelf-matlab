@@ -10,8 +10,8 @@ function l = tom_ListSpots(xo, opts)
 %       .delempty   1x1 boolean flag, remove empty/failed entries (true)
 %       .filter     filter expression, default: '$status==0'
 %       .outputs    list of fields to list, default:
-%                   {'majorAxisMM', 'minorAxisMM', 'deltaLBnorm', ...
-%                    'norm_border', 'norm_color', 'H', ...
+%                   {'cx', 'cy', 'majorAxisMM', 'minorAxisMM', ...
+%                    'deltaLBnorm', 'norm_border', 'norm_color', 'H', ...
 %                    'nevi_confidence', 'location_simple'}
 %
 % Output fields:
@@ -73,15 +73,38 @@ else
     opts.filter = opts.filter(:)';
 end
 if ~isfield(opts, 'output') || ~iscell(opts.output)
-    opts.output = {'majorAxisMM', 'minorAxisMM', 'deltaLBnorm', ...
-        'norm_border', 'norm_color', 'H', 'nevi_confidence', 'location_simple'};
+    opts.output = {'cx'; 'cy'; 'majorAxisMM'; 'minorAxisMM'; 'deltaLBnorm'; ...
+        'norm_border'; 'norm_color'; 'H'; 'nevi_confidence'; 'location_simple'};
 else
     opts.output = opts.output(:);
     opts.output(~cellfun(@ischar, opts.output)) = [];
     opts.output = ne_methods.ddeblank(outs.output);
 end
-fo = {'image_id'; 'index'; 'image_x'; 'image_y'; 'x1'; 'x2'; 'y1'; 'y2'};
+fo = {'json_index'; 'texture_id'; 'texture_width'; 'texture_height'; ...
+    't_x1'; 't_x2'; 't_y1'; 't_y2'};
 nf = numel(fo);
+bc = xo.C;
+
+% extract camera model names (for texture filenames)
+f = bc.Field;
+fn = {f.ContentName};
+txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));
+md = bc.MetaData;
+mn = {md.Name};
+mi = find(strcmpi(mn(:), 'texcameramodelnames'));
+if numel(mi) ~= 1
+    warning('Cannot guarantee camera/image names.');
+    l = [fo', opts.output'];
+    return
+else
+    modelnames = ne_methods.splittocellc(md(mi).Content, char(0));
+    if numel(modelnames) < numel(txs)
+        for txc = (numel(modelnames)+1):numel(txs)
+            modelnames{txc} = sprintf('texture%d', txc-1);
+        end
+    end
+end
+csz = struct;
 
 % try to read JSON file
 tom_folder = fileparts(xo.F);
@@ -179,33 +202,11 @@ no = numel(opts.output);
 l = cell(nc, nf + no);
 
 % access object
-bc = xo.C;
 crd = bc.VertexCoordinate;
 tr = bc.TriangleVertex;
 trac = bc.TexVertACoord;
 tram = bc.TexVertAMap;
 trm = bc.CornerTexVtxMap;
-
-% extract camera model names (for texture filenames)
-f = bc.Field;
-fn = {f.ContentName};
-txs = find(strcmpi(fn, 'txtrjpg_') | strcmpi(fn, 'txtrjpga'));
-md = bc.MetaData;
-mn = {md.Name};
-mi = find(strcmpi(mn(:), 'texcameramodelnames'));
-if numel(mi) ~= 1
-    warning('Cannot guarantee camera/image names.');
-    l = [fo', opts.output'];
-    return
-else
-    modelnames = ne_methods.splittocellc(md(mi).Content, char(0));
-    if numel(modelnames) < numel(txs)
-        for txc = (numel(modelnames)+1):numel(txs)
-            modelnames{txc} = sprintf('texture%d', txc-1);
-        end
-    end
-end
-csz = struct;
 
 % iterate over children
 for c = 1:nc
