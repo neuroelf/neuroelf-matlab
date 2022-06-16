@@ -182,6 +182,9 @@ l = cell(nc, nf + no);
 bc = xo.C;
 crd = bc.VertexCoordinate;
 tr = bc.TriangleVertex;
+trac = bc.TexVertACoord;
+tram = bc.TexVertAMap;
+trm = bc.CornerTexVtxMap;
 
 % extract camera model names (for texture filenames)
 f = bc.Field;
@@ -210,29 +213,28 @@ for c = 1:nc
     % get specification
     icc = cc(c);
     ccrd = [icc.x, icc.y, icc.z];
-    [ms, vs] = tom_MarkSpot(xo, ccrd);
-    
-    % also get specification of vertex
-    rcrd = crd(vs(1), :);
-    mv = tom_MarkSpot(xo, rcrd);
-    if mv(1) ~= ms(1)
-        rtr = any(tr == vs(1), 2);
-        vcand = tr(rtr, :);
-        vcand = unique(vcand(:));
-        vcand(vcand == vs(1)) = [];
-        for vcc = 1:numel(vcand)
-            rcrd = crd(vcand(vcc), :);
-            mv = tom_MarkSpot(xo, rcrd);
-            if mv(1) == ms(1)
-                break;
-            end
-        end
-        if mv(1) ~= ms(1)
-            warning('neuroelf:invalidData', 'Vertex has no neighbors in same texture.');
-            l(c, :) = repmat({''}, 1, size(l, 2));
-            continue;
-        end
+    try
+        [ms, vs] = tom_MarkSpot(xo, ccrd);
+    catch ne_eo;
+        warning('neuroelf:invalidData', 'Coordinate not close enough to any vertex.');
+        l(c, :) = repmat({''}, 1, size(l, 2));
+        continue;
     end
+    
+    % also get coordinates of triangle points
+    trvtx = tr(vs(2), :);
+    trcrd = crd(trvtx, :);
+    txvtx = trm(trm(:, 1) == vs(2), 2:3);
+    [~, txord] = sort(txvtx(:, 1));
+    txvtx = txvtx(txord, 2);
+    txcrd = double(trac(txvtx, :));
+    txmap = tram(txvtx);
+    if ~all(txmap == ms(1))
+        warning('neuroelf:invalidData', 'Coordinate not close enough to any vertex.');
+        l(c, :) = repmat({''}, 1, size(l, 2));
+        continue;
+    end
+    trdst = sqrt(sum((trcrd([1,1], :) - trcrd(2:3, :)) .^ 2, 2));
     
     % compare index
     msm = modelnames{ms(1)};
@@ -252,11 +254,9 @@ for c = 1:nc
     col = 1 + imsz(2) * ms(2);
     
     % determine pixel spacing
-    rowv = 1 + imsz(1) * (1 - mv(3));
-    colv = 1 + imsz(2) * mv(2);
-    cdist = sqrt(sum((ccrd - rcrd) .^ 2));
-    pdist = sqrt((row - rowv) ^ 2 + (col - colv) ^ 2);
-    ppmm = pdist / cdist;
+    txpix = txcrd * [imsz(2), 0; 0, imsz(1)];
+    txdst = sqrt(sum((txpix([1,1], :) - txpix(2:3, :)) .^ 2, 2));
+    ppmm = mean(txdst ./ trdst);
     
     % define coordinate
     row = floor(row);
