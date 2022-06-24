@@ -199,7 +199,13 @@ cc = cc(sel);
 
 % iterate over selected spots
 for c = 1:numel(cc)
-    msel = tom_MarkSpot(xo, [cc(c).x, cc(c).y, cc(c).z]);
+    try
+        msel = tom_MarkSpot(xo, [cc(c).x, cc(c).y, cc(c).z]);
+    catch xfferror
+        warning('neuroelf:xff:lookupError', 'Error locating spot at (%g/%g/%g): %s.', ...
+            cc(c).x, cc(c).y, cc(c).z, xfferror.message);
+        continue;
+    end
     cut = tom_ExtractSpot(xo, msel, opts.cutsize, opts.marksize);
     imwrite(cut, sprintf('%s/%s.jpg', sf, cc(c).id), 'Quality', opts.jpgqual);
 end
