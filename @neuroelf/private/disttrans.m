@@ -49,67 +49,30 @@ elseif ~any(x(:))
     return;
 end
 
-% cluster positive side
-connf = find('fev' == conn);
-if ndims(x) < 3
-    connf = min(5, connf + 3);
+% dilate
+if numel(xs) < 3
+    x = shiftdim(x, numel(xs) - 3);
+end
+d = zeros(3, 3);
+d(2, 2, :) = 1;
+d(2, :, 2) = 1;
+d(:, 2, 2) = 1;
+if conn == 'e'
+    d(2, :, :) = 1;
+    d(:, 2, :) = 1;
+    d(:, :, 2) = 1;
+elseif conn == 'v'
+    d(:) = 1;
+end
+xd = dilate3d(x, d) & ~x;
+[dx, dy, dz] = ind2sub(size(x), find(xd(:)));
+xi = find(x(:));
+[x, y, z] = ind2sub(size(x), xi);
+xd = xi;
+for c = 1:numel(xi)
+    xd(c) = min(sqrt((dx - x(c)) .^ 2 + (dy - y(c)) .^ 2 + (dz - z(c)) .^ 2));
 end
 
-% iterate over clusters
-d = zeros(xs);
-nd = numel(xs);
-[cs, cv, cl, cc] = clustercoordsc(x, connf);
-ar = struct('type', '()', 'subs', {repmat({':'}, [1, nd])});
-for c = 1:numel(cs)
-    
-    % cutout
-    nc = size(cc{c}, 1);
-    mnc = min(cc{c});
-    mxc = max(cc{c});
-    for dc = 1:nd
-        ar.subs{dc} = mnc(dc):mxc(dc);
-    end
-    cx = subsref(cv, ar) == c;
-    
-    % embed into zeros, create and find boundary pixels
-    cxx = false(size(cx) + 2);
-    if nd < 3
-        cxx(2:end-1, 2:end-1) = cx;
-        cxx(1:end-2, 2:end-1) = cxx(1:end-2, 2:end-1) | cx;
-        cxx(3:end, 2:end-1) = cxx(3:end, 2:end-1) | cx;
-        cxx(2:end-1, 1:end-2) = cxx(2:end-1, 1:end-2) | cx;
-        cxx(2:end-1, 3:end) = cxx(2:end-1, 3:end) | cx;
-        cxx(2:end-1, 2:end-1) = cxx(2:end-1, 2:end-1) & ~cx;
-        [cxx, cxy] = ind2sub(size(cxx), find(cxx(:)));
-        cxx = [cxx, cxy] - 1;
-    else
-        cxx(2:end-1, 2:end-1, 2:end-1) = cx;
-        cxx(1:end-2, 2:end-1, 2:end-1) = cxx(1:end-2, 2:end-1, 2:end-1) | cx;
-        cxx(3:end, 2:end-1, 2:end-1) = cxx(3:end, 2:end-1, 2:end-1) | cx;
-        cxx(2:end-1, 1:end-2, 2:end-1) = cxx(2:end-1, 1:end-2, 2:end-1) | cx;
-        cxx(2:end-1, 3:end, 2:end-1) = cxx(2:end-1, 3:end, 2:end-1) | cx;
-        cxx(2:end-1, 2:end-1, 1:end-2) = cxx(2:end-1, 2:end-1, 1:end-2) | cx;
-        cxx(2:end-1, 2:end-1, 3:end) = cxx(2:end-1, 2:end-1, 3:end) | cx;
-        cxx(2:end-1, 2:end-1, 2:end-1) = cxx(2:end-1, 2:end-1, 2:end-1) & ~cx;
-        [cxx, cxy, cxz] = find(cxx);
-        cxx = [cxx, cxy, cxz] - 1;
-    end
-    nbc = size(cxx, 1);
-    
-    % compute distances
-    ds = zeros(nc, nbc);
-    for dc = 1:nd
-        ds = ds + ((cc{c}(:, dc) - (mnc(dc) - 1)) * ones(1, nbc) - ones(nc, 1) * cxx(:, dc)') .^ 2;
-    end
-    ds = sqrt(min(ds, [], 2));
-    
-    % set in partial volume
-    dx = subsref(d, ar);
-    dx(cx) = ds;
-    
-    % set in output
-    d = subsasgn(d, ar, dx);
-end
-
-% resize again
-x = reshape(d, xso);
+% set in volume
+x = zeros(xso);
+x(xi) = xd;
