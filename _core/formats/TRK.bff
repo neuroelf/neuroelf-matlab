@@ -180,7 +180,7 @@ NewFileCode:!
 @VoxelOrder = char([82, 65, 83, 0]);
 @Paddings2 = char([0, 0, 0, 0]);
 @DICOMImageOrientation = [1, 0, 0, 0, 1, 0];
-@Paddings1 = char([0, 0, 0, 0]);
+@Paddings1 = char([0, 0]);
 @InvertXYZ = [0, 0, 0];
 @SwapXY = 0;
 @SwapYZ = 0;
