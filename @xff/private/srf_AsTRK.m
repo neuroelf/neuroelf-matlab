@@ -49,10 +49,9 @@ fs = rtv.FiberStarts;
 
 % convert
 trk = xff('new:trk');
-oldid = trk.C.RunTimeVars.xffID;
-trk.C.RunTimeVars = bc.RunTimeVars;
-trk.C.RunTimeVars.xffID = oldid;
-trk.C.RunTimeVars.SourceSRFFilename = xo.F;
+rtv.xffID = trk.C.RunTimeVars.xffID;
+rtv.SourceSRFFilename = xo.F;
+trk.C.RunTimeVars = rtv;
 trk.C.NrOfTracts = numel(fs) - 1;
 trk.C.NrOfScalarsPerPoint = 3;
 trk.C.ScalarNames = {'RGB-R'; 'RGB-G'; 'RGB-B'};
