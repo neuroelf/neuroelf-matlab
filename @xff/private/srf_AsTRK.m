@@ -60,6 +60,6 @@ t = repmat(trk.C.Tracts(1), trk.C.NrOfTracts, 1);
 for tc = 1:numel(t)
     t(tc).NrOfPoints = fs(tc+1) - (fs(tc) + 1);
     t(tc).Points = 256 - bc.VertexCoordinate(fs(tc):fs(tc+1)-2, [3, 1, 2]);
-    t(tc).Values = (1 / 255) .* bc.VertexColor(fs(tc):fs(tc+1)-2, :);
+    t(tc).Values = (1 / 255) .* bc.VertexColor(fs(tc):fs(tc+1)-2, 2:4);
 end
 trk.C.Tracts = t;
