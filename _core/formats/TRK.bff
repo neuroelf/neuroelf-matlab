@@ -185,5 +185,9 @@ NewFileCode:!
 @SwapXY = 0;
 @SwapYZ = 0;
 @SwapZX = 0;
+@NrOfTracts = 1;
+@FileVersion = 2;
+@HeaderSize = 1000;
+@Tracts = struct('NrOfPoints', 0, 'Points', zeros(0, 3), 'Values', [], 'Properties', zeros(1, @NrOfTractProperties));
 EndNewFileCode
 
