@@ -4,8 +4,8 @@
 # TRK FileVersions supported: 1, 2
 #
 # Version:  v1.1
-# Build:    23021012
-# Date:     Feb-10 2023, 12:14 PM EST
+# Build:    23021515
+# Date:     Feb-15 2023, 3:48 PM EST
 # Author:   Jochen Weber, NeuroElf.net
 # URL/Info: http://neuroelf.net/
 
@@ -78,6 +78,7 @@ for c200c = 1:numel(@ScalarNames), ...
     c200((c200c-1)*20+1:(c200c-1)*20+c200ml) = @ScalarNames{c200c}(1:c200ml); ...
 end, ...
 fwrite(fid, c200, '*char');
+
 EXPRE !$BFFREAD           !!!!! ...
 c200 = fread(fid, [1, 200], '*char'); ...
 c200n = 10; ...
@@ -102,6 +103,7 @@ for c200c = 1:numel(@TractProperties), ...
     c200((c200c-1)*20+1:(c200c-1)*20+c200ml) = @TractProperties{c200c}(1:c200ml); ...
 end, ...
 fwrite(fid, c200, '*char');
+
 EXPRE !$BFFREAD           !!!!! ...
 c200 = fread(fid, [1, 200], '*char'); ...
 c200n = 10; ...
@@ -117,7 +119,9 @@ for c200c = c200n:-1:1, ...
 end, ...
 @TractProperties = @TractProperties(1:c200n);
 
+EXPRE !$BFFWRITE          !!!!!@VoxelToRASMatrix = @VoxelToRASMatrix';
 FIELD !                       !single  !double  !4, 4                     !        !VoxelToRASMatrix
+EXPRE !                   !!!!!@VoxelToRASMatrix = @VoxelToRASMatrix';
 FIELD !                       !char    !char    !1, 444                   !        !Reserved
 FIELD !                       !char    !char    !1, 4                     !        !VoxelOrder
 FIELD !                       !char    !char    !1, 4                     !        !Paddings2
@@ -153,7 +157,7 @@ end
 FIELD !                       !int32   !double  !1, 1                     !2       !Tracts($TractNr).NrOfPoints
 EXPRE !                   !!!!!$tdim22 = [$tdim2, @Tracts($TractNr).NrOfPoints];
 FIELD !                       !single  !double  !$tdim22                  !        !Tracts($TractNr).Points
-EXPRE !$BFFREAD           !!!!! ...
+EXPRE !                   !!!!! ...
 @Tracts($TractNr).Values = @Tracts($TractNr).Points(4:end, :)'; ...
 @Tracts($TractNr).Points = @Tracts($TractNr).Points(1:3, :)';
 FIELD !                       !single  !double  !1, @NrOfTractProperties  !        !Tracts($TractNr).Properties
@@ -170,16 +174,16 @@ NewFileCode:!
 @FileMagic = ['TRACK' char(0)];
 @ImageVolumeDims = [256, 256, 256];
 @ImageVolumeVoxelSize = [1, 1, 1];
-@ImageVolumeOrigin = [128, 128, 128];
+@ImageVolumeOrigin = [0, 0, 0];
 @NrOfScalarsPerPoint = 0;
 @ScalarNames = cell(0, 1);
 @NrOfTractProperties = 0;
 @TractProperties = cell(0, 1);
-@VoxelToRASMatrix = eye(4);
+@VoxelToRASMatrix = [-1, 0, 0, 0; 0, -1, 0, 0; 0, 0, 1, 0; 0, 0, 0, 1];
 @Reserved = char(zeros(1, 444));
-@VoxelOrder = char([82, 65, 83, 0]);
+@VoxelOrder = char([76, 80, 83, 0]);
 @Paddings2 = char([0, 0, 0, 0]);
-@DICOMImageOrientation = [1, 0, 0, 0, 1, 0];
+@DICOMImageOrientation = [0, 0, 0, 0, 0, 0];
 @Paddings1 = char([0, 0]);
 @InvertXYZ = [0, 0, 0];
 @SwapXY = 0;

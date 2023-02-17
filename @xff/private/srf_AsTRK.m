@@ -46,20 +46,24 @@ if ~isfield(bc.RunTimeVars, 'FiberStarts')
 end
 rtv = bc.RunTimeVars;
 fs = rtv.FiberStarts;
+vc = bc.VertexCoordinate(:, [3, 1, 2]);
+vc(:, 3) = 256 - vc(:, 3);
+vnn = ~isnan(vc(:, 1));
+mn = floor(min(vc(vnn, :)));
+vc = vc - repmat(mn - 1, size(vc, 1), 1);
+mx = ceil(max(vc(vnn, :)));
 
 % convert
 trk = xff('new:trk');
 rtv.xffID = trk.C.RunTimeVars.xffID;
 rtv.SourceSRFFilename = xo.F;
 trk.C.RunTimeVars = rtv;
+trk.C.ImageVolumeDims = 2 .* ceil(0.5 .* (mx + 1));
 trk.C.NrOfTracts = numel(fs) - 1;
-trk.C.NrOfScalarsPerPoint = 3;
-trk.C.ScalarNames = {'RGB-R'; 'RGB-G'; 'RGB-B'};
-trk.C.VoxelToRASMatrix = rtv.TransVoxelToTal;
 t = repmat(trk.C.Tracts(1), trk.C.NrOfTracts, 1);
 for tc = 1:numel(t)
-    t(tc).NrOfPoints = fs(tc+1) - (fs(tc) + 1);
-    t(tc).Points = 256 - bc.VertexCoordinate(fs(tc):fs(tc+1)-2, [3, 1, 2]);
-    t(tc).Values = (1 / 255) .* bc.VertexColor(fs(tc):fs(tc+1)-2, 2:4);
+    t(tc).Points = vc(fs(tc):fs(tc+1)-2, :);
+    t(tc).NrOfPoints = size(t(tc).Points, 1);
+    t(tc).Values = zeros(t(tc).NrOfPoints, 0);
 end
 trk.C.Tracts = t;
