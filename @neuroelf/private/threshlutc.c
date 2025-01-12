@@ -13,13 +13,13 @@ Output fields:
 
       l           looked-up color map (XxYx3 uint8)
 
-% Version:  v0.9b
-% Build:    11050512
-% Date:     Sep-16 2010, 9:13 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:53 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -56,8 +56,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* dimensions */
     int nv = 0, vc = 0, nc = 0;
-    int od[3] = {0, 0, 3};
-    const int *id = NULL;
+    mwSize od[3] = {0, 0, 3};
+    const mwSize *id = NULL;
     short ci = 0, lc = 0;
 
     /* pointers */
@@ -83,14 +83,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetNumberOfDimensions(*prhs) != 2)
         mexErrMsgTxt("Input map must be 2D.");
     nv = mxGetNumberOfElements(*prhs);
-    id = (const int *) mxGetDimensions(*prhs);
+    id = (const mwSize *) mxGetDimensions(*prhs);
     *od = *id++;
     od[1] = *id;
     if (!mxIsDouble(prhs[1]))
         mexErrMsgTxt("LUT must be of type double.");
     if (mxGetNumberOfDimensions(prhs[1]) != 2)
         mexErrMsgTxt("LUT must be 2D.");
-    id = (const int *) mxGetDimensions(prhs[1]);
+    id = (const mwSize *) mxGetDimensions(prhs[1]);
     if (id[1] != 3)
         mexErrMsgTxt("LUT must be of size Cx3.");
     nc = (int) (0.5 * ((double) (*id)));
