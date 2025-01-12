@@ -14,13 +14,13 @@ Output fields:
 
       ff            first occurrance of "true" in v (as of spos)
 
-% Version:  v0.9d
-% Build:    14062016
-% Date:     Jun-20 2014, 4:20 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:02 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025 Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -50,20 +50,20 @@ Output fields:
 #include "mex.h"
 
 const static char *ff_errbadindex = "Invalid start index given.";
-const static int ff_emptyarray[2] = {0, 0};
-const static int ff_scalararray[2] = {1, 1};
+const static mwSize ff_emptyarray[2] = {0, 0};
+const static mwSize ff_scalararray[2] = {1, 1};
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	mxClassID cid;
-	const int *dim;
+	const mwSize *dim;
 	const unsigned char *uc;
 	const unsigned short *us;
 	const unsigned int *ul;
 	const double *dbl;
 	bool forward = 1;
 	int nd, ne, c = 0, cm, si;
-	int odim[2] = {1, 2};
+	mwSize odim[2] = {1, 2};
 	double *odbl;
 
 	if (nrhs < 1 || nrhs > 2 || nlhs > 2)
