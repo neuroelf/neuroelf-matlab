@@ -14,13 +14,13 @@ Output fields:
 
       col         converted data (uint8->double for hsv, uint8 for rgb)
 
-% Version:  v0.9b
-% Build:    11050511
-% Date:     Aug-11 2010, 5:28 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:11 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -289,7 +289,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
     /* dimensions */
-    const int *idim;
+    const mwSize *idim;
     int ndims, nv = 0, c;
 
     /* pointers */
