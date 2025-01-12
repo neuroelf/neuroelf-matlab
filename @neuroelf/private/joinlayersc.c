@@ -15,13 +15,13 @@ Output fields:
       j           HxWx3 single image [0.0 .. 255.0]
       a           HxW single alpha map [0.0 .. 1.0]
 
-% Version:  v0.9d
-% Build:    14082618
-% Date:     Aug-26 2014, 6:02 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:18 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010 - 2014, Jochen Weber
+Copyright (c) 2010 - 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int h = 0, w = 0, hw = 0, hw3 = 0, nl = 0, ln = 0, lc = 0,
         lfield = -1, pfield = -1, afield = -1,
         ndp = 0, nda = 0, pc = 0, nlist = 0;
-    int od[3] = {0, 0, 3};
+    mwSize od[3] = {0, 0, 3};
     const mxArray *layer = NULL, *inpp = NULL, *inpa = NULL;
 
     /* pointers */
