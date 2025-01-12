@@ -12,13 +12,13 @@ Output fields:
 
       neistream   1xS uint32 stream with neighbor information
 
-% Version:  v0.9d
-% Build:    14072111
-% Date:     Jul-21 2014, 11:32 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:59 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2014, Jochen Weber
+Copyright (c) 2010, 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     int nv = 0, nv2 = 0, ne = 0, nn, vc;
     int *nnei, *nneip, *out;
-    const int *ind;
+    const mwSize *ind;
     const double *din;
     const mxArray *cell;
 

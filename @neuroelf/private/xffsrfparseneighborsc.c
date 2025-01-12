@@ -14,13 +14,13 @@ Output fields:
       neighbors   Nx2 cell array with neighbors
       skip        number of elements to skip in input
 
-% Version:  v0.9d
-% Build:    14072111
-% Date:     Jul-21 2014, 11:40 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:59 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2014, Jochen Weber
+Copyright (c) 2010, 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
     int nv = 0, ne = 0, skip = 0, nn, vn = 0, vc;
-    const int *ind;
+    const mwSize *ind;
     mxArray *outa;
     double *outd;
     const double *dind;
@@ -75,7 +75,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ne = mxGetNumberOfElements(*prhs);
     if (ne < nv)
 		mexErrMsgTxt("Neighbors stream too short.");
-    ind = (const int*) mxGetPr(*prhs);
+    ind = (const mwSize*) mxGetPr(*prhs);
 
     /* prepare output */
     *plhs = mxCreateCellMatrix(nv, 2);
