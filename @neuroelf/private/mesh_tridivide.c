@@ -16,13 +16,13 @@ Output fields:
       coord       UCx3 new coordinates with triangles
 
 
-% Version:  v0.9d
-% Build:    14071115
-% Date:     Jul-11 2014, 3:31 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:33 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2014, Jochen Weber
+Copyright (c) 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* input pointers for triangles and coordinates */
     const double *t1, *t2, *t3, *crd1, *crd2, *crd3;
-    const int *di = NULL;
+    const mwSize *di = NULL;
 
     /* number of triangles and coordinates */
     int nt, nt3, nt4, nc = 0, nv = 0, nnv, sp1, sp2, sp3, tc, tc1, tc1m, tc2, tc2m, tc3, tc3m;
@@ -92,14 +92,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgTxt("Input arguments must be of type double.");
     if ((mxGetNumberOfElements(*prhs) < 3) || ((nrhs > 1) && (mxGetNumberOfElements(prhs[1]) < 3)))
         mexErrMsgTxt("Inputs must be Tx3 (and Cx3) in size.");
-    di = (const int *) mxGetDimensions(*prhs);
+    di = (const mwSize *) mxGetDimensions(*prhs);
     if (di[1] != 3)
         mexErrMsgTxt("Triangles must be Tx3 in size.");
     nt = *di;
     nt3 = 3 * nt;
     nt4 = 4 * nt;
     if (nrhs > 1) {
-        di = (const int *) mxGetDimensions(prhs[1]);
+        di = (const mwSize *) mxGetDimensions(prhs[1]);
         if (di[1] != 3)
             mexErrMsgTxt("Coordinates must be Cx3 in size.");
         nc = *di;
