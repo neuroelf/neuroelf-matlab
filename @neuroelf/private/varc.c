@@ -14,13 +14,13 @@ Output fields:
 
       v           variance
 
-% Version:  v0.9a
-% Build:    11050512
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:58 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -126,8 +126,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	int nd, ne, td, ti, c1, c2, c3, i1, i2, dnom;
-    int odim[64];
-    const int *dim;
+    mwSize odim[64];
+    const mwSize *dim;
 	double s, v, vr, ddnom, ddnum, *varo;
     const double *idbl, *idb2;
     const float  *isng, *isn2;
