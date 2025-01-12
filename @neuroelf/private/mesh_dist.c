@@ -14,13 +14,13 @@ Output fields:
       d           Vx1 vertex pair distances (lengths)
 
 
-% Version:  v0.9d
-% Build:    14071115
-% Date:     Jul-11 2014, 3:29 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:21 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2014, Jochen Weber
+Copyright (c) 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     /* inputs */
-    const int *idim;
+    const mwSize *idim;
     const double *c1, *c2, *c3, *v1, *v2;
 
     /* outputs */
@@ -70,7 +70,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if ((nrhs < 2) ||
         (nrhs > 3))
         mexErrMsgTxt("2 or 3 inputs are required.");
-    idim = (const int *) mxGetDimensions(*prhs);
+    idim = (const mwSize *) mxGetDimensions(*prhs);
     if (nlhs > 1)
         mexErrMsgTxt("Up to 1 output supported.");
     if (mxGetClassID(*prhs) != mxDOUBLE_CLASS)
@@ -83,14 +83,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetClassID(prhs[1]) != mxDOUBLE_CLASS)
         mexErrMsgTxt("Second argument must be of type double.");
     if (nrhs > 2) {
-        idim = (const int *) mxGetDimensions(prhs[2]);
+        idim = (const mwSize *) mxGetDimensions(prhs[2]);
         nl = *idim;
         if ((idim[1] > 1) ||
             (mxGetNumberOfElements(prhs[2]) != nl))
             mexErrMsgTxt("Third argument must be Vx1.");
         v2 = (const double *) mxGetData(prhs[2]);
     }
-    idim = (const int*) mxGetDimensions(prhs[1]);
+    idim = (const mwSize*) mxGetDimensions(prhs[1]);
     v1 = (const double *) mxGetData(prhs[1]);
     if (nl == 0) {
         nl = *idim;
