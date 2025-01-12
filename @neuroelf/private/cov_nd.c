@@ -17,13 +17,13 @@ Output fields:
 Note: cv and r are computed over the LAST dimension, so if X and Y
 are 10-by-30-by-50 matrices, cv and r are 10-by-30 matrices.
 
-% Version:  v0.9d
-% Build:    14062016
-% Date:     Jun-20 2014, 4:12 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:33 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010 - 2014, Jochen Weber
+% Copyright (c) 2010 - 2014, 2025, Jochen Weber
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, with or without
@@ -199,8 +199,9 @@ are 10-by-30-by-50 matrices, cv and r are 10-by-30 matrices.
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	int docr, c, ec, ic, nd, nl, dr[64], rd, rs, ts, lag;
-	const int *d1, *d2;
+	int docr, c, ec, ic, nd, nl, rd, rs, ts, lag;
+    mwSize dr[64];
+	const mwSize *d1, *d2;
 	double dnl, dnx, *t1, *t2;
 	const double *idbl1, *idbl2;
 	const float *isng1, *isng2;
