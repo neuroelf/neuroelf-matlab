@@ -15,13 +15,13 @@ Output fields:
 
       V           limited output
 
-% Version:  v0.9a
-% Build:    11050511
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:31 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -152,7 +152,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     unsigned int uimin = 0, uimax = 0, uiinv = 0, uival;
     unsigned short usmin = 0, usmax = 0, usinv = 0, usval;
     unsigned char ucmin = 0, ucmax = 0, ucinv = 0, ucval;
-    const int *dim;
+    const mwSize *dim;
     const double *idbl;
     const float  *isng;
     const int    *iint;
