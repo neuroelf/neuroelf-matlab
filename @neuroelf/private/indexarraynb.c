@@ -25,13 +25,13 @@ Note: supported indexing expressions (either double or uint32) are:
       > other than indexarray, this function does not perform
         boundary checks, return 0 values for index out of bounds
 
-Version:  v0.9d
-Build:    14060615
-Date:     Jun-06 2014, 3:42 PM EST
-Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+Version:  v1.1b
+Build:    25011122
+Date:     Jan-11 2025, 10:15 PM EST
+Author:   Jochen Weber, NeuroElf
 URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2011, 2014, Jochen Weber
+Copyright (c) 2010 - 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -433,9 +433,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* MEX function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	int d1 = 1, d2 = 1, d3 = 1, d4 = 1, nd, ne, c1, c2, c3, c4, cs1, cs2, cs3, cs4, i1, i2, i3, i4, n2, n3, n4, od, s1 = 1, s2 = 1, s3 = 1, s4 = 1;
-    const int *dim, *idim;
-    int odim[4];
+	mwSize d1 = 1, d2 = 1, d3 = 1, d4 = 1;
+    int nd, ne, c1, c2, c3, c4, cs1, cs2, cs3, cs4, i1, i2, i3, i4, n2, n3, n4, od, s1 = 1, s2 = 1, s3 = 1, s4 = 1;
+    const mwSize *dim, *idim;
+    mwSize odim[4];
     mxClassID cid;
     double fr1 = 0.0, fr2 = 0.0, fr3 = 0.0, fr4 = 0.0, st1 = 1.0, st2 = 1.0, st3 = 1.0, st4 = 1.0, to1 = 1.0, to2 = 1.0, to3 = 1.0, to4 = 1.0;
     const          double  *dbl, *dblc, *di1 = NULL, *di2 = NULL, *di3 = NULL, *di4 = NULL;
