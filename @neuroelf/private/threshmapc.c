@@ -15,13 +15,13 @@ Output fields:
 
       t           thresholded map (-1...1)
 
-% Version:  v0.9a
-% Build:    11050512
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:04 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* dimensions */
     int nd = 0, nv = 0, vc = 0;
-    const int *id = NULL;
+    const mwSize *id = NULL;
 
     /* pointers */
     const double *map = NULL, *inval = NULL;
@@ -86,7 +86,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     nd = mxGetNumberOfDimensions(*prhs);
     if (nd > 3)
         mexErrMsgTxt("Input map must be 2D or 3D.");
-    id = (const int *) mxGetDimensions(*prhs);
+    id = (const mwSize *) mxGetDimensions(*prhs);
     map = (const double *) mxGetData(*prhs);
     if (!mxIsDouble(prhs[1]))
         mexErrMsgTxt("Input lt must be of type double.");
