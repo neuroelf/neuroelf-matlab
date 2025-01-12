@@ -21,13 +21,13 @@ Note: instead of a CxD array, a special 4xD array can be given. if the
       if they were used in Matlab's colon operator (row2:row3:row4)
       this allows for very fast subsampling
 
-% Version:  v0.9d
-% Build:    14062016
-% Date:     Jun-20 2014, 4:21 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:47 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -892,8 +892,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        - coordinate dim pointer,
        - weight dim pointer,
        - output dim array/pointer and vars */
+    const mwSize *inputdim;
     const int
-        *inputdim,
         *coorddim,
         *weightdim;
 
@@ -941,6 +941,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        - a "large" counter
        - negative and positive kernel "limits" (so as not to access beyond)
        - kernel offsets and subcoordinates */
+    mwSize inputdimx[4] = {1, 1, 1, 1}, outputdim[4] = {1, 1, 1, 1};
     int
         coordcount,
         nrofdims,
@@ -948,8 +949,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         nrofelems = 1,
         VARNAME_MAKE4I(nrofweights, 1) ,
         inputclass = -1,
-        inputdimx[4] = {1, 1, 1, 1},
-    	outputdim[4] = {1, 1, 1, 1},
         VARNAME_MAKE4(basecoord) ,
         VARNAME_MAKE4(samplecoord) ,
         VARNAME_MAKE4(cachepos) ,
@@ -1022,7 +1021,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     nrofdims = mxGetNumberOfDimensions(*prhs);
     if (nrofdims > 4)
         mexErrMsgTxt("Only up to 4 dims supported for now.");
-    inputdim = (const int *) mxGetDimensions(*prhs);
+    inputdim = (const mwSize *) mxGetDimensions(*prhs);
     if ((nrofdims == 2) && (inputdim[1] == 1))
         --nrofdims;
     for (smallcount1 = 0; smallcount1 < nrofdims; ++smallcount1) {
