@@ -16,13 +16,13 @@ Input fields:
                   potentially pre-multiplied with
                   inv(dataset.mat) * normimage.mat)
 
-% Version:  v0.9d
-% Build:    14062015
-% Date:     Jun-20 2014, 3:52 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:11 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ Input fields:
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
-    const int *idim, *tdim;
+    const mwSize *idim, *tdim;
     int c1, c2, c3, cc, d1, d2, d3, d12, d123, nc, r1 = 0, r2 = 0, r3 = 0, s1, s2, s3;
     double cvx, cvy, cvz, tv;
     const double *cx, *cy, *cz, *tb, *tx, *ty, *tz;
@@ -68,7 +68,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             rf1 = 0.0, rf2 = 0.0, rf3 = 0.0,
             rp1 = 0.0, rp2 = 0.0, rp3 = 0.0,
             rs1 = 0.0, rs2 = 0.0, rs3 = 0.0;
-    int mnout[2] = {0, 3};
+    mwSize mnout[2] = {0, 3};
     bool q1 = 0, q2 = 0, cr = 0;
     /* char vstr[256]; */
 
