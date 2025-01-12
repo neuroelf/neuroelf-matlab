@@ -32,13 +32,13 @@ function [varargout] = xini(varargin)
 %
 % Using: asciiread, gluetostring, splittocell.
 
-% Version:  v1.0
-% Build:    16011316
-% Date:     Jan-13 2016, 4:18 PM EST
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:20 PM EST
 % Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
 % URL/Info: http://neuroelf.net/
 %
-% Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2016, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -2284,17 +2284,20 @@ function fromwhere = extcaller(varargin)
         pathstack = dbstack;
     else
         pathstack = dbstack('-completenames');
+        while ~isempty(pathstack) && strcmpi(pathstack(1).file, 'xini.m')
+            pathstack(1) = [];
+        end
     end
 
     % set default caller name
     fromwhere = 'CONSOLE_OR_GUI';
-    if numel(pathstack) < 3
+    if numel(pathstack) < 1
         return;
     end
 
     % input argument handling
     if nargin < 1
-        func = lower(pathstack(2).(ec_mlv));
+        func = lower(pathstack(1).(ec_mlv));
 
     elseif ischar(varargin{1})
         func = lower(varargin{1});
@@ -2302,7 +2305,7 @@ function fromwhere = extcaller(varargin)
     elseif isnumeric(varargin{1}) && ...
        ~isempty(varargin{1}) && ...
        ~isnan(varargin{1}(1))
-        func = lower(pathstack(2).(ec_mlv));
+        func = lower(pathstack(1).(ec_mlv));
         if varargin{1}(1) == 1
             func = fileparts(func);
         end
@@ -2315,7 +2318,7 @@ function fromwhere = extcaller(varargin)
     end
 
     % try to find matching caller
-    for dbsi = 3:numel(pathstack)
+    for dbsi = 1:numel(pathstack)
         if isempty(strfind(lower(pathstack(dbsi).(ec_mlv)), func))
             break;
         end
