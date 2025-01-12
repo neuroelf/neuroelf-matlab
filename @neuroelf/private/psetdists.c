@@ -2,13 +2,13 @@
 
    psetdists.c -- return the pair-wise distances between points of two sets
 
-% Version:  v0.9b
-% Build:    11051113
-% Date:     May-11 2011, 12:41 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:40 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2011, Jochen Weber
+Copyright (c) 2011, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     int ndim, c1, c2, cc, nr, nc, nd;
-    const int *idim = NULL;
+    const mwSize *idim = NULL;
     const double *p1 = NULL, *p2 = NULL;
     double *out = NULL, cdiff, tdiff;
 
