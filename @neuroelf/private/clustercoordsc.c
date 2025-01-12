@@ -22,13 +22,13 @@ Output fields:
       l           Vx4 list of cluster voxels [x(:), y(:), z(:), n(:)]
       c           Cx1 cell array with lists of coordinates
 
-% Version:  v0.9d
-% Build:    14062015
-% Date:     Jun-20 2014, 3:53 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:18 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -69,8 +69,8 @@ Output fields:
 }
 
 /* functions used for copying */
-void ff_copy_intopart(unsigned int x1, unsigned int y1, unsigned int z1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned int *off);
-void ff_copy_frompart(unsigned int x1, unsigned int y1, const unsigned int *sd, const int *tnd, unsigned int *td, const unsigned int *off);
+void ff_copy_intopart(mwSize x1, mwSize y1, mwSize z1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned int *off);
+void ff_copy_frompart(mwSize x1, mwSize y1, const unsigned int *sd, const mwSize *tnd, unsigned int *td, const unsigned int *off);
 
 /* up to 13 directions (and their reverse) */
 static const signed int dlx[13] = { 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1 };
@@ -104,9 +104,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     /* sizes and position */
-    const int *dim = NULL;
-    int idim[3] = {1, 1, 1};
-    int tdim[3] = {1, 1, 1};
+    const mwSize *dim = NULL;
+    mwSize idim[3] = {1, 1, 1};
+    mwSize tdim[3] = {1, 1, 1};
 
     /* offset (must be variable, as copy might not require additional slices) */
     unsigned int toff[3] = {1, 1, 1};
@@ -489,7 +489,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 }
 
-void ff_copy_intopart(unsigned int x1, unsigned int y1, unsigned int z1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned int *off)
+void ff_copy_intopart(mwSize x1, mwSize y1, mwSize z1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned int *off)
 {
     unsigned int xc, yc, zc, x2, y2, z2, xy, to, yo, zo;
     x2 = *tnd++;
@@ -507,7 +507,7 @@ void ff_copy_intopart(unsigned int x1, unsigned int y1, unsigned int z1, const u
     }
 }
 
-void ff_copy_frompart(unsigned int x1, unsigned int y1, const unsigned int *sd, const int *tnd, unsigned int *td, const unsigned int *off)
+void ff_copy_frompart(mwSize x1, mwSize y1, const unsigned int *sd, const mwSize *tnd, unsigned int *td, const unsigned int *off)
 {
     unsigned int rv, xc, yc, zc, xy, x2, y2, z2, to, yo, zo;
     rv = 0;
