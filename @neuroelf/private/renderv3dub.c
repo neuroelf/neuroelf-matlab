@@ -11,13 +11,13 @@ Input fields:
 
 No output fields.
 
-% Version:  v0.9d
-% Build:    14071115
-% Date:     Jul-11 2014, 3:31 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:47 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2014, Jochen Weber
+Copyright (c) 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     /* variables */
     int i3, isloc, isaloc, fieldnum, nvol, vc, ndim, inumc, numx, numy,
         numxy, bufx, bufy, bufxy, bufxy2, x1, x2, xc, y1, y2, yc;
-    const int *idim;
+    const mwSize *idim;
     double imin, imaxmin, aval, avali, numa, numc, val, valg, valb;
     double *Ibuffer;
     const double *atable, *ctable, *ctableg, *ctableb, *inval, *inaloc, *inloc, *inlocg, *inlocb;
@@ -83,7 +83,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgTxt("Field Ibuffer not found.");
     outmatrix = (mxArray*) mxGetFieldByNumber(*prhs, 0, fieldnum);
     ndim = mxGetNumberOfDimensions(outmatrix);
-    idim = (const int*) mxGetDimensions(outmatrix);
+    idim = (const mwSize*) mxGetDimensions(outmatrix);
     bufx = *idim++;
     bufy = *idim++;
     i3 = ((*idim == 3) ? 1 : 0);
@@ -150,7 +150,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (!mxIsDouble(inmatrix))
         mexErrMsgTxt("Field ctable{vc} element must be of type double.");
     ndim = mxGetNumberOfDimensions(inmatrix);
-    idim = (const int*) mxGetDimensions(inmatrix);
+    idim = (const mwSize*) mxGetDimensions(inmatrix);
     if ((ndim != 2) ||
         (idim[1] != 3))
         mexErrMsgTxt("Field ctable{vc} element must be Cx3 in size.");
@@ -179,7 +179,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if ((ndim < 2) ||
         (ndim > 3))
         mexErrMsgTxt("Field intensity_loc or intensity_rgb must be 2D or 3D.");
-    idim = (const int*) mxGetDimensions(inmatrix);
+    idim = (const mwSize*) mxGetDimensions(inmatrix);
     numx = *idim++;
     numy = *idim++;
     if ((isloc == 0) &&

@@ -14,13 +14,13 @@ Input fields:
 
 No output fields.
 
-% Version:  v0.9d
-% Build:    14071115
-% Date:     Jul-11 2014, 3:31 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:49 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2014, Jochen Weber
+Copyright (c) 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -55,8 +55,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     /* variables */
     int a, c, d3, x1, x2, xc, xs, xy, xyo, y1, y2, yc, ys, ndim;
-    int odim[3] = {0, 0, 1};
-    const int *idim;
+    mwSize odim[3] = {0, 0, 1};
+    const mwSize *idim;
     double p1, p2, p3, p4, v1, v2, v3, v4, o1, o2, o3;
     double *outaslice, *outslice, *outsliceg, *outsliceb, *outarow, *outrow, *outrowg, *outrowb;
     const double *aslice, *slice, *sliceg, *sliceb, *inval, *inval2, *inval3, *inval4;
@@ -91,7 +91,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* get dims */
     ndim = mxGetNumberOfDimensions(*prhs);
-    idim = (const int*) mxGetDimensions(*prhs);
+    idim = (const mwSize*) mxGetDimensions(*prhs);
     if (ndim > 3)
         mexErrMsgTxt("Slice data cannot be more than 3D.");
     xs = *idim++;
@@ -116,7 +116,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetNumberOfElements(prhs[1]) > 0) {
         if (!mxIsDouble(prhs[1]))
             mexErrMsgTxt("Alpha slice must be of type double.");
-        idim = (const int*) mxGetDimensions(prhs[1]);
+        idim = (const mwSize*) mxGetDimensions(prhs[1]);
         if ((*idim != xs) ||
             (idim[1] != ys))
             mexErrMsgTxt("Alpha slice must match intensity slice in X/Y size.");
