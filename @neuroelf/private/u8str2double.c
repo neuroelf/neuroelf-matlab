@@ -10,13 +10,13 @@ Output fields:
 
       numtab      double matrix
 
-% Version:  v0.9b
-% Build:    11062416
-% Date:     Jun-15 2010, 12:37 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:57 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Actual conversion function (strtodmod, see below) originally
@@ -595,7 +595,7 @@ int strtodmodc(const mxChar *sstr, int ne, double *storage)
 
 /* main function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
-    const int *idim;
+    const mwSize *idim;
     const unsigned char *str = NULL;
     const mxChar *sstr = NULL;
     int ne = 0, nen = 0, nc = 0, nr = 1, col = 0, row = 0, skip = 0;
