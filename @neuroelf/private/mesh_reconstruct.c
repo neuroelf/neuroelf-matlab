@@ -16,13 +16,13 @@ Output fields:
       n           optional Cx2 neighbors array (for BV formats)
 
 
-% Version:  v0.9b
-% Build:    11050511
-% Date:     Jul-28 2010, 5:30 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:27 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -503,7 +503,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     const unsigned char *vox = NULL;
 
     /* size arguments */
-    const int *idim = NULL;
+    const mwSize *idim = NULL;
     signed short dim1, dim2, dim3, lim1, lim2, lim3;
     int dim12;
 
@@ -539,7 +539,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     /* neighbors cell array arguments */
     int *neigh = NULL, *pneigh;
     mxArray *cneigh = NULL;
-    int cdi[2] = {0, 2};
+    mwSize cdi[2] = {0, 2};
     int neighvi, neighvn, lneigh[12];
     signed char nneigh, maxnei;
 
