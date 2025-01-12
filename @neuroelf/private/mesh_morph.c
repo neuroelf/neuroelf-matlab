@@ -36,13 +36,13 @@ Output fields:
 Note: for smoothing the neighbor information is used, for distortion
       correction the triangle data is used!
 
-% Version:  v0.9d
-% Build:    14070113
-% Date:     Jul-01 2014, 1:37 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:21 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2011, 2014, Jochen Weber
+Copyright (c) 2010 - 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -160,7 +160,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* number of dimensions and dim size */
     int nd;
-    const int *di;
+    const mwSize *di;
 
     /* field number, field array and array pointer */
     int fn;
@@ -185,7 +185,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* compute output flag */
     bool compdm = 0;
-    int compds[2] = {1, 1};
+    mwSize compds[2] = {1, 1};
     int compdmnumfields = O_XNUMBEROFFIELDS;
     const char *compdmfields[] = {
         "AreaMean",
