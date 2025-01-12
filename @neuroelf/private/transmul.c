@@ -2,13 +2,13 @@
 
    transmul.c -- return the multiplication of M' * M or M * M2
 
-% Version:  v0.9b
-% Build:    11050512
-% Date:     Aug-26 2010, 1:53 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:55 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,8 +41,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
     unsigned char transflag = 0;
-    const int *mn, *mn2;
-    int mnout[3], c, c1, c2, d3, id = 0, m = 0, mc1, n = 0, nc1, nd, nn;
+    const mwSize *mn, *mn2;
+    mwSize mnout[3], c1, c2, d3;
+    int c, id = 0, m = 0, mc1, n = 0, nc1, nd, nn;
     const double *a, *ac1, *ac1c, *ac2, *ac3, *b;
     double *p, s, v1, v2, v3, v4, v5,
             s11, s12, s13, s14, s15,
