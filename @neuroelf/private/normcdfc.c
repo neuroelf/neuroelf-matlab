@@ -13,10 +13,10 @@
 
   Note: this function supports single and double input.
 
-% Version:  v0.9b
-% Build:    11050511
-% Date:     Aug-29 2010, 1:47 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:39 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
 Copyright (c) 2010, Jochen Weber
@@ -82,7 +82,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     const double *inpd;
     const float *inpf;
     double *outp;
-    const int *idim;
+    const mwSize *idim;
     int ndim, ne;
     long double s, t, b, q, e;
     double x;
