@@ -1,13 +1,13 @@
 /*
   conv3d.h
 
-% Version:  v0.9b
-% Build:    11043013
-% Date:     Sep-01 2010, 11:28 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
-% URL/Info: http://neuroelf.net/
+Version:  v1.1b
+Build:    25011121
+Date:     Jan-11 2025, 9:30 PM EST
+Author:   Jochen Weber, NeuroElf
+URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* macros to define a copy frompart function */
 #define CONV3D_COPY_FPFD_TYPE_F(MLtype, Ctype) \
-void conv3d_copy_frompart_fromdbl_##MLtype(const int *snd, const double *sd, const int *tnd, Ctype *td, const unsigned long *off) \
+void conv3d_copy_frompart_fromdbl_##MLtype(mwSize *snd, const double *sd, const mwSize *tnd, Ctype *td, const unsigned long *off) \
 { unsigned long xc, yc, zc, xy, x1, y1, x2, y2, z2, to, yo, zo; x1 = *snd++; y1 = *snd; xy = x1 * y1; x2 = *tnd++; y2 = *tnd++; z2 = *tnd; \
   to = off[0] + off[1] * x1 + off[2] * xy - 1; \
   for (zc = 0; zc < z2; ++zc) { zo = to + zc * xy; for (yc = 0; yc < y2; ++yc) { yo = zo + yc * x1; for (xc = 0; xc < x2; ++xc) { \
@@ -53,7 +53,7 @@ void conv3d_copy_frompart_fromdbl_##MLtype(const int *snd, const double *sd, con
   } } } \
 }
 #define CONV3D_COPY_FPFD_TYPE_S(MLtype, Ctype) \
-void conv3d_copy_frompart_fromdbl_##MLtype(const int *snd, const double *sd, const int *tnd, signed Ctype *td, const unsigned long *off) \
+void conv3d_copy_frompart_fromdbl_##MLtype(mwSize *snd, const double *sd, const mwSize *tnd, signed Ctype *td, const unsigned long *off) \
 { unsigned long xc, yc, zc, xy, x1, y1, x2, y2, z2, to, yo, zo; double sdb = 0.0; x1 = *snd++; y1 = *snd; xy = x1 * y1; x2 = *tnd++; y2 = *tnd++; z2 = *tnd; \
   to = off[0] + off[1] * x1 + off[2] * xy - 1; \
   for (zc = 0; zc < z2; ++zc) { zo = to + zc * xy; for (yc = 0; yc < y2; ++yc) { yo = zo + yc * x1; for (xc = 0; xc < x2; ++xc) { \
@@ -61,7 +61,7 @@ void conv3d_copy_frompart_fromdbl_##MLtype(const int *snd, const double *sd, con
   } } } \
 }
 #define CONV3D_COPY_FPFD_TYPE_U(MLtype, Ctype) \
-void conv3d_copy_frompart_fromdbl_##MLtype(const int *snd, const double *sd, const int *tnd, unsigned Ctype *td, const unsigned long *off) \
+void conv3d_copy_frompart_fromdbl_##MLtype(mwSize *snd, const double *sd, const mwSize *tnd, unsigned Ctype *td, const unsigned long *off) \
 { unsigned long xc, yc, zc, xy, x1, y1, x2, y2, z2, to, yo, zo; x1 = *snd++; y1 = *snd; xy = x1 * y1; x2 = *tnd++; y2 = *tnd++; z2 = *tnd; \
   to = off[0] + off[1] * x1 + off[2] * xy - 1; \
   for (zc = 0; zc < z2; ++zc) { zo = to + zc * xy; for (yc = 0; yc < y2; ++yc) { yo = zo + yc * x1; for (xc = 0; xc < x2; ++xc) { \
@@ -130,5 +130,5 @@ static const unsigned char conv3d_krn_fullcb[27] =
      1, 1, 1};
 
 /* function for binary erosion/dilation (compare to flexmask.h) */
-unsigned long conv3d_set1ge_frompart_uint8(const int *snd, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off, unsigned char t);
-void conv3d_set1ge_frompart_double(const int *snd, const double *sd, const int *tnd, unsigned char *td, const unsigned long *off, double t);
+unsigned long conv3d_set1ge_frompart_uint8(mwSize *snd, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, unsigned char t);
+void conv3d_set1ge_frompart_double(mwSize *snd, const double *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, double t);

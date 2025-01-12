@@ -42,13 +42,13 @@ Output fields:
 Note: for 1x1 kernel arguments 0 to 4 , a logical array with the
       requested threshold is produced
 
-% Version:  v0.9d
-% Build:    14062015
-% Date:     Jun-20 2014, 3:53 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:29 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -100,15 +100,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* image arg mxArray class, and content pointers and dims */
     const mxArray *ia = NULL;
-    const int *idim = NULL;
+    const mwSize *idim = NULL;
     mxClassID iclass;
 
     /* kernel arg mxArray class, and content pointers and dims and value */
     const mxArray *ka = NULL;
     unsigned long knd = 0;
     unsigned long kne = 0;
-    const int *kdim = NULL;
-    int kdims[3] = {1, 1, 1};
+    const mwSize *kdim = NULL;
+    mwSize kdims[3] = {1, 1, 1};
     const double *kad = NULL;
     double kdv = 0.0;
     signed char ksv = 0;
@@ -121,7 +121,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxArray *suma = NULL;
     unsigned long sumoffs[3] = {1, 1, 1};
     unsigned long soffx = 0, soffy = 0, soffz = 0;
-    int sdims[3], sdimx = 0, sdimy = 0, sdimz = 0;
+    mwSize sdims[3], sdimx = 0, sdimy = 0, sdimz = 0;
     unsigned char *sumau8 = NULL, *sumpu8 = NULL;
     double *sumad = NULL, *sumpd = NULL;
 
@@ -142,7 +142,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* output array */
     mxArray *outa = NULL;
-    int odims[3] = {1, 1, 1};
+    mwSize odims[3] = {1, 1, 1};
     void *outav = NULL;
     unsigned char *outau8 = NULL;
     unsigned long neout = 0, necnt = 0;
@@ -156,7 +156,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxArray *flexout[2];
 
     /* in case we need to create arrays from scratch */
-    int cadim[3] = {1, 1, 1};
+    mwSize cadim[3] = {1, 1, 1};
 
     /* isinfnan.h variables */
     VARS_FOR_ISINFNAN
@@ -780,7 +780,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxDestroyArray(suma);
 }
 
-unsigned long conv3d_set1ge_frompart_uint8(const int *snd, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off, unsigned char t)
+unsigned long conv3d_set1ge_frompart_uint8(mwSize *snd, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, unsigned char t)
 {
     unsigned long xc, yc, zc, xy, x1, y1, z1, x2, y2, z2, to, yo, zo;
     x1 = *snd++;
@@ -806,7 +806,7 @@ unsigned long conv3d_set1ge_frompart_uint8(const int *snd, const unsigned char *
     }
     return z1;
 }
-void conv3d_set1ge_frompart_double(const int *snd, const double *sd, const int *tnd, unsigned char *td, const unsigned long *off, double t)
+void conv3d_set1ge_frompart_double(mwSize *snd, const double *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, double t)
 {
     unsigned long xc, yc, zc, xy, x1, y1, x2, y2, z2, to, yo, zo;
     x1 = *snd++;
