@@ -1,13 +1,13 @@
 % FUNCTION cv_addtolist: add a variable to the workspace (ne_gcfg.w)
 function cv_addtolist(h, f, n, xt, emptystring)
 
-% Version:  v1.1
-% Build:    16020111
-% Date:     Feb-01 2016, 11:16 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:25 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2011, 2014, 2016, Jochen Weber
+% Copyright (c) 2010 - 2016, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ if numel(s) == 1 && ...
 end
 
 % if already in list, do nothing
-for uc = 1:size(u)
+for uc = 1:size(u, 1)
     if u{uc, 4} == f
         return;
     end
