@@ -13,13 +13,13 @@ Input fields:
 Output fields:
       glued       1xN char array/string with glued content
 
-% Version:  v0.9a
-% Build:    11050511
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:03 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     int ne, ncells;
-    const int *dim;
+    const mwSize *dim;
 
     mxChar *glued, gluechar;
     const mxChar *toglue;
@@ -64,7 +64,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     const mxChar defglue[1] = {CHAR_LF};
     const mxArray *snippet, *togluec;
 
-    int odim[2] = {1, 0};
+    mwSize odim[2] = {1, 0};
     signed long gluelen = 1, copypos = 0, totallen = 0, sc = 0;
     bool endterm = 0;
 
