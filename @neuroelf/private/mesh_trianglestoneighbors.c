@@ -16,13 +16,13 @@ Output fields:
       tri         Nx1 triangle list (1-based)
 
 
-% Version:  v0.9d
-% Build:    14062814
-% Date:     Jun-28 2014, 2:34 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:30 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2014, Jochen Weber
+Copyright (c) 2010, 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -83,9 +83,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* number of dimensions and dim size */
     int nd;
-    const int *di;
-    int cdi[2] = {1, 2};
-    int ndi[2] = {1, 1};
+    const mwSize *di;
+    mwSize cdi[2] = {1, 2};
+    mwSize ndi[2] = {1, 1};
 
     /* variable output string */
     char vstr[256];
