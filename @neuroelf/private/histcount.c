@@ -23,13 +23,13 @@ Note: if v2 is set to a double array with the same size as v1 and from2
       dimension and weighting, give dimension first, then weighting as
       from2
 
-% Version:  v0.9d
-% Build:    14052616
-% Date:     May-26 2014, 4:51 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:09 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010 - 2014, Jochen Weber
+Copyright (c) 2010 - 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -892,7 +892,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     mxClassID cid1, cid2 = mxDOUBLE_CLASS;
-	const int *dim1, *dim2;
+	const mwSize *dim1, *dim2;
     const signed char *sc1, *sc2;
     const unsigned char *uc1, *uc2;
     const signed short *ss1, *ss2;
@@ -904,7 +904,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double f1 = 1.0, f2 = 1.0, mn1 = 0.0, mn2 = 0.0, mx1 = 1.0, mx2 = 1.0,
            val1, val2;
     int c, i1, i2, i3, ii, m = 1, n = 1, nd, ne, o;
-    int odim[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    mwSize odim[8] = {1, 1, 1, 1, 1, 1, 1, 1};
     double *odbl;
     /* char vstr[256]; */
 
