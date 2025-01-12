@@ -892,8 +892,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        - coordinate dim pointer,
        - weight dim pointer,
        - output dim array/pointer and vars */
-    const mwSize *inputdim;
-    const int
+    const mwSize
+        *inputdim,
         *coorddim,
         *weightdim;
 
@@ -1035,7 +1035,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     inputvoid = (const void *) mxGetData(*prhs);
 
     /* check coordinates */
-    coorddim = (const int *) mxGetDimensions(prhs[1]);
+    coorddim = (const mwSize *) mxGetDimensions(prhs[1]);
     if ((coorddim[1] < nrofdims) ||
         (coorddim[1] > 4))
         mexErrMsgTxt("Sample coordinates must have at least NrOfDataDims columns.");
@@ -1101,7 +1101,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         (mxGetNumberOfElements(prhs[3]) == 1)) {
         stepsizeptr = mxGetData(prhs[3]);
         nrofweights1 = mxGetNumberOfElements(prhs[2]);
-        weightdim = (const int *) mxGetDimensions(prhs[2]);
+        weightdim = (const mwSize *) mxGetDimensions(prhs[2]);
         if (!mxIsNaN(*stepsizeptr) &&
             !mxIsInf(*stepsizeptr) &&
             (*stepsizeptr >= 1) &&
@@ -1142,7 +1142,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 (mxGetNumberOfElements(ckernelsize) == 1)) {
                 stepsizeptr = mxGetData(ckernelsize);
                 nrofweights4 = mxGetNumberOfElements(ckernelptr);
-                weightdim = (const int *) mxGetDimensions(ckernelptr);
+                weightdim = (const mwSize *) mxGetDimensions(ckernelptr);
                 if (!mxIsNaN(*stepsizeptr) &&
                     !mxIsInf(*stepsizeptr) &&
                     (*stepsizeptr >= 1) &&
