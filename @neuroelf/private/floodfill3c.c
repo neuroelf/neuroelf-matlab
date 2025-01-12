@@ -17,13 +17,13 @@ Input fields:
                   6 edge-connectivity (XY-slice)
                   7 edge-connectivity (XY-slice, zstart = :)
 
-% Version:  v0.9d
-% Build:    14070916
-% Date:     Jul-09 2014, 4:39 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:02 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2014, Jochen Weber
+Copyright (c) 2010, 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -62,8 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 /* functions used for copying */
-void ff_copy_intopart(unsigned long x1, unsigned long y1, unsigned long z1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off);
-unsigned long ff_set1_frompart_eq(unsigned long x1, unsigned long y1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off, unsigned char thr);
+void ff_copy_intopart(unsigned long x1, unsigned long y1, unsigned long z1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off);
+unsigned long ff_set1_frompart_eq(unsigned long x1, unsigned long y1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, unsigned char thr);
 
 /* up to 13 directions (and their reverse) */
 static const signed long dlx[13] = { 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1 };
@@ -71,7 +71,7 @@ static const signed long dly[13] = { 0, 1, 0, 1,-1, 0, 0, 1, 1, 1, 1,-1,-1 };
 static const signed long dlz[13] = { 0, 0, 1, 0, 0, 1,-1, 1,-1, 1,-1, 1,-1 };
 
 /* scalar dims */
-static const int scalardim[2] = {1, 1};
+static const mwSize scalardim[2] = {1, 1};
 
 /* here comes the main function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -80,9 +80,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     const double *rdp = NULL;
 
     /* sizes and position */
-    const int *dim = NULL;
-    int idim[3] = {1, 1, 1};
-    int tdim[3] = {1, 1, 1};
+    const mwSize *dim = NULL;
+    mwSize idim[3] = {1, 1, 1};
+    mwSize tdim[3] = {1, 1, 1};
     unsigned long toff[3] = {1, 1, 1};
     unsigned long dx = 0, dy = 0, dz = 0, dxy = 0, sx = 0, sy = 0, sz = 0, np = 0;
 
@@ -355,7 +355,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         CREATE_SCALAR(plhs[1], np);
 }
 
-void ff_copy_intopart(unsigned long x1, unsigned long y1, unsigned long z1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off)
+void ff_copy_intopart(unsigned long x1, unsigned long y1, unsigned long z1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off)
 {
     unsigned long xc, yc, zc, x2, y2, z2, xy, to, yo, zo;
     x2 = *tnd++;
@@ -373,7 +373,7 @@ void ff_copy_intopart(unsigned long x1, unsigned long y1, unsigned long z1, cons
     }
 }
 
-unsigned long ff_set1_frompart_eq(unsigned long x1, unsigned long y1, const unsigned char *sd, const int *tnd, unsigned char *td, const unsigned long *off, unsigned char thr)
+unsigned long ff_set1_frompart_eq(unsigned long x1, unsigned long y1, const unsigned char *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, unsigned char thr)
 {
     unsigned long rv, xc, yc, zc, xy, x2, y2, z2, to, yo, zo;
     rv = 0;
