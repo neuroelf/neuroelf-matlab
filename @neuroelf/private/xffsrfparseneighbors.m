@@ -18,13 +18,13 @@ function neighbors = xffsrfparseneighbors(fid, numvtx)
 %
 % Note: this function uses a compiled function, xffsrfparseneighborsc.
 
-% Version:  v0.9d
-% Build:    14072111
-% Date:     Jul-21 2014, 11:35 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:36 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, 2014, Jochen Weber
+% Copyright (c) 2010, 2014, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -52,9 +52,8 @@ function neighbors = xffsrfparseneighbors(fid, numvtx)
 % argument check
 if nargin < 2 || ...
    ~isa(fid, 'double') || ...
-    isempty(fid) || ...
+    numel(fid) ~= 1 || ...
    ~isreal(fid) || ...
-   ~any(fopen('all') == fid(1)) || ...
    ~isa(numvtx, 'double') || ...
     isempty(numvtx) || ...
    ~isreal(numvtx) || ...

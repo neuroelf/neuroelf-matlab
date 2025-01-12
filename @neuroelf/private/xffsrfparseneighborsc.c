@@ -15,8 +15,8 @@ Output fields:
       skip        number of elements to skip in input
 
 % Version:  v1.1b
-% Build:    25011122
-% Date:     Jan-11 2025, 10:59 PM EST
+% Build:    25011123
+% Date:     Jan-11 2025, 11:36 PM EST
 % Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
     int nv = 0, ne = 0, skip = 0, nn, vn = 0, vc;
-    const mwSize *ind;
+    const int *ind;
     mxArray *outa;
     double *outd;
     const double *dind;
@@ -75,7 +75,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ne = mxGetNumberOfElements(*prhs);
     if (ne < nv)
 		mexErrMsgTxt("Neighbors stream too short.");
-    ind = (const mwSize*) mxGetPr(*prhs);
+    ind = (const int*) mxGetPr(*prhs);
 
     /* prepare output */
     *plhs = mxCreateCellMatrix(nv, 2);
