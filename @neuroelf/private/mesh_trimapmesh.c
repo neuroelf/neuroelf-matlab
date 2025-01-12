@@ -18,13 +18,13 @@ Output fields:
 
 Note: coordinates must be centered around [0, 0, 0] and rescaled to r=1
 
-% Version:  v0.9a
-% Build:    11050511
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:36 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -122,7 +122,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int ival1 = 0, ival2 = 0, *apip = NULL, *apip2 = NULL;
 
     /* dim argument for sort call */
-    int sortinsz[2] = {0, 1};
+    mwSize sortinsz[2] = {0, 1};
     double dqs, dqsh;
     mxArray *sortin;
     mxArray *sortres[2];
@@ -132,8 +132,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     const mxArray *cellcont;
 
     /* output array size and pointers */
-    const int *di;
-    int ndi[2] = {0, 0};
+    const mwSize *di;
+    mwSize ndi[2] = {0, 0};
     double *otl = NULL, *oll = NULL, *ol2 = NULL;
 
     /* sorting result */
