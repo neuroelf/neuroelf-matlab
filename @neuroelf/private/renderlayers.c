@@ -12,13 +12,13 @@ Output fields:
 
       r           HxWx3 uint8 image
 
-% Version:  v0.9b
-% Build:    12012119
-% Date:     Aug-07 2010, 6:02 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:45 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         lfield = -1, tfield = -1, pfield = -1, afield = -1,
         rpfield = -1, rafield = -1, trfield = -1, ndp = 0, nda = 0,
         pc = 0, sx = 0, sy = 0, tx = 0, ty = 0, sxy = 0, sxy3 = 0;
-    int od[3] = {0, 0, 3};
+    mwSize od[3] = {0, 0, 3};
     const mxArray *layer = NULL, *intype = NULL, *inpp = NULL, *inpa = NULL;
     char typec = 0;
 
