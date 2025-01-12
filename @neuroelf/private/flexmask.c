@@ -18,13 +18,13 @@ Output fields:
 
       dout        masked data
 
-% Version:  v0.9a
-% Build:    11043013
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:41 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,11 +59,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* input and output dimensions */
     int ndim = 3;
-    const int *idmc = NULL;
+    const mwSize *idmc = NULL;
     mxClassID icls;
     const void *dp = NULL;
     unsigned long ne = 0, ns = 0;
-    int idim[3], odim[3];
+    mwSize idim[3], odim[3];
     unsigned long offs[3] = {0, 0, 0};
     int offm[3] = {0, 0, 0};
     mxArray *oa = NULL;

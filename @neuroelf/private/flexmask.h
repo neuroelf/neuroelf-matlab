@@ -2,13 +2,13 @@
 
 flexmask.h (used by flexmask.c)
 
-% Version:  v0.9a
-% Build:    11102110
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011121
+% Date:     Jan-11 2025, 9:41 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, Jochen Weber
+Copyright (c) 2010, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -441,81 +441,81 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLXMSK_FUNC_COPY(MLtype, Ctype) \
 void FLXMSK_copy_##MLtype(unsigned long ne, const Ctype *from, Ctype *to) { FLXMSK_COPY_CMD }
 #define FLXMSK_FUNC_COPY_FROMPART(MLtype, Ctype) \
-void FLXMSK_copy_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off) { FLXMSK_COPY_FROMPART_A1A2CMD }
+void FLXMSK_copy_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off) { FLXMSK_COPY_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPY_INTOPART(MLtype, Ctype) \
-void FLXMSK_copy_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off) { FLXMSK_COPY_INTOPART_A1A2CMD }
+void FLXMSK_copy_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off) { FLXMSK_COPY_INTOPART_A1A2CMD }
 #define FLXMSK_FUNC_COPY_TODBL(MLtype, Ctype) \
 void FLXMSK_copy_todbl_##MLtype(unsigned long ne, const Ctype *from, double *to) { FLXMSK_COPY_CMD }
 #define FLXMSK_FUNC_COPY_TODBL_FROMPART(MLtype, Ctype) \
-void FLXMSK_copy_todbl_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off) { FLXMSK_COPY_FROMPART_A1A2CMD }
+void FLXMSK_copy_todbl_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off) { FLXMSK_COPY_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPY_TODBL_INTOPART(MLtype, Ctype) \
-void FLXMSK_copy_todbl_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off) { FLXMSK_COPY_INTOPART_A1A2CMD }
+void FLXMSK_copy_todbl_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off) { FLXMSK_COPY_INTOPART_A1A2CMD }
 
 /* copy where equal */
 #define FLXMSK_FUNC_COPYEQ(MLtype, Ctype) \
 void FLXMSK_copyeq_##MLtype(unsigned long ne, const Ctype *from, Ctype *to, Ctype t) { FLXMSK_COPYEQ_CMD }
 #define FLXMSK_FUNC_COPYEQ_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyeq_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_FROMPART_A1A2CMD }
+void FLXMSK_copyeq_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYEQ_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyeq_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_INTOPART_A1A2CMD }
+void FLXMSK_copyeq_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_INTOPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYEQ_TODBL(MLtype, Ctype) \
 void FLXMSK_copyeq_todbl_##MLtype(unsigned long ne, const Ctype *from, double *to, Ctype t) { FLXMSK_COPYEQ_CMD }
 #define FLXMSK_FUNC_COPYEQ_TODBL_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyeq_todbl_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_FROMPART_A1A2CMD }
+void FLXMSK_copyeq_todbl_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYEQ_TODBL_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyeq_todbl_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_INTOPART_A1A2CMD }
+void FLXMSK_copyeq_todbl_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYEQ_INTOPART_A1A2CMD }
 
 /* copy where greate or equal */
 #define FLXMSK_FUNC_COPYGE(MLtype, Ctype) \
 void FLXMSK_copyge_##MLtype(unsigned long ne, const Ctype *from, Ctype *to, Ctype t) { FLXMSK_COPYGE_CMD }
 #define FLXMSK_FUNC_COPYGE_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyge_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_FROMPART_A1A2CMD }
+void FLXMSK_copyge_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYGE_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyge_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_INTOPART_A1A2CMD }
+void FLXMSK_copyge_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_INTOPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYGE_TODBL(MLtype, Ctype) \
 void FLXMSK_copyge_todbl_##MLtype(unsigned long ne, const Ctype *from, double *to, Ctype t) { FLXMSK_COPYGE_CMD }
 #define FLXMSK_FUNC_COPYGE_TODBL_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyge_todbl_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_FROMPART_A1A2CMD }
+void FLXMSK_copyge_todbl_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYGE_TODBL_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyge_todbl_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_INTOPART_A1A2CMD }
+void FLXMSK_copyge_todbl_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYGE_INTOPART_A1A2CMD }
 
 /* copy where less or equal */
 #define FLXMSK_FUNC_COPYLE(MLtype, Ctype) \
 void FLXMSK_copyle_##MLtype(unsigned long ne, const Ctype *from, Ctype *to, Ctype t) { FLXMSK_COPYLE_CMD }
 #define FLXMSK_FUNC_COPYLE_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyle_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_FROMPART_A1A2CMD }
+void FLXMSK_copyle_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYLE_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyle_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_INTOPART_A1A2CMD }
+void FLXMSK_copyle_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, Ctype *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_INTOPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYLE_TODBL(MLtype, Ctype) \
 void FLXMSK_copyle_todbl_##MLtype(unsigned long ne, const Ctype *from, double *to, Ctype t) { FLXMSK_COPYLE_CMD }
 #define FLXMSK_FUNC_COPYLE_TODBL_FROMPART(MLtype, Ctype) \
-void FLXMSK_copyle_todbl_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_FROMPART_A1A2CMD }
+void FLXMSK_copyle_todbl_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_COPYLE_TODBL_INTOPART(MLtype, Ctype) \
-void FLXMSK_copyle_todbl_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_INTOPART_A1A2CMD }
+void FLXMSK_copyle_todbl_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, double *td, const unsigned long *off, Ctype t) { FLXMSK_COPYLE_INTOPART_A1A2CMD }
 
 /* set 1 (true) where equal */
 #define FLXMSK_FUNC_SET1EQ(MLtype, Ctype) \
 unsigned long FLXMSK_set1eq_##MLtype(unsigned long ne, const Ctype *from, unsigned char *to, Ctype t) { FLXMSK_SET1EQ_CMD }
 #define FLXMSK_FUNC_SET1EQ_FROMPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1eq_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1EQ_FROMPART_A1A2CMD }
+unsigned long FLXMSK_set1eq_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1EQ_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_SET1EQ_INTOPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1eq_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1EQ_INTOPART_A1A2CMD }
+unsigned long FLXMSK_set1eq_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1EQ_INTOPART_A1A2CMD }
 
 /* set 1 (true) where greater or equal */
 #define FLXMSK_FUNC_SET1GE(MLtype, Ctype) \
 unsigned long FLXMSK_set1ge_##MLtype(unsigned long ne, const Ctype *from, unsigned char *to, Ctype t) { FLXMSK_SET1GE_CMD }
 #define FLXMSK_FUNC_SET1GE_FROMPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1ge_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1GE_FROMPART_A1A2CMD }
+unsigned long FLXMSK_set1ge_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1GE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_SET1GE_INTOPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1ge_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1GE_INTOPART_A1A2CMD }
+unsigned long FLXMSK_set1ge_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1GE_INTOPART_A1A2CMD }
 
 /* set 1 (true) where less or equal */
 #define FLXMSK_FUNC_SET1LE(MLtype, Ctype) \
 unsigned long FLXMSK_set1le_##MLtype(unsigned long ne, const Ctype *from, unsigned char *to, Ctype t) { FLXMSK_SET1LE_CMD }
 #define FLXMSK_FUNC_SET1LE_FROMPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1le_frompart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1LE_FROMPART_A1A2CMD }
+unsigned long FLXMSK_set1le_frompart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1LE_FROMPART_A1A2CMD }
 #define FLXMSK_FUNC_SET1LE_INTOPART(MLtype, Ctype) \
-unsigned long FLXMSK_set1le_intopart_##MLtype(const int *snd, const Ctype *sd, const int *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1LE_INTOPART_A1A2CMD }
+unsigned long FLXMSK_set1le_intopart_##MLtype(mwSize *snd, const Ctype *sd, const mwSize *tnd, unsigned char *td, const unsigned long *off, Ctype t) { FLXMSK_SET1LE_INTOPART_A1A2CMD }
 
 /* macro to define all type functions */
 #define FLXMSK_TYPEFUNCS(FNNAME) \
@@ -703,4 +703,4 @@ static const char *flexmask_err_nologcopy = "Copying to logical arrays not suppo
 static const char *flexmask_err_nologmask = "Masking of logical arrays not supported (and useful).";
 
 /* scalar value dims */
-static const int flexmask_scalar_dim[2] = {1, 1};
+static const mwSize flexmask_scalar_dim[2] = {1, 1};
