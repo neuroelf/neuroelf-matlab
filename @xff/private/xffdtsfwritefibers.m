@@ -19,13 +19,13 @@ function xffdtsfwritefibers(fid, fibers)
 %
 % See also xff
 
-% Version:  v1.1
-% Build:    16021216
-% Date:     Feb-12 2016, 4:29 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:49 PM EST
+% Author:   Jochen Weber, NeuroElf.net
 % URL/Info: http://neuroelf.net/
 %
-% Copyright (c) 2010, 2011, 2016, Jochen Weber
+% Copyright (c) 2010 - 2016, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -51,8 +51,8 @@ function xffdtsfwritefibers(fid, fibers)
 % SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 % argument check
-if nargin < 2 || ~isa(fid, 'double') || isempty(fid) || ~isreal(fid) || ...
-   ~any(fopen('all') == fid(1)) || ~isstruct(fibers) || ~isfield(fibers, 'NrOfPoints') || ...
+if nargin < 2 || ~isa(fid, 'double') || numel(fid) ~= 1 || ~isreal(fid) || ...
+   ~isstruct(fibers) || ~isfield(fibers, 'NrOfPoints') || ...
    ~isfield(fibers, 'Selected') || ~isfield(fibers, 'RGB') || ...
    ~isfield(fibers, 'FromToPoint') || ~isfield(fibers, 'Coord')
     error('neuroelf:xff:badArgument', 'Bad or missing argument.');

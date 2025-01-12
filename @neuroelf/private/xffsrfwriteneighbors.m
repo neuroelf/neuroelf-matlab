@@ -12,13 +12,13 @@ function xffsrfwriteneighbors(fid, varargin)
 %
 % Note: this function uses a compiled function, xffsrfwriteneighborsc.
 
-% Version:  v0.9a
-% Build:    11050712
-% Date:     May-17 2010, 10:48 AM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011123
+% Date:     Jan-11 2025, 11:45 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-% Copyright (c) 2010, Jochen Weber
+% Copyright (c) 2010, 2025, Jochen Weber
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without
@@ -46,9 +46,8 @@ function xffsrfwriteneighbors(fid, varargin)
 % argument check
 if nargin < 2 || ...
    ~isa(fid, 'double') || ...
-    isempty(fid) || ...
+    numel(fid) ~= 1 || ...
    ~isreal(fid) || ...
-   ~any(fopen('all') == fid(1)) || ...
    ~iscell(varargin{1}) || ...
     isempty(varargin{1}) || ...
     length(size(varargin{1})) ~= 2 || ...
