@@ -14,13 +14,13 @@ Output fields:
       na          CxN neighbors array
 
 
-% Version:  v0.9d
-% Build:    14061514
-% Date:     Jun-15 2014, 2:57 PM EST
-% Author:   Jochen Weber, SCAN Unit, Columbia University, NYC, NY, USA
+% Version:  v1.1b
+% Build:    25011122
+% Date:     Jan-11 2025, 10:25 PM EST
+% Author:   Jochen Weber, NeuroElf
 % URL/Info: http://neuroelf.net/
 
-Copyright (c) 2010, 2014, Jochen Weber
+Copyright (c) 2010, 2014, 2025, Jochen Weber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     /* input dimensions */
-    const int *idim;
+    const mwSize *idim;
     const double *val;
     const mxArray *cell;
 
